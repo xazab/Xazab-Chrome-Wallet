@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <title>Dash Chrome-Wallet</title>
+</head>
+
+<body>
+  <table style="border: 1px solid rgb(1, 32, 96); text-align: left; width: 556px; visibility: visible; height: 520px;"
+    border="1" cellpadding="5" cellspacing="0">
+
+    <tbody>
+
+      <tr>
+        <td style="vertical-align: top; text-align: left;"><button
+            style="width: 160px; height: 25px; background-color: rgb(0, 141, 228);" id="createBtn">Create
+            Wallet</button>Address: <textarea style="width: 260px; height: 25px;" readonly="readonly" cols="1" rows="1"
+            id="addressText"></textarea> </td>
+        <td style="vertical-align: top;"><button style="width: 160px; height: 25px; background-color: rgb(0, 141, 228);"
+            id="identityBtn">Create Identity</button><textarea style="width: 260px; height: 25px;" id="identityText"
+            readonly="readonly" cols="1" rows="1"></textarea></td>
+
+
+
+      </tr>
+      <tr>
+        <td style="vertical-align: top; height: 2px; width: 2px;">Balance:
+          <textarea style="width: 80px; height: 20px;" readonly="readonly" cols="1" rows="1"
+            id="balanceText"></textarea> <button style="width: 100px; height: 25px;" id="balanceBtn"
+            type="button">Refresh</button>
+        </td>
+
+        <td style="vertical-align: top;"><textarea style="width: 260px; height: 25px;" id="nameText" cols="1"
+            rows="1"></textarea><button style="width: 160px; height: 25px; background-color: rgb(0, 141, 228);"
+            id="nameBtn">Register Name</button>
+        </td>
+
+
+      </tr>
+      <tr>
+        <td style="vertical-align: top;"><button style="width: 160px; height: 25px; background-color: rgb(0, 141, 228);"
+            id="sendBtn">Send</button> <textarea style="width: 50px; height: 25px;" cols="1" rows="1"
+            id="amountText"></textarea>
+          DASH to address<textarea style="width: 260px; height: 40px;" cols="0" rows="0" id="toAddressText"></textarea>
+        </td>
+
+        <td style="vertical-align: top;">
+          <select id="exampleQuerySelector">
+            <option></option>
+            <option>Example 1</option>
+            <!-- <option>Example 2</option> -->
+          </select>
+          Record Locator:<textarea style="width: 260px; height: 25px;" cols="1" rows="1"
+            id="recordLocatorText"></textarea>Query Object:<textarea style="width: 260px; height: 50px;" cols="1"
+            rows="1" id="queryObjectText"></textarea><button
+            style="width: 160px; height: 25px; background-color: rgb(0, 141, 228);" id="getDocumentsBtn">Retrieve
+            Documents</button>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top; height: 2px; width: 2px;">Mnemonic:
+          <textarea style="width: 260px; height: 50px;" cols="1" rows="1" id="mnemonicText"></textarea> <button
+            style="width: 260px; height: 25px;" id="mnemonicBtn" type="button">Import
+            Mnemonic</button></td>
+
+        <td style="vertical-align: top; height: 2px; width: 2px;">Id:<textarea style="width: 260px; height: 50px;"
+            cols="1" rows="1" id="contractText"></textarea><button
+            style="width: 160px; height: 25px; background-color: rgb(0, 141, 228);" id="getContractBtn">Retrieve
+            Contract</button>
+        </td>
+
+      </tr>
+      <tr>
+        <td style="vertical-align: top;"><button style="width: 160px; height: 25px; background-color: rgb(0, 141, 228);"
+            type="button" id="connectBtn">Test Connection</button></td>
+        <td style="vertical-align: top;"><br>
+        </td>
+
+      </tr>
+
+
+
+
+    </tbody>
+  </table>
+
+  <br>
+
+  <br>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
