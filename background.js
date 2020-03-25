@@ -4,7 +4,7 @@ var curBalance = '';
 var curIdentity = '';
 var curName = '';
 
-chrome.runtime.onInstalled.addListener(function () {
+chrome.runtime.onInstalled.addListener(function() {
   console.log("Dash Chrome-Wallet installed.");
 
   // chrome.storage.local.set({ mnemonic: 'slight offer leaf pumpkin immune grit minimum novel train village orphan purity' });
@@ -17,21 +17,23 @@ chrome.runtime.onInstalled.addListener(function () {
 
 });
 
-chrome.storage.local.get('mnemonic', function (data) {
-  if (data.mnemonic != '' && data.mnemoic != undefined)
+chrome.storage.local.get('mnemonic', function(data) {
+  console.log('blub')
+  if (data.mnemonic != '' && data.mnemoic != undefined) {
     curMnemonic = data.mnemonic;
-  else if (curMnemonic == undefined)
+    console.log('blub' + curMnemonic);
+  } else if (curMnemonic == undefined)
     curMnemonic = '';
 });
 
 chrome.runtime.onMessage.addListener(
-  function (request, sender, sendResponse) {
+  async function(request, sender, sendResponse) {
 
     if (request.greeting == "connect") {
       const sdkOpts = {
         network: 'testnet'
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
       async function connect() {
         try {
@@ -57,25 +59,26 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
       async function importMnemonic() {
         try {
           await sdk.isReady();
-          curAddress = sdk.account.getUnusedAddress().address;
-          curBalance = sdk.account.getConfirmedBalance();
+          curAddress = await sdk.account.getUnusedAddress().address;
+          curBalance = ((await sdk.account.getTotalBalance()) / 100000000);
+          console.log(curAddress);
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
           sdk.disconnect();
         }
       }
-      importMnemonic();
+      await importMnemonic();
       chrome.storage.local.set({ mnemonic: curMnemonic });
       chrome.storage.local.set({ address: curAddress });
       chrome.storage.local.set({ balance: curBalance });
 
-      sendResponse({ farewell: "goodbye importMnemonic" });
+      sendResponse({ farewell: "goodbye importMnemonic", address: curAddress, balance: curBalance });
     }
 
     if (request.greeting == "getBalance") {
@@ -83,16 +86,16 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
       async function getBalance() {
         try {
           await sdk.isReady();
           console.log(sdk.account.getUnusedAddress().address);
-          console.log(sdk.account.getUnconfirmedBalance());
-          console.log(sdk.account.getConfirmedBalance());
+          // console.log(sdk.account.getConfirmedBalance());
+          // console.log(sdk.account.getUnconfirmedBalance());
           console.log(sdk.account.getTotalBalance());
-          chrome.storage.local.set({ balance: sdk.account.getConfirmedBalance() });
+          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 10000000) });
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
@@ -108,36 +111,36 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: null,
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
       async function createWallet() {
         try {
           await sdk.isReady();
-          const mnemonic = sdk.wallet.exportWallet();
-          const address = sdk.account.getUnusedAddress();
+          const mnemonic = await sdk.wallet.exportWallet();
+          const address = await sdk.account.getUnusedAddress();
           curMnemonic = mnemonic;
           console.log('Mnemonic:', mnemonic);
-          chrome.storage.local.set({ mnemonic: mnemonic }, function () {
+          await chrome.storage.local.set({ mnemonic: mnemonic }, function() {
             console.log("mnemonic saved");
           });
-          chrome.storage.local.get(['mnemonic'], function (result) {
+          await chrome.storage.local.get(['mnemonic'], function(result) {
             console.log('Value currently is ' + result.mnemonic);
           });
           console.log('Unused address:', address.address);
-          chrome.storage.local.set({ address: address.address }, function () {
+          await chrome.storage.local.set({ address: address.address }, function() {
             console.log("address saved");
           });
-          chrome.storage.local.get(['address'], function (result) {
+          await chrome.storage.local.get(['address'], function(result) {
             console.log('Value currently is ' + result.address);
           });
-          chrome.storage.local.set({ balance: '0' });
+          await chrome.storage.local.set({ balance: '0' });
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
           sdk.disconnect();
         }
       }
-      createWallet();
+      await createWallet();
       sendResponse({ farewell: "goodbye createWallet" });
     }
 
@@ -146,19 +149,20 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic,
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      console.log('mnemopncifds: ' + curMnemonic)
+      const sdk = new DashJS.Client(sdkOpts);
 
       async function sendFunds() {
         try {
           await sdk.isReady();
           if (request.toAddress == '' && request.amount == '') {
-            const transaction = sdk.account.createTransaction({
+            const transaction = await sdk.account.createTransaction({
               recipient: 'yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf', // Evonet faucet
               satoshis: 100000000, // 1 Dash
               // amount: 1
             });
           } else if (request.toAddress != '' && request.amount != '') {
-            const transaction = sdk.account.createTransaction({
+            const transaction = await sdk.account.createTransaction({
               recipient: request.toAddress,
               satoshis: request.amount,
               // amount: 1
@@ -167,7 +171,7 @@ chrome.runtime.onMessage.addListener(
           // TODO check if working
           const result = await sdk.account.broadcastTransaction(transaction);
           console.log('Transaction broadcast!\nTransaction ID:', result);
-          chrome.storage.local.set({ balance: sdk.account.getTotalBalance() });
+          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 10000000) });
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
@@ -183,13 +187,13 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
-      const createIdentity = async function () {
+      const createIdentity = async function() {
         try {
           await sdk.isReady();
           const platform = sdk.platform;
-          const identity = await platform.identities.register('user');  // literally 'user', do not change
+          const identity = await platform.identities.register('user'); // literally 'user', do not change
           console.log({ identity });
           curIdentity = identity;
           chrome.storage.local.set({ identity: identity });
@@ -199,7 +203,7 @@ chrome.runtime.onMessage.addListener(
           sdk.disconnect();
         }
       }
-      createIdentity();
+      await createIdentity();
       sendResponse({ farewell: "goodbye registerIdentity" });
     }
 
@@ -208,9 +212,9 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
-      const registerName = async function () {
+      const registerName = async function() {
         try {
           await sdk.isReady();
           curName = request.name;
@@ -235,9 +239,9 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
-      const getDocuments = async function () {
+      const getDocuments = async function() {
         try {
           await sdk.isReady();
           const documents = await sdk.platform.documents.get(request.recordLocator, request.queryObject);
@@ -248,6 +252,8 @@ chrome.runtime.onMessage.addListener(
           //   startAt: 0
           // });
           console.log(documents);
+          alert(JSON.stringify(documents));
+
           sendResponse({ farewell: "goodbye getDocuments", document: documents });
         } catch (e) {
           console.error('Something went wrong:', e);
@@ -264,21 +270,29 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.SDK(sdkOpts);
+      const sdk = new DashJS.Client(sdkOpts);
 
-      const getContract = async function () {
+      const getContract = async function() {
         try {
           let platform = sdk.platform;
           await sdk.isReady();
 
-          platform
-            .contracts
-            // .get('2KfMcMxktKimJxAZUeZwYkFUsEcAZhDKEpQs8GMnpUse')
-            .get(request.contractid)
-            .then((contract) => {
-              // console.dir({ contract }, { depth: 5 });
-              sendResponse({ farewell: "goodbye getContract", contract: contract });
-            });
+          // await platform
+          //     .contracts
+          //     // .get('2KfMcMxktKimJxAZUeZwYkFUsEcAZhDKEpQs8GMnpUse')
+          //     .get(request.contractid)
+          //     .then((contract) => {
+          //       console.dir({ contract }, { depth: 5 });
+          //       alert(JSON.stringify(contract));
+          //       sendResponse({ farewell: "goodbye getContract", contract: contract });
+          //     });
+          const contract = await platform.contracts.get(request.contractid);
+          // .get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
+
+          console.dir({ contract }, { depth: 5 });
+          alert(JSON.stringify(contract));
+          sendResponse({ farewell: "goodbye getContract", contract: contract });
+
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
@@ -288,8 +302,5 @@ chrome.runtime.onMessage.addListener(
       };
       getContract();
     }
-    
+
   });
-
-
-

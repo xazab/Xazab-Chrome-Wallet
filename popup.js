@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			// 	nameText.value = data.name;
 			// });
 			nameText.readOnly = true;
+			nameBtn.disabled = true;
 			chrome.extension.getBackgroundPage().console.log(response.farewell);
 		});
 
@@ -129,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			chrome.storage.local.get('identity', function (data) {
 				identityText.value = data.identity;
 			});
+			identityBtn.disabled = true;
 			chrome.extension.getBackgroundPage().console.log(response.farewell);
 		});
 
@@ -147,6 +149,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 			chrome.storage.local.get('address', function (data) {
 				addressText.value = data.address;
+				// TODO: empty, need to await somewhere
+				// chrome.extension.getBackgroundPage().console.log("debug: " + data.address);
 			});
 			chrome.storage.local.get('balance', function (data) {
 				balanceText.value = data.balance;
@@ -171,6 +175,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			chrome.storage.local.get('balance', function (data) {
 				balanceText.value = data.balance;
 			});
+			//addressText.value = response.address;
+			//balanceText.value = response.balance;
 
 			chrome.extension.getBackgroundPage().console.log(response.farewell);
 		});
