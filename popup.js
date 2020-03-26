@@ -110,9 +110,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		chrome.runtime.sendMessage({ greeting: "registerName", name: nameText.value }, function (response) {
 
-			// chrome.storage.local.get('name', function (data) {
-			// 	nameText.value = data.name;
-			// });
+			chrome.storage.local.get('name', function (data) {
+				nameText.value = data.name;
+			});
 			nameText.readOnly = true;
 			nameBtn.disabled = true;
 			chrome.extension.getBackgroundPage().console.log(response.farewell);

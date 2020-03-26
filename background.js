@@ -228,7 +228,7 @@ chrome.runtime.onMessage.addListener(
         }
       }
 
-      registerName();
+      await registerName();
       sendResponse({ farewell: "goodbye registerName" });
     }
 
