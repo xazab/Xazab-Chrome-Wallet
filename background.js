@@ -93,7 +93,7 @@ chrome.runtime.onMessage.addListener(
           // console.log(sdk.account.getConfirmedBalance());
           // console.log(sdk.account.getUnconfirmedBalance());
           console.log(sdk.account.getTotalBalance());
-          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 10000000) });
+          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 100000000) });
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
@@ -170,7 +170,7 @@ chrome.runtime.onMessage.addListener(
           // TODO check if working
           const result = await sdk.account.broadcastTransaction(transaction);
           console.log('Transaction broadcast!\nTransaction ID:', result);
-          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 10000000) });
+          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 100000000) });
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
