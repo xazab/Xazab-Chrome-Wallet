@@ -158,13 +158,13 @@ chrome.runtime.onMessage.addListener(
             const transaction = await sdk.account.createTransaction({
               recipient: 'yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf', // Evonet faucet
               satoshis: 100000000, // 1 Dash
-              // amount: 1
             });
           } else if (request.toAddress != '' && request.amount != '') {
+            var satAmount = parseInt(request.amount) * 100000000;
             const transaction = await sdk.account.createTransaction({
               recipient: request.toAddress,
-              satoshis: request.amount * 100000000,
-              // amount: 1
+              satoshis: satAmount,
+              // dash: request.amount,
             });
           }
           // TODO check if working

@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	var myButton = document.getElementById('sendBtn');
 	myButton.addEventListener('click', function () {
 
-		chrome.runtime.sendMessage({ greeting: "sendFunds", toAddress: toAddressText, amount: amountText }, function (response) {
+		chrome.runtime.sendMessage({ greeting: "sendFunds", toAddress: toAddressText.value, amount: amountText.value }, function (response) {
 
 			chrome.storage.local.get('balance', function (data) {
 				balanceText.value = data.balance;
