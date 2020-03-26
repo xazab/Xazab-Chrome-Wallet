@@ -10,7 +10,7 @@ Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet us
 - Google Chrome Browser
 
 ## Installation:
-- Download xxx and extract directory on disk
+- Download Release [Windows](https://github.com/readme55/Dash-Chrome-Wallet/archive/DashChromeWallet-1.0.zip) or [Linux](https://github.com/readme55/Dash-Chrome-Wallet/archive/DashChromeWallet-1.0.tar.gz) and extract directory on disk
 - Start "Google Chrome Browser"
 - type "chrome://extensions" into addressline or open Menu -> Tools -> Extensions
 - Activate "Developer Mode" in the top right corner
@@ -22,6 +22,9 @@ Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet us
 - Use the [Faucet](http://devnet-evonet-1117662964.us-west-2.elb.amazonaws.com/) to receive Testnet-Coins and [Explorer](http://devnet-evonet-1117662964.us-west-2.elb.amazonaws.com/) to check balance if needed
 
 ## TODO:
-- add css
+- fix gui update problems (async-await handling)
 - import identity/name with mnemonic
+- add css
+
+
 
