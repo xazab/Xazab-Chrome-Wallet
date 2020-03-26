@@ -149,15 +149,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		chrome.runtime.sendMessage({ greeting: "createWallet" }, function (response) {
 			
+			// TODO: need to use Promise for response somehow
+			if(response == null) {
+				chrome.extension.getBackgroundPage().console.log("Something went wrong")
+			}
 			chrome.extension.getBackgroundPage().console.log("blub2")
-
+			
 			chrome.storage.local.get('mnemonic', function (data) {
 				mnemonicText.value = data.mnemonic;
 			});
 			chrome.storage.local.get('address', function (data) {
 				addressText.value = data.address;
-				// TODO: empty, need to await somewhere
-				// chrome.extension.getBackgroundPage().console.log("debug: " + data.address);
 			});
 			chrome.storage.local.get('balance', function (data) {
 				balanceText.value = data.balance;
@@ -165,6 +167,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			createBtn.disabled = true;
 			chrome.extension.getBackgroundPage().console.log(response.farewell);
 		});
+
+		// return true from the event listener to indicate you wish to send a response asynchronously
+		// (this will keep the message channel open to the other end until sendResponse is called).
+		return true;
 
 	}, false);
 }, false);

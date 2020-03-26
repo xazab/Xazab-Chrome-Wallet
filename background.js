@@ -4,7 +4,7 @@ var curBalance = '';
 var curIdentity = '';
 var curName = '';
 
-chrome.runtime.onInstalled.addListener(function() {
+chrome.runtime.onInstalled.addListener(function () {
   console.log("Dash Chrome-Wallet installed.");
 
   // chrome.storage.local.set({ mnemonic: 'slight offer leaf pumpkin immune grit minimum novel train village orphan purity' });
@@ -17,7 +17,7 @@ chrome.runtime.onInstalled.addListener(function() {
 
 });
 
-chrome.storage.local.get('mnemonic', function(data) {
+chrome.storage.local.get('mnemonic', function (data) {
   if (data.mnemonic != '' && data.mnemoic != undefined) {
     curMnemonic = data.mnemonic;
   } else if (curMnemonic == undefined)
@@ -25,7 +25,7 @@ chrome.storage.local.get('mnemonic', function(data) {
 });
 
 chrome.runtime.onMessage.addListener(
-  async function(request, sender, sendResponse) {
+  async function (request, sender, sendResponse) {
 
     if (request.greeting == "connect") {
       const sdkOpts = {
@@ -118,17 +118,17 @@ chrome.runtime.onMessage.addListener(
           const address = await sdk.account.getUnusedAddress();
           curMnemonic = mnemonic;
           console.log('Mnemonic:', mnemonic);
-          await chrome.storage.local.set({ mnemonic: mnemonic }, function() {
+          await chrome.storage.local.set({ mnemonic: mnemonic }, function () {
             console.log("mnemonic saved");
           });
-          await chrome.storage.local.get(['mnemonic'], function(result) {
+          await chrome.storage.local.get(['mnemonic'], function (result) {
             console.log('Value currently is ' + result.mnemonic);
           });
           console.log('Unused address:', address.address);
-          await chrome.storage.local.set({ address: address.address }, function() {
+          await chrome.storage.local.set({ address: address.address }, function () {
             console.log("address saved");
           });
-          await chrome.storage.local.get(['address'], function(result) {
+          await chrome.storage.local.get(['address'], function (result) {
             console.log('Value currently is ' + result.address);
           });
           await chrome.storage.local.set({ balance: '0' });
@@ -149,7 +149,6 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic,
       };
-      console.log('mnemopncifds: ' + curMnemonic)
       const sdk = new DashJS.Client(sdkOpts);
 
       async function sendFunds() {
@@ -189,7 +188,7 @@ chrome.runtime.onMessage.addListener(
       };
       const sdk = new DashJS.Client(sdkOpts);
 
-      const createIdentity = async function() {
+      const createIdentity = async function () {
         try {
           await sdk.isReady();
           const platform = sdk.platform;
@@ -214,7 +213,7 @@ chrome.runtime.onMessage.addListener(
       };
       const sdk = new DashJS.Client(sdkOpts);
 
-      const registerName = async function() {
+      const registerName = async function () {
         try {
           await sdk.isReady();
           curName = request.name;
@@ -241,7 +240,7 @@ chrome.runtime.onMessage.addListener(
       };
       const sdk = new DashJS.Client(sdkOpts);
 
-      const getDocuments = async function() {
+      const getDocuments = async function () {
         try {
           await sdk.isReady();
           const documents = await sdk.platform.documents.get(request.recordLocator, request.queryObject);
@@ -275,7 +274,7 @@ chrome.runtime.onMessage.addListener(
       };
       const sdk = new DashJS.Client(sdkOpts);
 
-      const getContract = async function() {
+      const getContract = async function () {
         try {
           let platform = sdk.platform;
           await sdk.isReady();
@@ -300,4 +299,7 @@ chrome.runtime.onMessage.addListener(
       getContract();
     }
 
+    // return true from the event listener to indicate you wish to send a response asynchronously
+    // (this will keep the message channel open to the other end until sendResponse is called).
+    return true;
   });
