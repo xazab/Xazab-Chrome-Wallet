@@ -7,9 +7,7 @@ var curName = '';
 chrome.runtime.onInstalled.addListener(function () {
   console.log("Dash Chrome-Wallet installed.");
 
-  // chrome.storage.local.set({ mnemonic: 'slight offer leaf pumpkin immune grit minimum novel train village orphan purity' });
   chrome.storage.local.set({ mnemonic: '' });
-  // chrome.storage.local.set({ address: 'yaArRuZMXMXGKUdv5mUAySLCyYmZpTEH6Q' });
   chrome.storage.local.set({ address: '' });
   chrome.storage.local.set({ balance: '' });
   chrome.storage.local.set({ identity: '' });
@@ -63,7 +61,7 @@ chrome.runtime.onMessage.addListener(
         try {
           await sdk.isReady();
           curAddress = await sdk.account.getUnusedAddress().address;
-          curBalance = ((await sdk.account.getTotalBalance()) / 100000000);
+          curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
           console.log(curAddress);
         } catch (e) {
           console.error('Something went wrong:', e);
@@ -90,10 +88,10 @@ chrome.runtime.onMessage.addListener(
         try {
           await sdk.isReady();
           console.log(sdk.account.getUnusedAddress().address);
-          // console.log(sdk.account.getConfirmedBalance());
-          // console.log(sdk.account.getUnconfirmedBalance());
-          console.log(sdk.account.getTotalBalance());
-          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 100000000) });
+          console.log("Confirmed: " + sdk.account.getConfirmedBalance());
+          console.log("Unconfirmed: " + sdk.account.getUnconfirmedBalance());
+          console.log("Total: " + sdk.account.getTotalBalance());
+          chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
@@ -154,23 +152,24 @@ chrome.runtime.onMessage.addListener(
       async function sendFunds() {
         try {
           await sdk.isReady();
+          var transaction = null;
           if (request.toAddress == '' && request.amount == '') {
-            const transaction = await sdk.account.createTransaction({
+            transaction = await sdk.account.createTransaction({
               recipient: 'yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf', // Evonet faucet
               satoshis: 100000000, // 1 Dash
             });
           } else if (request.toAddress != '' && request.amount != '') {
             var satAmount = parseInt(request.amount) * 100000000;
-            const transaction = await sdk.account.createTransaction({
+            transaction = await sdk.account.createTransaction({
               recipient: request.toAddress,
               satoshis: satAmount,
-              // dash: request.amount,
             });
           }
-          // TODO check if working
+          console.dir(transaction)
           const result = await sdk.account.broadcastTransaction(transaction);
           console.log('Transaction broadcast!\nTransaction ID:', result);
-          chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 100000000) });
+          chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
+
         } catch (e) {
           console.error('Something went wrong:', e);
         } finally {
