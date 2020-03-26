@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				"['normalizedParentDomainName', '==', 'dash']\n" +
 				"],\n" +
 				"startAt: 0 }\n";
+			contractText.value = '77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3';
 		}
 	});
 }, false);
@@ -126,6 +127,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	myButton.addEventListener('click', function () {
 
 		chrome.runtime.sendMessage({ greeting: "registerIdentity" }, function (response) {
+
+			if(balanceText.value == '0') {
+				alert('No funds detected!\nNeed to pay some fee to create identity.')
+			}
 
 			chrome.storage.local.get('identity', function (data) {
 				identityText.value = data.identity;

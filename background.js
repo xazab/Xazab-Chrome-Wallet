@@ -252,7 +252,10 @@ chrome.runtime.onMessage.addListener(
           //   startAt: 0
           // });
           console.log(documents);
-          alert(JSON.stringify(documents));
+          var documentJson = JSON.stringify(documents, null, 2)
+          let newWin = window.open("about:blank", "Receive Document", "width=800,height=500");
+          newWin.document.write('<html><body><pre>' + documentJson + '</pre></body></html>');
+          newWin.document.close();
 
           sendResponse({ farewell: "goodbye getDocuments", document: documents });
         } catch (e) {
@@ -276,21 +279,15 @@ chrome.runtime.onMessage.addListener(
         try {
           let platform = sdk.platform;
           await sdk.isReady();
-
-          // await platform
-          //     .contracts
-          //     // .get('2KfMcMxktKimJxAZUeZwYkFUsEcAZhDKEpQs8GMnpUse')
-          //     .get(request.contractid)
-          //     .then((contract) => {
-          //       console.dir({ contract }, { depth: 5 });
-          //       alert(JSON.stringify(contract));
-          //       sendResponse({ farewell: "goodbye getContract", contract: contract });
-          //     });
           const contract = await platform.contracts.get(request.contractid);
           // .get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
 
           console.dir({ contract }, { depth: 5 });
-          alert(JSON.stringify(contract));
+          var contractJson = JSON.stringify(contract, null, 2)
+          let newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
+          newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
+          newWin.document.close();
+
           sendResponse({ farewell: "goodbye getContract", contract: contract });
 
         } catch (e) {
