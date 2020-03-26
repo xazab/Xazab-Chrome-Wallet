@@ -163,7 +163,7 @@ chrome.runtime.onMessage.addListener(
           } else if (request.toAddress != '' && request.amount != '') {
             const transaction = await sdk.account.createTransaction({
               recipient: request.toAddress,
-              satoshis: request.amount,
+              satoshis: request.amount * 100000000,
               // amount: 1
             });
           }
