@@ -148,6 +148,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	myButton.addEventListener('click', function () {
 
 		chrome.runtime.sendMessage({ greeting: "createWallet" }, function (response) {
+			
+			chrome.extension.getBackgroundPage().console.log("blub2")
 
 			chrome.storage.local.get('mnemonic', function (data) {
 				mnemonicText.value = data.mnemonic;

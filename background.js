@@ -18,10 +18,8 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 chrome.storage.local.get('mnemonic', function(data) {
-  console.log('blub')
   if (data.mnemonic != '' && data.mnemoic != undefined) {
     curMnemonic = data.mnemonic;
-    console.log('blub' + curMnemonic);
   } else if (curMnemonic == undefined)
     curMnemonic = '';
 });
@@ -140,7 +138,9 @@ chrome.runtime.onMessage.addListener(
           sdk.disconnect();
         }
       }
-      await createWallet();
+      // await createWallet().then(sendResponse({ farewell: "goodbye createWallet" }));
+      await createWallet()
+      console.log("blub1");
       sendResponse({ farewell: "goodbye createWallet" });
     }
 
