@@ -3,6 +3,10 @@ Chrome-Extension Cryptocurrency Wallet for the [Dash](https://www.dash.org) EvoN
 
 <img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/img/chrome-wallet.PNG" width="300" />
 
+## Changelog
+- v1.1 update to DashJS 2.0 (27 March 2020)
+- v1.0 Initial Release
+
 ## Description:
 Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet using [DashJS](https://github.com/dashevo/DashJS) with DAPI (Decentralized API) showing Payments, Usernames, Documents and Contracts features
 
