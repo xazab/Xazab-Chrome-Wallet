@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener(
       const sdkOpts = {
         network: 'testnet'
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       async function connect() {
         try {
@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       async function importMnemonic() {
         try {
@@ -82,7 +82,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       async function getBalance() {
         try {
@@ -107,7 +107,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: null,
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       async function createWallet() {
         try {
@@ -147,7 +147,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic,
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       async function sendFunds() {
         try {
@@ -159,7 +159,7 @@ chrome.runtime.onMessage.addListener(
               satoshis: 100000000, // 1 Dash
             });
           } else if (request.toAddress != '' && request.amount != '') {
-            var satAmount = parseInt(request.amount) * 100000000;
+            var satAmount = request.amount * 100000000;
             transaction = await sdk.account.createTransaction({
               recipient: request.toAddress,
               satoshis: satAmount,
@@ -185,7 +185,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       const createIdentity = async function () {
         try {
@@ -210,7 +210,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       const registerName = async function () {
         try {
@@ -237,7 +237,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       const getDocuments = async function () {
         try {
@@ -271,7 +271,7 @@ chrome.runtime.onMessage.addListener(
         network: 'testnet',
         mnemonic: curMnemonic
       };
-      const sdk = new DashJS.Client(sdkOpts);
+      const sdk = new Dash.Client(sdkOpts);
 
       const getContract = async function () {
         try {
