@@ -231,12 +231,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function getDocuments() {
             console.log('getDocuments');
             const documents = await sdk.platform.documents.get(request.recordLocator, request.queryObject);
-            // const documents = await sdk.platform.documents.get('dpns.domain', {
-            //   where: [
-            //     ['normalizedParentDomainName', '==', 'dash']
-            //   ],
-            //   startAt: 0
-            // });
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
             newWin = window.open("about:blank", "Receive Document", "width=800,height=500");

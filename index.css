@@ -11,36 +11,21 @@
    padding: 10px 10px;
    /* Some padding */
    font-size: 12px;
-     /* Set a font size */
-   position: relative;
-   text-align: center;
-   /* Safari */
-   -webkit-transition-duration: 0.4s;
-   transition-duration: 0.4s;
-   text-decoration: none;
-   overflow: hidden;
-   cursor: pointer;
+   /* border-radius: 15px; */
+   box-shadow: 0 0px #999;
+ }
+ .button:hover {background-color: rgb(0, 60, 97);}
+
+ .buttonload:active {
+   background-color: rgb(0, 96, 156);
+   box-shadow: 0 0px #666;
+   transform: translateY(2px);
+   
+ }
+ .buttonload:disabled {
+   background: rgb(76, 186, 255);
  }
 
- .buttonload:after {
-   content: "";
-   background: rgb(148, 214, 255);
-   display: block;
-   position: absolute;
-   padding-top: 300%;
-   padding-left: 350%;
-   margin-left: -20px !important;
-   margin-top: -120%;
-   opacity: 0;
-   transition: all 0.8s
- }
-
- .buttonload:active:after {
-   padding: 0;
-   margin: 0;
-   opacity: 1;
-   transition: 0s
- }
 
 
 

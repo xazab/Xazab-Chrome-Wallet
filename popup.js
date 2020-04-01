@@ -91,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //create wallet
   createBtn.addEventListener('click', function () {
-    chrome.extension.getBackgroundPage().console.log("Click Event")
     createBtn.disabled = true;
     showLoading('spinnerCreateWallet', true);
     chrome.runtime.sendMessage({ greeting: "createWallet" }, function (response) {
