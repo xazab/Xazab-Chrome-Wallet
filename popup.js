@@ -84,20 +84,21 @@ document.addEventListener('DOMContentLoaded', function () {
   connectBtn.addEventListener('click', function () {
     chrome.runtime.sendMessage({ greeting: "connect" }, function (response) {
       //check return response then send alert
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
     });
   }, false);
 
 
   //create wallet
   createBtn.addEventListener('click', function () {
+    chrome.extension.getBackgroundPage().console.log("Click Event")
     createBtn.disabled = true;
     showLoading('spinnerCreateWallet', true);
     chrome.runtime.sendMessage({ greeting: "createWallet" }, function (response) {
       if (response.complete) {
         getLocalStorage(['address', 'balance', 'mnemonic']).then((cookies) => {
           chrome.extension.getBackgroundPage().console.log("COOKIES:", JSON.stringify(cookies));
-          chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+          chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
           addressText.value = cookies.address;
           balanceText.value = cookies.balance;
           mnemonicText.value = cookies.mnemonic;
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
     balanceBtn.disabled = true;
     showLoading('spinnerRefreshBalance', true);
     chrome.runtime.sendMessage({ greeting: "getBalance" }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['balance']).then((cookies) => {
         balanceBtn.disabled = false;
         showLoading('spinnerRefreshBalance', false);
@@ -133,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
     sendBtn.disabled = true;
     showLoading('spinnerSend', true);
     chrome.runtime.sendMessage({ greeting: "sendFunds", toAddress: toAddressText.value, amount: amountText.value }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['balance']).then((cookies) => {
         sendBtn.disabled = false;
         showLoading('spinnerSend', false);
@@ -146,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
   //get documents
   getDocumentsBtn.addEventListener('click', function () {
     chrome.runtime.sendMessage({ greeting: "getDocuments", recordLocator: recordLocatorText.value, queryObject: queryObjectText.value }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       // queryObjectText.value = response.document;
     });
   }, false);
@@ -157,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
     getContractBtn.disabled = true;
     showLoading('spinnerGetContract', true);
     chrome.runtime.sendMessage({ greeting: "getContract", contractid: contractText.value }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getContractBtn.disabled = false;
       showLoading('spinnerGetContract', false);
     });
@@ -179,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
   //register identity
   identityBtn.addEventListener('click', function () {
     chrome.runtime.sendMessage({ greeting: "registerIdentity" }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       if (balanceText.value == '0') {
         alert('No funds detected!\nNeed to pay some fee to create identity.')
       }
@@ -195,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
   //register name
   nameBtn.addEventListener('click', function () {
     chrome.runtime.sendMessage({ greeting: "registerName", name: nameText.value }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['name']).then((cookies) => {
         nameText.value = cookies.name;
       });
@@ -208,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   mnemonicBtn.addEventListener('click', function () {
     chrome.runtime.sendMessage({ greeting: "importMnemonic", mnemonic: mnemonicText.value }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['address', 'balance']).then((cookies) => {
         addressText.value = cookies.address;
         balanceText.value = cookies.balance;
