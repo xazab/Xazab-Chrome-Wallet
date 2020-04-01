@@ -47,13 +47,14 @@ function disconnect(){
   return new Promise((resolve, reject) => {
     try{
       if(sdk!= undefined){
-        console.log('disconnecting sdk')
+        console.log('disconnecting sdk:')
         sdk.disconnect().then(()=>{
-          console.log('disconnected')
+          console.log('SUCCESS')
           sdk = null;
           resolve();
         })
         .catch((e)=>{
+          console.log('FAIL')
           reject(e)
         });
       }
@@ -135,7 +136,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               await chrome.storage.local.set({ balance: '0' });
               var savedBalance = await getLocalStorage(['balance']);
               sendResponse({complete: true});
-              disconnect().then(()=>{console.log('disconnected')}).catch((e)=>{console.log('error disconnecting',e)});
+              // disconnect().then(()=>{console.log('disconnected')}).catch((e)=>{console.log('error disconnecting',e)});
             })()
             
             break;
@@ -147,12 +148,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               console.log('importMnemonic');
               curMnemonic = request.mnemonic;
               curAddress = await sdk.account.getUnusedAddress().address;
-              curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
+              // curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
               console.log(curAddress);
+              console.log("TODO: Balance missing, should not be 0: " + curBalance);
               await chrome.storage.local.set({ mnemonic: curMnemonic });
               await chrome.storage.local.set({ address: curAddress });
-              await chrome.storage.local.set({ balance: curBalance });
+              // await chrome.storage.local.set({ balance: curBalance });
               sendResponse({complete: true});
+              // TODO: option 2 fire getBalance update here
             })()
             
             break;
@@ -248,8 +251,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           case "getContract":
             (async function getContract() {
               console.log('getContract');
-              const contract = await platform.contracts.get(request.contractid);
-              // .get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
+              const contract = await sdk.platform.contracts.get(request.contractid);
+              // const contract = await platform.contracts.get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
       
               console.dir({ contract }, { depth: 5 });
               var contractJson = JSON.stringify(contract, null, 2)
@@ -270,6 +273,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('ERROR CONNECTING',e);
         sendResponse({complete: false});
       });
+      
     }
     
     catch(e){
