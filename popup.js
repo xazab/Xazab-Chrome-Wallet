@@ -113,9 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }, false);
 
 
-  
-
-
   //refresh balance
   balanceBtn.addEventListener('click', function () {
     balanceBtn.disabled = true;
@@ -154,6 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }, false);
 
+
   //get contract
   getContractBtn.addEventListener('click', function () {
     getContractBtn.disabled = true;
@@ -178,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
 
-
   //register identity
   identityBtn.addEventListener('click', function () {
     chrome.runtime.sendMessage({ greeting: "registerIdentity" }, function (response) {
@@ -193,8 +190,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
   }, false);
-
-
 
 
   //register name

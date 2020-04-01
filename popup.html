@@ -17,8 +17,36 @@
       /* White text */
       padding: 10px 10px;
       /* Some padding */
-      font-size: 12px
+      font-size: 12px;
         /* Set a font size */
+      position: relative;
+      text-align: center;
+      /* Safari */
+      -webkit-transition-duration: 0.4s;
+      transition-duration: 0.4s;
+      text-decoration: none;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .buttonload:after {
+      content: "";
+      background: rgb(148, 214, 255);
+      display: block;
+      position: absolute;
+      padding-top: 300%;
+      padding-left: 350%;
+      margin-left: -20px !important;
+      margin-top: -120%;
+      opacity: 0;
+      transition: all 0.8s
+    }
+
+    .buttonload:active:after {
+      padding: 0;
+      margin: 0;
+      opacity: 1;
+      transition: 0s
     }
   </style>
 </head>
