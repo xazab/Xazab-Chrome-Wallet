@@ -81,6 +81,7 @@ function getLocalStorage(arrKeys) {
 }
 
 
+
 sdkOpts.network = 'testnet';
 
 
@@ -130,13 +131,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             curMnemonic = mnemonic;
             const address = await sdk.account.getUnusedAddress();
             await chrome.storage.local.set({ mnemonic: mnemonic });
-            var savedMN = await getLocalStorage(['mnemonic']);
+            var savedMM = await getLocalStorage(['mnemonic']);
             await chrome.storage.local.set({ address: address.address });
             var savedAddress = await getLocalStorage(['address']);
             await chrome.storage.local.set({ balance: '0' });
             var savedBalance = await getLocalStorage(['balance']);
             sendResponse({ complete: true });
-            // disconnect().then(()=>{console.log('disconnected')}).catch((e)=>{console.log('error disconnecting',e)});
+            disconnect();
           })()
 
           break;
@@ -148,12 +149,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('importMnemonic');
             curMnemonic = request.mnemonic;
             curAddress = await sdk.account.getUnusedAddress().address;
-            // curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
+            curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
             console.log(curAddress);
             console.log("TODO: Balance missing, should not be 0: " + curBalance);
             await chrome.storage.local.set({ mnemonic: curMnemonic });
             await chrome.storage.local.set({ address: curAddress });
-            // await chrome.storage.local.set({ balance: curBalance });
+            await chrome.storage.local.set({ balance: curBalance });
             sendResponse({ complete: true });
             // TODO: option 2 fire getBalance update here
           })()
@@ -233,7 +234,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const documents = await sdk.platform.documents.get(request.recordLocator, request.queryObject);
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
-            newWin = window.open("about:blank", "Receive Document", "width=800,height=500");
+            const newWin = window.open("about:blank", "Receive Document", "width=800,height=500");
             newWin.document.write('<html><body><pre>' + documentJson + '</pre></body></html>');
             newWin.document.close();
             sendResponse({ complete: true });
@@ -250,7 +251,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
             console.dir({ contract }, { depth: 5 });
             var contractJson = JSON.stringify(contract, null, 2)
-            newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
+            const newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
             newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
             newWin.document.close();
             sendResponse({ complete: true });

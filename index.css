@@ -1,4 +1,5 @@
-@import url('./fonts/Font_Awesome/font-awesome.min.css');
+@import url('./fonts/css/all.min.css');
+/* @import url('./fonts/Font_Awesome/font-awesome.min.css'); */
 
 /* Style buttons */
 .buttonload {
@@ -10,6 +11,7 @@
    /* White text */
    padding: 10px 10px;
    /* Some padding */
+   font-family: 'Open Sans', sans-serif;
    font-size: 12px;
    /* border-radius: 15px; */
    box-shadow: 0 0px #999;
