@@ -7,6 +7,7 @@
   <title>Dash Chrome-Wallet</title>
 
   <link rel="stylesheet" type="text/css" href="./index.css">
+  <script defer src="./fonts/js/all.js"></script>
 </head>
 
 <body>
@@ -18,24 +19,24 @@
       <tr>
         <td style="vertical-align: top; text-align: left;"><button class="buttonload" id="createBtn">
             Create Wallet <i id="spinnerCreateWallet" class="fas fa-sync fa-spin" style="display: none;"></i></button>
-          <br>Address:<br><textarea style="width: 260px; height: 30px;" readonly="readonly" cols="1" rows="1"
+          <br>Address:<br><textarea style="width: 260px; height: 33px;" readonly="readonly" cols="1" rows="1"
             id="addressText"></textarea> </td>
-        <td style="vertical-align: top;"><button class="buttonload" id="identityBtn">Create Identity </button><textarea
+        <td style="vertical-align: top;"><button class="buttonload" id="identityBtn">Create Identity <i id="spinnerCreateIdentity" class="fas fa-sync fa-spin" style="display: none;"></i></button><textarea
             style="width: 260px; height: 35px;" id="identityText" readonly="readonly" cols="1" rows="1"></textarea></td>
       </tr>
       <tr>
         <td style="vertical-align: top; height: 2px; width: 2px;">Balance:<br>
           <textarea style="width: 100px; height: 20px;" readonly="readonly" cols="1" rows="1"
             id="balanceText"></textarea><br> <button class="buttonload" id="balanceBtn" type="button">Refresh <i
-              id="spinnerRefreshBalance" class="fas fa-sync fa-spin" style="display: none;"></i></button>
+              id="spinnerGetBalance" class="fas fa-sync fa-spin" style="display: none;"></i></button>
         </td>
 
         <td style="vertical-align: top;"><textarea style="width: 260px; height: 25px;" id="nameText" cols="1"
-            rows="1"></textarea><button class="buttonload" id="nameBtn">Register Name </button>
+            rows="1"></textarea><button class="buttonload" id="nameBtn">Register Name <i id="spinnerRegisterName" class="fas fa-sync fa-spin" style="display: none;"></i></button>
         </td>
       </tr>
       <tr>
-        <td style="vertical-align: top;"><button class="buttonload" id="sendBtn">Send <i id="spinnerSend"
+        <td style="vertical-align: top;"><button class="buttonload" id="sendBtn">Send <i id="spinnerSendFunds"
               class="fas fa-sync fa-spin" style="display: none;"></i></button><br><textarea
             style="width: 50px; height: 25px;" cols="1" rows="1" id="amountText"></textarea>
           DASH to address:<br><textarea style="width: 260px; height: 40px;" cols="0" rows="0"
@@ -51,7 +52,7 @@
           Record Locator:<textarea style="width: 260px; height: 25px;" cols="1" rows="1"
             id="recordLocatorText"></textarea>Query Object:<textarea style="width: 260px; height: 50px;" cols="1"
             rows="1" id="queryObjectText"></textarea><button class="buttonload" id="getDocumentsBtn">Retrieve
-            Documents <i id="spinnerGetDocs" class="fas fa-sync fa-spin" style="display: none;"></i></button>
+            Documents <i id="spinnerGetDocuments" class="fas fa-sync fa-spin" style="display: none;"></i></button>
           <i id="spinnerGetDocs" class="fas fa-sync fa-spin" style="display: none;"> </i></td>
       </tr>
       <tr>

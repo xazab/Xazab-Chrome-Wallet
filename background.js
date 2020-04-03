@@ -11,6 +11,7 @@ var newWin = null;
 const connectMaxRetries = 3;
 var connectTries = 0;
 
+sdkOpts.network = 'testnet';
 
 function connect() {
   return new Promise((resolve, reject) => {
@@ -65,7 +66,6 @@ function disconnect() {
   });
 }
 
-
 function getLocalStorage(arrKeys) {
   return new Promise((resolve, reject) => {
     try {
@@ -79,11 +79,6 @@ function getLocalStorage(arrKeys) {
     }
   });
 }
-
-
-
-sdkOpts.network = 'testnet';
-
 
 chrome.runtime.onInstalled.addListener(function () {
   console.log("Dash Chrome-Wallet installed.");
@@ -99,15 +94,18 @@ chrome.runtime.onInstalled.addListener(function () {
 chrome.storage.local.get('mnemonic', function (data) {
   if (data.mnemonic != '' && data.mnemoic != undefined) {
     curMnemonic = data.mnemonic;
-  } else if (curMnemonic == undefined)
+  } else if (curMnemonic == undefined)  // TODO: test if still needed
     curMnemonic = null;
 });
-
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   try {
+    // TODO: add button for extension in tab
+    // chrome.tabs.create({url: chrome.extension.getURL("popup.html")})
+    //console.log(chrome.extension.getURL("popup.html"));
+    if(request.greeting=='importMnemonic'){curMnemonic = request.mnemonic}
 
     connect().then(() => {
 
@@ -147,7 +145,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
           (async function importMnemonic() {
             console.log('importMnemonic');
-            curMnemonic = request.mnemonic;
             curAddress = await sdk.account.getUnusedAddress().address;
             curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
             console.log(curAddress);
@@ -156,6 +153,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             await chrome.storage.local.set({ address: curAddress });
             await chrome.storage.local.set({ balance: curBalance });
             sendResponse({ complete: true });
+            disconnect();
             // TODO: option 2 fire getBalance update here
           })()
 
@@ -165,8 +163,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "getBalance":
           (async function getBalance() {
             console.log('getBalance');
+            console.log(await sdk.account.getUnconfirmedBalance())
+            console.log(await sdk.account.getTotalBalance())
+            console.log(await sdk.account.getConfirmedBalance())
+
             await chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
             sendResponse({ complete: true });
+            disconnect();
           })()
 
           break;
@@ -179,7 +182,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.toAddress == '' && request.amount == '') {
               transaction = await sdk.account.createTransaction({
                 recipient: 'yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf', // Evonet faucet
-                satoshis: 100000000, // 1 Dash
+                satoshis: 10000000, // 0.1 Dash
               });
             }
             else if (request.toAddress != '' && request.amount != '') {
@@ -192,8 +195,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.dir(transaction)
             const result = await sdk.account.broadcastTransaction(transaction);
             console.log('Transaction broadcast!\nTransaction ID:', result);
-            await chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
+            // TODO: this should be working, bug in DashJS i guess, using popup.js for now
+            // await new Promise(r => setTimeout(r, 20000));  // sleep x ms
+            // console.log(await sdk.account.getUnconfirmedBalance())
+            // console.log(await sdk.account.getTotalBalance())
+            // await chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
             sendResponse({ complete: true });
+            disconnect();
           })()
 
           break;
@@ -202,12 +210,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "registerIdentity":
           (async function registerIdentity() {
             console.log('registerIdentity');
-            platform = sdk.platform;
-            identity = await platform.identities.register('user'); // literally 'user', do not change
+            identity = await sdk.platform.identities.register('user'); // literally 'user', do not change
             console.log({ identity });
             curIdentity = identity;
             await chrome.storage.local.set({ identity: identity });
             sendResponse({ complete: true });
+            disconnect();
           })()
 
           break;
@@ -217,12 +225,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function registerName() {
             console.log('registerName');
             curName = request.name;
-            platform = sdk.platform;
-            identity = await platform.identities.get(curIdentity);
-            const nameRegistration = await platform.names.register(curName, identity);
+            identity = await sdk.platform.identities.get(curIdentity);
+            const nameRegistration = await sdk.platform.names.register(curName, identity);
             console.log({ nameRegistration });
             await chrome.storage.local.set({ name: curName });
             sendResponse({ complete: true });
+            disconnect();
           })()
 
           break;
@@ -238,6 +246,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             newWin.document.write('<html><body><pre>' + documentJson + '</pre></body></html>');
             newWin.document.close();
             sendResponse({ complete: true });
+            disconnect();
           })()
 
           break;
@@ -247,14 +256,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function getContract() {
             console.log('getContract');
             const contract = await sdk.platform.contracts.get(request.contractid);
-            // const contract = await platform.contracts.get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
-
+            // const contract = await sdk.platform.contracts.get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
             console.dir({ contract }, { depth: 5 });
             var contractJson = JSON.stringify(contract, null, 2)
             const newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
             newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
             newWin.document.close();
             sendResponse({ complete: true });
+            disconnect();
           })()
 
           break;
@@ -267,6 +276,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .catch((e) => {
         console.log('ERROR CONNECTING', e);
         sendResponse({ complete: false });
+        disconnect();
       });
 
   }

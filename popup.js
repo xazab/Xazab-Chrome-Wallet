@@ -21,23 +21,20 @@ function getLocalStorage(arrKeys) {
   });
 }
 
-
 // on DOMContentLoaded
-
 document.addEventListener('DOMContentLoaded', function () {
-
 
   let connectBtn = document.getElementById('connectBtn');
   let createBtn = document.getElementById('createBtn');
   let addressText = document.getElementById('addressText');
   let balanceText = document.getElementById('balanceText');
-  let balanceBtn = document.getElementById('balanceBtn');
-  let sendBtn = document.getElementById('sendBtn');
+  let getBalanceBtn = document.getElementById('balanceBtn');
+  let sendFundsBtn = document.getElementById('sendBtn');
   let amountText = document.getElementById('amountText');
   let toAddressText = document.getElementById('toAddressText');
-  let identityBtn = document.getElementById('identityBtn');
+  let regIdentityBtn = document.getElementById('identityBtn');
   let identityText = document.getElementById('identityText');
-  let nameBtn = document.getElementById('nameBtn');
+  let regNameBtn = document.getElementById('nameBtn');
   let nameText = document.getElementById('nameText');
   let mnemonicText = document.getElementById('mnemonicText');
   let mnemonicBtn = document.getElementById('mnemonicBtn');
@@ -65,13 +62,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   chrome.storage.local.get('identity', function (data) {
     if (data.identity != '')
-      identityBtn.disabled = true;
+      regIdentityBtn.disabled = true;
     identityText.value = data.identity;
   });
   chrome.storage.local.get('name', function (data) {
     if (data.name != '') {
       nameText.readOnly = true;
-      nameBtn.disabled = true;
+      regNameBtn.disabled = true;
     }
     nameText.value = data.name;
   });
@@ -82,9 +79,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //connect
   connectBtn.addEventListener('click', function () {
+    connectBtn.disabled = true;
+    showLoading('spinnerTestConnection', true);
     chrome.runtime.sendMessage({ greeting: "connect" }, function (response) {
       //check return response then send alert
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      connectBtn.disabled = false;
+      showLoading('spinnerTestConnection', false);
     });
   }, false);
 
@@ -105,39 +106,51 @@ document.addEventListener('DOMContentLoaded', function () {
         });
       }
       else {
+        alert('There was a problem creating the wallet - please try again');
         createBtn.disabled = false;
         showLoading('spinnerCreateWallet', false);
-        alert('There was a problem creating the wallet - please try again')
       }
     });
   }, false);
 
 
-  //refresh balance
-  balanceBtn.addEventListener('click', function () {
-    balanceBtn.disabled = true;
-    showLoading('spinnerRefreshBalance', true);
+  // get balance
+  getBalanceBtn.addEventListener('click', function () {
+    getBalanceBtn.disabled = true;
+    showLoading('spinnerGetBalance', true);
     chrome.runtime.sendMessage({ greeting: "getBalance" }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['balance']).then((cookies) => {
-        balanceBtn.disabled = false;
-        showLoading('spinnerRefreshBalance', false);
         balanceText.value = cookies.balance;
+        getBalanceBtn.disabled = false;
+        showLoading('spinnerGetBalance', false);
       });
     });
   }, false);
 
 
   //send funds
-  sendBtn.addEventListener('click', function () {
-    sendBtn.disabled = true;
-    showLoading('spinnerSend', true);
+  sendFundsBtn.addEventListener('click', function () {
+    sendFundsBtn.disabled = true;
+    showLoading('spinnerSendFunds', true);
     chrome.runtime.sendMessage({ greeting: "sendFunds", toAddress: toAddressText.value, amount: amountText.value }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['balance']).then((cookies) => {
-        sendBtn.disabled = false;
-        showLoading('spinnerSend', false);
         balanceText.value = cookies.balance;
+      });
+      sendFundsBtn.disabled = false;
+      showLoading('spinnerSendFunds', false);
+
+      // TODO: execute getBalance button here till dashjs sendTX + getBalance bug fixed
+      getBalanceBtn.disabled = true;
+      showLoading('spinnerGetBalance', true);
+      chrome.runtime.sendMessage({ greeting: "getBalance" }, function (response) {
+        chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+        getLocalStorage(['balance']).then((cookies) => {
+          balanceText.value = cookies.balance;
+          getBalanceBtn.disabled = false;
+          showLoading('spinnerGetBalance', false);
+        });
       });
     });
   }, false);
@@ -145,9 +158,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //get documents
   getDocumentsBtn.addEventListener('click', function () {
+    getDocumentsBtn.disabled = true;
+    showLoading('spinnerGetDocuments', true);
     chrome.runtime.sendMessage({ greeting: "getDocuments", recordLocator: recordLocatorText.value, queryObject: queryObjectText.value }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       // queryObjectText.value = response.document;
+      getDocumentsBtn.disabled = false;
+      showLoading('spinnerGetDocuments', false);
     });
   }, false);
 
@@ -177,7 +194,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   //register identity
-  identityBtn.addEventListener('click', function () {
+  regIdentityBtn.addEventListener('click', function () {
+    regIdentityBtn.disabled = true;
+    showLoading('spinnerCreateIdentity', true);
     chrome.runtime.sendMessage({ greeting: "registerIdentity" }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       if (balanceText.value == '0') {
@@ -186,33 +205,40 @@ document.addEventListener('DOMContentLoaded', function () {
       getLocalStorage(['identity']).then((cookies) => {
         identityText.value = cookies.identity;
       });
-      identityBtn.disabled = true;
+      showLoading('spinnerCreateIdentity', false);
     });
 
   }, false);
 
 
   //register name
-  nameBtn.addEventListener('click', function () {
+  regNameBtn.addEventListener('click', function () {
+    regNameBtn.disabled = true;
+    showLoading('spinnerRegisterName', true);
     chrome.runtime.sendMessage({ greeting: "registerName", name: nameText.value }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['name']).then((cookies) => {
         nameText.value = cookies.name;
       });
       nameText.readOnly = true;
-      nameBtn.disabled = true;
+      showLoading('spinnerRegisterName', false);
     });
 
   }, false);
 
 
+  // import Mnemonic
   mnemonicBtn.addEventListener('click', function () {
+    mnemonicBtn.disabled = true;
+    showLoading('spinnerImportMnemonic', true);
     chrome.runtime.sendMessage({ greeting: "importMnemonic", mnemonic: mnemonicText.value }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getLocalStorage(['address', 'balance']).then((cookies) => {
         addressText.value = cookies.address;
         balanceText.value = cookies.balance;
       });
+      showLoading('spinnerImportMnemonic', false);
+      mnemonicBtn.disabled = false;
       // TODO: option 1 fire getBalance click event here
     });
 

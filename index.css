@@ -1,6 +1,17 @@
 @import url('./fonts/css/all.min.css');
 /* @import url('./fonts/Font_Awesome/font-awesome.min.css'); */
 
+body {
+   font-family: 'Open Sans', sans-serif;
+   font-size: 0.85em;
+}
+
+textarea {
+   font-family: 'Open Sans', sans-serif;
+   /* font-family: "Lucida Console", Courier, monospace; */
+   font-size: 1.05em;
+}
+
 /* Style buttons */
 .buttonload {
    background-color: rgb(0, 141, 228);
