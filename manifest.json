@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Dash Chrome-Wallet",
-    "version": "1.0",
+    "version": "1.2",
     "description": "A Chrome-Extension for the Dash EvoNet-Testnet environment",
     "icons": {
         "16": "./img/icon16.png",
