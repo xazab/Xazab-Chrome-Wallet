@@ -1,0 +1,29 @@
+{
+  "name": "Dash-ChromeWallet",
+  "version": "1.0.0",
+  "description": "",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/readme55/Dash-Chrome-Wallet.git"
+  },
+  "keywords": [],
+  "author": "readme55",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/readme55/Dash-Chrome-Wallet/issues"
+  },
+  "homepage": "https://github.com/readme55/Dash-Chrome-Wallet#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "web-ext": "^4.1.0"
+  },
+  "scripts": {
+    "start:firefox": "web-ext run --source-dir ./app/"
+  }
+}

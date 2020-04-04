@@ -1,7 +1,7 @@
 # Dash Chrome-Wallet
 Chrome-Extension Cryptocurrency Wallet for the [Dash](https://www.dash.org) EvoNet-Testnet environment
 
-<img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/img/chrome-wallet.PNG" width="300" />
+<img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/chrome-wallet.PNG" width="300" />
 
 ## Changelog
 - v1.1 update to DashJS 2.0 (27 March 2020)
