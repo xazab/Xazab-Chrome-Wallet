@@ -2,6 +2,7 @@ var curMnemonic = null;
 var curAddress = '';
 var curBalance = '';
 var curIdentity = '';
+var curApps = '';
 var curName = '';
 var sdkOpts = {};
 var sdk = null;
@@ -18,6 +19,13 @@ function connect() {
     try {
       connectTries++;
       sdkOpts.mnemonic = curMnemonic;
+      sdkOpts.apps = curApps;
+
+      console.log(sdkOpts.apps)
+      console.log()
+      console.log(sdkOpts)
+      console.log()
+      console.dir(sdkOpts)
       sdk = new Dash.Client(sdkOpts);
       sdk.isReady().then(() => {
         console.log('connected after', connectTries, 'tries');
@@ -106,6 +114,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // chrome.tabs.create({url: chrome.extension.getURL("popup.html")})
     //console.log(chrome.extension.getURL("popup.html"));
     if(request.greeting=='importMnemonic'){curMnemonic = request.mnemonic}
+    if(request.greeting=='getDocuments') {
+      curApps = ' { "myContract" : { "contractId" : "' + request.contractId + '" } }'
+      curApps = JSON.parse(curApps)
+    }
 
     connect().then(() => {
 
@@ -239,7 +251,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "getDocuments":
           (async function getDocuments() {
             console.log('getDocuments');
-            const documents = await sdk.platform.documents.get(request.recordLocator, request.queryObject);
+            const recordLocator = "myContract." + request.documentName; // just use myContract for all
+            const documents = await sdk.platform.documents.get(recordLocator, request.queryObject);
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
             const newWin = window.open("about:blank", "Receive Document", "width=800,height=500");
@@ -255,7 +268,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "getContract":
           (async function getContract() {
             console.log('getContract');
-            const contract = await sdk.platform.contracts.get(request.contractid);
+            const contract = await sdk.platform.contracts.get(request.contractId);
             // const contract = await sdk.platform.contracts.get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
             console.dir({ contract }, { depth: 5 });
             var contractJson = JSON.stringify(contract, null, 2)

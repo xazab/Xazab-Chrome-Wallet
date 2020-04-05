@@ -40,11 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
   let mnemonicBtn = document.getElementById('mnemonicBtn');
 
   let exampleQuerySelector = document.getElementById('exampleQuerySelector');
-  let recordLocatorText = document.getElementById('recordLocatorText');
+  let documentNameText = document.getElementById('documentNameText');
   let queryObjectText = document.getElementById('queryObjectText');
   let getDocumentsBtn = document.getElementById('getDocumentsBtn');
 
-  let contractText = document.getElementById('contractText');
+  let contractIdText = document.getElementById('contractIdText');
   let getContractBtn = document.getElementById('getContractBtn');
 
 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
   getDocumentsBtn.addEventListener('click', function () {
     getDocumentsBtn.disabled = true;
     showLoading('spinnerGetDocuments', true);
-    chrome.runtime.sendMessage({ greeting: "getDocuments", recordLocator: recordLocatorText.value, queryObject: queryObjectText.value }, function (response) {
+    chrome.runtime.sendMessage({ greeting: "getDocuments", documentName: documentNameText.value, queryObject: queryObjectText.value, contractId: contractIdText.value }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       // queryObjectText.value = response.document;
       getDocumentsBtn.disabled = false;
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
   getContractBtn.addEventListener('click', function () {
     getContractBtn.disabled = true;
     showLoading('spinnerGetContract', true);
-    chrome.runtime.sendMessage({ greeting: "getContract", contractid: contractText.value }, function (response) {
+    chrome.runtime.sendMessage({ greeting: "getContract", contractId: contractIdText.value }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       getContractBtn.disabled = false;
       showLoading('spinnerGetContract', false);
@@ -181,14 +181,21 @@ document.addEventListener('DOMContentLoaded', function () {
   }, false);
 
   exampleQuerySelector.addEventListener("change", function () {
-    if (exampleQuerySelector.value == "Example 1") {
-      recordLocatorText.value = 'dpns.domain';
+    if (exampleQuerySelector.value == "Example DPNS") {
+      documentNameText.value = 'domain';
       queryObjectText.value = "{ where: [\n" +
         "['normalizedParentDomainName', '==', 'dash']\n" +
         "],\n" +
         "startAt: 0 }\n";
-      contractText.value = '77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3';
-      toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
+      contractIdText.value = '77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3';
+      // toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
+      toAddressText.value = "";
+    }
+    if (exampleQuerySelector.value == "Example Login") {
+      documentNameText.value = 'login';
+      queryObjectText.value = "{ startAt: 0 }\n";
+      contractIdText.value = '7kXTykyrTW192bCTKiMuEX2s15KExZaHKos8GrWCF21D';
+      toAddressText.value = "";
     }
   });
 
