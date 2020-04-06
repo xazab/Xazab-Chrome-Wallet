@@ -9,6 +9,7 @@ textarea {
    font-family: 'Open Sans', sans-serif;
    /* font-family: "Lucida Console", Courier, monospace; */
    font-size: 1.05em;
+   
 }
 
 /* Style buttons */
@@ -26,18 +27,30 @@ textarea {
    /* border-radius: 15px; */
    box-shadow: 0 0px #999;
  }
- .button:hover {background-color: rgb(0, 60, 97);}
+ button:hover {background-color: rgb(0, 60, 97);}
+ 
+ /* button::-moz-focus-inner {
+  border: 0;
+ } */
 
- .buttonload:active {
+ /* fix for mozilla firefox dotted line around button text when focus */
+ button:focus-within {
+   border: 0;
+ }
+
+ button:active {
    background-color: rgb(0, 96, 156);
+   /* background: rgb(76, 186, 255); */
    box-shadow: 0 0px #666;
    transform: translateY(2px);
    
  }
- .buttonload:disabled {
+
+ button:disabled {
    background: rgb(76, 186, 255);
    color:  rgb(248, 248, 248);
  }
+
 
 
 
