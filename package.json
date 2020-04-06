@@ -24,6 +24,9 @@
     "web-ext": "^4.1.0"
   },
   "scripts": {
-    "start:firefox": "web-ext run --source-dir ./app/"
+    "start:firefox": "web-ext run --source-dir ./app/",
+    "lint:firefox": "web-ext lint --source-dir ./app/",
+    "sign:firefox": "web-ext sign --source-dir ./app/",
+    "build:firefox": "web-ext build --source-dir ./app/"
   }
 }

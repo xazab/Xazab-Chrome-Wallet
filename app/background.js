@@ -26,6 +26,7 @@ function connect() {
       console.log(sdkOpts)
       console.log()
       console.dir(sdkOpts)
+      console.log("SDK Init")
       sdk = new Dash.Client(sdkOpts);
       sdk.isReady().then(() => {
         console.log('connected after', connectTries, 'tries');
@@ -113,10 +114,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // TODO: add button for extension in tab
     // chrome.tabs.create({url: chrome.extension.getURL("popup.html")})
     //console.log(chrome.extension.getURL("popup.html"));
-    if(request.greeting=='importMnemonic'){curMnemonic = request.mnemonic}
-    if(request.greeting=='getDocuments') {
-      curApps = ' { "myContract" : { "contractId" : "' + request.contractId + '" } }'
-      curApps = JSON.parse(curApps)
+    if (request.greeting == 'importMnemonic') { curMnemonic = request.mnemonic }
+    if (request.greeting == 'getDocuments') {
+      curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
+      curApps = JSON.parse(curApps);
     }
 
     connect().then(() => {
@@ -159,14 +160,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('importMnemonic');
             curAddress = await sdk.account.getUnusedAddress().address;
             curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
-            console.log(curAddress);
-            console.log("TODO: Balance missing, should not be 0: " + curBalance);
+            
+            const identityHDPrivateKey = await sdk.account.getIdentityHDKey(0, 'user');
+            // const identityPrivateKey = identityHDPrivateKey.privateKey;
+            const identityPublicKey = identityHDPrivateKey.publicKey;
+            const identityAddress = identityPublicKey.toAddress().toString();
+            console.log(identityAddress)
+            curIdentity = identityAddress;
+
             await chrome.storage.local.set({ mnemonic: curMnemonic });
             await chrome.storage.local.set({ address: curAddress });
             await chrome.storage.local.set({ balance: curBalance });
+            await chrome.storage.local.set({ identity: curIdentity });
             sendResponse({ complete: true });
             disconnect();
-            // TODO: option 2 fire getBalance update here
           })()
 
           break;
@@ -237,6 +244,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function registerName() {
             console.log('registerName');
             curName = request.name;
+            // TODO: bug when having several identitys, importing 1st and then registering name
             identity = await sdk.platform.identities.get(curIdentity);
             const nameRegistration = await sdk.platform.names.register(curName, identity);
             console.log({ nameRegistration });
@@ -255,7 +263,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const documents = await sdk.platform.documents.get(recordLocator, request.queryObject);
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
-            const newWin = window.open("about:blank", "Receive Document", "width=800,height=500");
+            var newWin = window.open("", "DocumentQuery", "width=800,height=500");
             newWin.document.write('<html><body><pre>' + documentJson + '</pre></body></html>');
             newWin.document.close();
             sendResponse({ complete: true });

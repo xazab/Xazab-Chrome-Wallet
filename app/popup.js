@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
       showLoading('spinnerSendFunds', false);
 
       // TODO: execute getBalance button here till dashjs sendTX + getBalance bug fixed
+      //       then delete here and execute in sendFunds background.js
       getBalanceBtn.disabled = true;
       showLoading('spinnerGetBalance', true);
       chrome.runtime.sendMessage({ greeting: "getBalance" }, function (response) {
@@ -152,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
           showLoading('spinnerGetBalance', false);
         });
       });
+      ////////////
     });
   }, false);
 
@@ -240,13 +242,13 @@ document.addEventListener('DOMContentLoaded', function () {
     showLoading('spinnerImportMnemonic', true);
     chrome.runtime.sendMessage({ greeting: "importMnemonic", mnemonic: mnemonicText.value }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      getLocalStorage(['address', 'balance']).then((cookies) => {
+      getLocalStorage(['address', 'balance', 'identity']).then((cookies) => {
         addressText.value = cookies.address;
         balanceText.value = cookies.balance;
+        identityText.value = cookies.identity;
       });
       showLoading('spinnerImportMnemonic', false);
       mnemonicBtn.disabled = false;
-      // TODO: option 1 fire getBalance click event here
     });
 
   }, false);
