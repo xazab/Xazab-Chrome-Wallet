@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //register identity
   regIdentityBtn.addEventListener('click', function () {
-    if (balanceText.value < '0.0001' || balanceText.value == '' ) {
+    if (balanceText.value < '0.0001' || balanceText.value == '') {
       alert('Not enough funds detected!\nYou need to pay 0.0001 Dash as fee to create identity.')
       return;
     }

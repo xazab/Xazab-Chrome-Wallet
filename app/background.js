@@ -20,12 +20,6 @@ function connect() {
       connectTries++;
       sdkOpts.mnemonic = curMnemonic;
       sdkOpts.apps = curApps;
-
-      console.log(sdkOpts.apps)
-      console.log()
-      console.log(sdkOpts)
-      console.log()
-      console.dir(sdkOpts)
       console.log("SDK Init")
       sdk = new Dash.Client(sdkOpts);
       sdk.isReady().then(() => {
