@@ -160,7 +160,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('importMnemonic');
             curAddress = await sdk.account.getUnusedAddress().address;
             curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
-            
+
             const identityHDPrivateKey = await sdk.account.getIdentityHDKey(0, 'user');
             // const identityPrivateKey = identityHDPrivateKey.privateKey;
             const identityPublicKey = identityHDPrivateKey.publicKey;
@@ -263,9 +263,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const documents = await sdk.platform.documents.get(recordLocator, request.queryObject);
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
-            var newWin = window.open("", "DocumentQuery", "width=800,height=500");
+            
+            newWin = window.open("about:blank", "Document Query", "width=800,height=500");
+            newWin.document.open();
+            // newWin.document.body.innerHTML = '<html><body><pre>' + documentJson + '</pre></body></html>';
             newWin.document.write('<html><body><pre>' + documentJson + '</pre></body></html>');
             newWin.document.close();
+
+            // chrome.windows.create({
+            //   type: 'popup',
+            //   url: "about:blank"
+            // }, function (newWindow) {
+            //   console.log(newWindow);
+            //   chrome.tabs.executeScript(newWindow.tabs[0].id, {
+            //     code: 'document.write("hello world");'
+            //   });
+            // });
             sendResponse({ complete: true });
             disconnect();
           })()
@@ -281,6 +294,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.dir({ contract }, { depth: 5 });
             var contractJson = JSON.stringify(contract, null, 2)
             const newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
+            newWin.document.open();
             newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
             newWin.document.close();
             sendResponse({ complete: true });
