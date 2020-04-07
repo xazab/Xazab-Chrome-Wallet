@@ -48,34 +48,41 @@ document.addEventListener('DOMContentLoaded', function () {
   let getContractBtn = document.getElementById('getContractBtn');
 
 
-  // disable create button when address already created and stored
+  // disable button rules (executed each time popup opened)
   chrome.storage.local.get('mnemonic', function (data) {
+    mnemonicText.value = data.mnemonic;
     if (data.mnemonic != '')
       createBtn.disabled = true;
-    mnemonicText.value = data.mnemonic;
   });
   chrome.storage.local.get('address', function (data) {
     addressText.value = data.address;
   });
   chrome.storage.local.get('balance', function (data) {
     balanceText.value = data.balance;
+    if (balanceText.value == '' || balanceText.value == '0') {
+      sendFundsBtn.disabled = true;
+    }
   });
   chrome.storage.local.get('identity', function (data) {
-    if (data.identity != '')
-      regIdentityBtn.disabled = true;
     identityText.value = data.identity;
+    if (identityText.value != '')
+      regIdentityBtn.disabled = true;
+    else if (addressText.value == '') {
+      regIdentityBtn.disabled = true;
+    }
   });
   chrome.storage.local.get('name', function (data) {
-    if (data.name != '') {
+    if (data.name == '' && identityText.value == '') {
+      nameText.readOnly = true;
+      regNameBtn.disabled = true;
+    }
+    else if (data.name != '') {
       nameText.readOnly = true;
       regNameBtn.disabled = true;
     }
     nameText.value = data.name;
   });
 
-
-  // import not working for identities yet
-  // mnemonicBtn.disabled = true;
 
   //connect
   connectBtn.addEventListener('click', function () {
@@ -204,13 +211,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //register identity
   regIdentityBtn.addEventListener('click', function () {
+    if (balanceText.value < '0.0001' || balanceText.value == '' ) {
+      alert('Not enough funds detected!\nYou need to pay 0.0001 Dash as fee to create identity.')
+      return;
+    }
     regIdentityBtn.disabled = true;
     showLoading('spinnerCreateIdentity', true);
     chrome.runtime.sendMessage({ greeting: "registerIdentity" }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      if (balanceText.value == '0') {
-        alert('No funds detected!\nNeed to pay some fee to create identity.')
-      }
+
       getLocalStorage(['identity']).then((cookies) => {
         identityText.value = cookies.identity;
       });
@@ -249,6 +258,8 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       showLoading('spinnerImportMnemonic', false);
       mnemonicBtn.disabled = false;
+      if (addressText.value != '') createBtn.disabled = true;
+      if (identityText.value != '') regIdentityBtn.disabled = true;
     });
 
   }, false);
