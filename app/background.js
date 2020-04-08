@@ -156,10 +156,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
 
             const identityHDPrivateKey = await sdk.account.getIdentityHDKey(0, 'user');
-            // const identityPrivateKey = identityHDPrivateKey.privateKey;
+            const identityPrivateKey = identityHDPrivateKey.privateKey;
             const identityPublicKey = identityHDPrivateKey.publicKey;
             const identityAddress = identityPublicKey.toAddress().toString();
-            console.log(identityAddress)
+            console.log("Identity Priv: " + identityPrivateKey)
+            console.log("Identity Pub: " + identityPublicKey)
+            console.log("Identity Address: " + identityAddress)
             curIdentity = identityAddress;
 
             await chrome.storage.local.set({ mnemonic: curMnemonic });
@@ -254,10 +256,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function getDocuments() {
             console.log('getDocuments');
             const recordLocator = "myContract." + request.documentName; // just use myContract for all
-            const documents = await sdk.platform.documents.get(recordLocator, request.queryObject);
+            
+            var queryJson = JSON.parse(request.queryObject);
+            const documents = await sdk.platform.documents.get(recordLocator, queryJson);
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
-            
+
             newWin = window.open("about:blank", "Document Query", "width=800,height=500");
             newWin.document.open();
             // newWin.document.body.innerHTML = '<html><body><pre>' + documentJson + '</pre></body></html>';
