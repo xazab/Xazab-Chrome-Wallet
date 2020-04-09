@@ -136,11 +136,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             curMnemonic = mnemonic;
             const address = await sdk.account.getUnusedAddress();
             await chrome.storage.local.set({ mnemonic: mnemonic });
-            var savedMM = await getLocalStorage(['mnemonic']);
+            // var savedMM = await getLocalStorage(['mnemonic']);
             await chrome.storage.local.set({ address: address.address });
-            var savedAddress = await getLocalStorage(['address']);
+            // var savedAddress = await getLocalStorage(['address']);
             await chrome.storage.local.set({ balance: '0' });
-            var savedBalance = await getLocalStorage(['balance']);
+            // var savedBalance = await getLocalStorage(['balance']);
             sendResponse({ complete: true });
             disconnect();
           })()
@@ -155,19 +155,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             curAddress = await sdk.account.getUnusedAddress().address;
             curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
 
-            const identityHDPrivateKey = await sdk.account.getIdentityHDKey(0, 'user');
-            const identityPrivateKey = identityHDPrivateKey.privateKey;
-            const identityPublicKey = identityHDPrivateKey.publicKey;
-            const identityAddress = identityPublicKey.toAddress().toString();
-            console.log("Identity Priv: " + identityPrivateKey)
-            console.log("Identity Pub: " + identityPublicKey)
-            console.log("Identity Address: " + identityAddress)
-            curIdentity = identityAddress;
+            // const identityHDPrivateKey = await sdk.account.getIdentityHDKey(0, 'user');
+            // const identityPrivateKey = identityHDPrivateKey.privateKey;
+            // const identityPublicKey = identityHDPrivateKey.publicKey;
+            // const identityAddress = identityPublicKey.toAddress().toString();
+            // console.log("Identity Priv: " + identityPrivateKey)
+            // console.log("Identity Pub: " + identityPublicKey)
+            // console.log("Identity Address: " + identityAddress)
+            // curIdentity = identityAddress;
 
             await chrome.storage.local.set({ mnemonic: curMnemonic });
             await chrome.storage.local.set({ address: curAddress });
             await chrome.storage.local.set({ balance: curBalance });
-            await chrome.storage.local.set({ identity: curIdentity });
+            // await chrome.storage.local.set({ identity: curIdentity });
+            await chrome.storage.local.set({ identity: "" });
+
             sendResponse({ complete: true });
             disconnect();
           })()
@@ -256,7 +258,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function getDocuments() {
             console.log('getDocuments');
             const recordLocator = "myContract." + request.documentName; // just use myContract for all
-            
+
             var queryJson = JSON.parse(request.queryObject);
             const documents = await sdk.platform.documents.get(recordLocator, queryJson);
             console.log(documents);

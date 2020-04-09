@@ -197,14 +197,14 @@ document.addEventListener('DOMContentLoaded', function () {
       queryObjectText.value = '{ "where": [\n' +
         '["normalizedParentDomainName", "==", "dash"]\n' +
         '],\n' +
-        '"startAt": 0 }\n';
+        '"startAt": 1 }\n';
       contractIdText.value = '77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3';
       // toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Login") {
       documentNameText.value = 'login';
-      queryObjectText.value = '{ "startAt": 0 }';
+      queryObjectText.value = '{ "startAt": 1 }';
       contractIdText.value = '7kXTykyrTW192bCTKiMuEX2s15KExZaHKos8GrWCF21D';
       toAddressText.value = "";
     }
@@ -265,6 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
       mnemonicBtn.disabled = false;
       if (addressText.value != '') createBtn.disabled = true;
       if (identityText.value != '') regIdentityBtn.disabled = true;
+      if (identityText.value == '') regIdentityBtn.disabled = false;
     });
 
   }, false);
