@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
           balanceText.value = cookies.balance;
           mnemonicText.value = cookies.mnemonic;
         });
+        regIdentityBtn.disabled = false;
         showLoading('spinnerCreateWallet', false);
       }
       else {

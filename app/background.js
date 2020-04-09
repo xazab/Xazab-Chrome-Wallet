@@ -108,7 +108,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // TODO: add button for extension in tab
     // chrome.tabs.create({url: chrome.extension.getURL("popup.html")})
     //console.log(chrome.extension.getURL("popup.html"));
-    if (request.greeting == 'importMnemonic') { curMnemonic = request.mnemonic }
+    if (request.greeting == 'importMnemonic') { curMnemonic = request.mnemonic; console.log(curMnemonic); }
     if (request.greeting == 'getDocuments') {
       curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
       curApps = JSON.parse(curApps);
