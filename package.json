@@ -1,12 +1,15 @@
 {
   "name": "Dash-ChromeWallet",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:firefox": "web-ext run --source-dir ./app/",
+    "lint:firefox": "web-ext lint --source-dir ./app/",
+    "sign:firefox": "web-ext sign --source-dir ./app/",
+    "build:firefox": "web-ext build --source-dir ./app/"
   },
   "repository": {
     "type": "git",
@@ -22,11 +25,5 @@
   "devDependencies": {
     "gulp": "^4.0.2",
     "web-ext": "^4.1.0"
-  },
-  "scripts": {
-    "start:firefox": "web-ext run --source-dir ./app/",
-    "lint:firefox": "web-ext lint --source-dir ./app/",
-    "sign:firefox": "web-ext sign --source-dir ./app/",
-    "build:firefox": "web-ext build --source-dir ./app/"
   }
 }

@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let contractIdText = document.getElementById('contractIdText');
   let getContractBtn = document.getElementById('getContractBtn');
+  let signingSwitch = document.getElementById('switch1');
 
 
   // disable button rules (executed each time popup opened)
@@ -82,7 +83,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     nameText.value = data.name;
   });
+  chrome.storage.local.get('switch', function (data) {
+    signingSwitch.checked = data.switch;
+  });
 
+  //switch
+  signingSwitch.addEventListener('change', function () {
+    // chrome.extension.getBackgroundPage().console.log("switch changed")
+    // signingSwitch.checked = true;
+    chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) {
+    });
+  }, false);
 
   //connect
   connectBtn.addEventListener('click', function () {
@@ -134,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       getBalanceBtn.disabled = false;
       showLoading('spinnerGetBalance', false);
-      if(balanceText.value != '0') { sendFundsBtn.disabled = false }
+      if (balanceText.value != '0') { sendFundsBtn.disabled = false }
     });
   }, false);
 
@@ -225,8 +236,8 @@ document.addEventListener('DOMContentLoaded', function () {
       await getLocalStorage(['identity']).then((cookies) => {
         identityText.value = cookies.identity;
       });
-      if(identityText.value != '') { 
-        regNameBtn.disabled = false 
+      if (identityText.value != '') {
+        regNameBtn.disabled = false
         nameText.readOnly = false;
       }
       showLoading('spinnerCreateIdentity', false);

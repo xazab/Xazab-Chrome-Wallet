@@ -8,9 +8,15 @@ var sdkOpts = {};
 var sdk = null;
 var platform = null;
 var identity = null;
-var newWin = null;
+// var newWin = null;
 const connectMaxRetries = 3;
 var connectTries = 0;
+var curSwitch = false;
+var curIdentHDPrivKey = null;
+var curIdentPrivKey = '';
+var curidentPubKey = '';
+var curIdentAddr = '';
+var pollSdk = null;
 
 sdkOpts.network = 'testnet';
 
@@ -91,6 +97,8 @@ chrome.runtime.onInstalled.addListener(function () {
   chrome.storage.local.set({ balance: '' });
   chrome.storage.local.set({ identity: '' });
   chrome.storage.local.set({ name: '' });
+  chrome.storage.local.set({ switch: '' });
+  // chrome.storage.local.set({ tab: chrome.extension.getURL("popup.html") });
 
 });
 
@@ -101,18 +109,150 @@ chrome.storage.local.get('mnemonic', function (data) {
     curMnemonic = null;
 });
 
+async function getIdentityKeys() {
+  curIdentHDPrivKey = await sdk.account.getIdentityHDKey(0, 'user')
+  curIdentPrivKey = curIdentHDPrivKey.privateKey;
+  var pk = curIdentPrivKey;
+  curIdentityPublicKey = curIdentHDPrivKey.publicKey;
+  var pubk = curIdentityPublicKey;
+  console.log("IdentityPrivateKey " + curIdentPrivKey)
+  // those are identical after converting toAddress()
+  console.log("IdentityPublicKey.toAddress() : " + pubk.toAddress().toString())
+  console.log("identityPrivateKey.toAddress: " + pk.toAddress().toString())
+
+}
+
+async function signMsg(msg) {
+  try {
+    const message = "readme Fri, 03 Apr 2020 16:50:59 GMT";
+    const messageDash = new Dash.Core.Message(message);
+    console.log("message: " + messageDash);
+    console.log("curIdentPrivKey: " + curIdentPrivKey)
+
+    // Cannot read property 'sign' of undefined
+    // const signedMsg = await pollSdk.account.sign(messageDash, curIdentPrivKey);
+    var signedMsg = await messageDash.sign(curIdentPrivKey);
+
+    console.log("sign(msg, privKey): " + signedMsg)
+
+    const verify = await messageDash.verify(curIdentPrivKey.toAddress().toString(), signedMsg.toString());
+    console.log("verify(identAddr, signed msg):  " + verify)
+  } catch (e) {
+    console.log("caught signMsg " + e)
+  } finally {
+    return signedMsg;
+  }
+}
+
+async function submitDocument(msg) {
+
+  try {
+    //TODO change to curIdentity
+    var tidentity = await pollSdk.platform.identities.get('J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb');
+
+    var docProperties = {
+      message: msg
+    }
+    // Create the note document TODO: change record locator
+    var noteDocument = await pollSdk.platform.documents.create(
+      'myContract.login',
+      tidentity,
+      docProperties,
+    );
+    // Sign and submit the document
+    // TypeError: Cannot read property 'getIdentityHDKey' of undefined
+    console.log(tidentity)
+    console.log(noteDocument)
+    await pollSdk.platform.documents.broadcast(noteDocument, tidentity);
+  } catch (e) {
+    console.error('Something went wrong:', e);
+  } finally {
+    console.log("submited login document with message: " + msg)
+  }
+  return true;
+}
+
+
+//////////////////////////////////// just testing/hacking for now
+
+async function polling() {
+
+  pContractID = "7kXTykyrTW192bCTKiMuEX2s15KExZaHKos8GrWCF21D";
+  pDocument = "login";
+  // pTarget = "myName"
+
+  var psdkOpts = {};
+  psdkOpts.network = 'testnet';
+  psdkOpts.mnemonic = 'napkin oven gasp job romance park call isolate kite exotic bachelor control';
+  curApps = '{ "myContract" : { "contractId" : "' + pContractID + '" } }';
+  curApps = JSON.parse(curApps);
+  psdkOpts.apps = curApps;
+
+  var nStart = 1;
+  var pollLocator = "myContract." + pDocument;
+
+  pollSdk = new Dash.Client(psdkOpts);
+  await pollSdk.isReady();
+
+  // while (curSwitch) {
+
+  try {
+
+    console.log("polling");
+    var pollQuery = '{ "startAt" : "' + nStart + '" }';
+    pollQuery = JSON.parse(pollQuery);
+    console.log(pollQuery)
+    const pollDoc = await pollSdk.platform.documents.get(pollLocator, pollQuery);
+    nStart = nStart + pollDoc.length;
+    console.log(pollDoc.length);
+    console.log(pollDoc[0].data.message);
+
+    if (pollDoc[0].data.message.startsWith("readme")) {
+      console.log("suc");
+
+      curIdentity = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb'; // TODO remove
+      var retSignMsg = await signMsg("blub");
+      console.log("retSignMsg: " + retSignMsg)
+      await submitDocument(retSignMsg);
+    }
+    // await pollSdk.disconnect();
+    await new Promise(r => setTimeout(r, 5000));  // sleep x ms
+  } catch (e) {
+    console.log("caught polling " + e)
+  }
+  // }
+  return true;
+}
+// while (true) {
+// polling();
+// }
+////////////////////////////////////
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   try {
     // TODO: add button for extension in tab
     // chrome.tabs.create({url: chrome.extension.getURL("popup.html")})
-    //console.log(chrome.extension.getURL("popup.html"));
+    // console.log(chrome.extension.getURL("popup.html"));
     if (request.greeting == 'importMnemonic') { curMnemonic = request.mnemonic; console.log(curMnemonic); }
     if (request.greeting == 'getDocuments') {
       curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
       curApps = JSON.parse(curApps);
     }
+    if (request.greeting == "switch") {
+      (async function dappSigning() {
+        curSwitch = request.switch;
+        console.log(curSwitch)
+        await chrome.storage.local.set({ switch: curSwitch });
+        if (curSwitch) {
+          polling();
+        }
+        // exit somehow
+      })();
+    }
+
+    /////////////////// start switch - case ////////////////////
 
     connect().then(() => {
 
@@ -126,6 +266,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           })()
 
           break;
+
 
         case "createWallet":
 
@@ -155,14 +296,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             curAddress = await sdk.account.getUnusedAddress().address;
             curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
 
-            // const identityHDPrivateKey = await sdk.account.getIdentityHDKey(0, 'user');
-            // const identityPrivateKey = identityHDPrivateKey.privateKey;
-            // const identityPublicKey = identityHDPrivateKey.publicKey;
-            // const identityAddress = identityPublicKey.toAddress().toString();
-            // console.log("Identity Priv: " + identityPrivateKey)
-            // console.log("Identity Pub: " + identityPublicKey)
-            // console.log("Identity Address: " + identityAddress)
-            // curIdentity = identityAddress;
+            getIdentityKeys();
 
             await chrome.storage.local.set({ mnemonic: curMnemonic });
             await chrome.storage.local.set({ address: curAddress });
@@ -231,6 +365,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log({ identity });
             curIdentity = identity;
             await chrome.storage.local.set({ identity: identity });
+            getIdentityKeys();
+
             sendResponse({ complete: true });
             disconnect();
           })()
@@ -264,21 +400,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
 
-            newWin = window.open("about:blank", "Document Query", "width=800,height=500");
-            newWin.document.open();
-            // newWin.document.body.innerHTML = '<html><body><pre>' + documentJson + '</pre></body></html>';
-            newWin.document.write('<html><body><pre>' + documentJson + '</pre></body></html>');
-            newWin.document.close();
+            let a = URL.createObjectURL(new Blob([documentJson]))
+            // console.log(a)
+            chrome.windows.create({
+              type: 'popup',
+              url: a
+            });
+            // chrome.tabs.create({ url: a });
 
-            // chrome.windows.create({
-            //   type: 'popup',
-            //   url: "about:blank"
-            // }, function (newWindow) {
-            //   console.log(newWindow);
-            //   chrome.tabs.executeScript(newWindow.tabs[0].id, {
-            //     code: 'document.write("hello world");'
-            //   });
-            // });
+            // newWin = window.open(a, "Document Query", "width=800,height=500");
+
             sendResponse({ complete: true });
             disconnect();
           })()

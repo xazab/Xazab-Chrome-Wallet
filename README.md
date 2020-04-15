@@ -28,6 +28,7 @@ Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet us
 
 ## TODO:
 - import identity/name with mnemonic
+- reset function
 
 
 
