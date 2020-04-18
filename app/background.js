@@ -23,10 +23,10 @@ curMnemonic = 'napkin oven gasp job romance park call isolate kite exotic bachel
 curAddress = 'yNx9SY6FPdNLM4zrwkfGCziNaqGnfsguCa';
 curBalance = '1';
 curIdentityId = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb';
-chrome.storage.local.set({ mnemonic: 'napkin oven gasp job romance park call isolate kite exotic bachelor control' });
-chrome.storage.local.set({ address: 'yNx9SY6FPdNLM4zrwkfGCziNaqGnfsguCa' });
-chrome.storage.local.set({ balance: '1' });
-chrome.storage.local.set({ identityId: 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb' });
+chrome.storage.local.set({ mnemonic: curMnemonic });
+chrome.storage.local.set({ address: curAddress });
+chrome.storage.local.set({ balance: curBalance });
+chrome.storage.local.set({ identityId: curIdentityId });
 
 // productive environment settings:
 sdkOpts.network = 'testnet';
@@ -144,8 +144,8 @@ async function getIdentityKeys() {
 
 async function signMsg(msg) {
   try {
-    const message = "readme Fri, 03 Apr 2020 16:50:59 GMT"; // TODO
-    const messageDash = new Dash.Core.Message(message);
+    // const message = "readme Fri, 03 Apr 2020 16:50:59 GMT"; // TODO
+    const messageDash = new Dash.Core.Message(msg);
     console.log("message: " + messageDash);
     console.log("curIdentPrivKey: " + curIdentityPrivKey)
 
@@ -193,19 +193,15 @@ async function submitDocument(msg) {
   return true;
 }
 
-
-//////////////////////////////////// just testing/hacking for now
-
 async function polling() {
 
   // TODO: remove later
   getIdentityKeys()
 
+  // TODO remove when DashJS removed curApps
   var psdkOpts = {};
   psdkOpts.network = 'testnet';
-  // psdkOpts.mnemonic = 'napkin oven gasp job romance park call isolate kite exotic bachelor control';
   psdkOpts.mnemonic = curMnemonic;
-
   curApps = '{ "myContract" : { "contractId" : "' + pContractID + '" } }';
   curApps = JSON.parse(curApps);
   psdkOpts.apps = curApps;
@@ -216,34 +212,50 @@ async function polling() {
   pollSdk = new Dash.Client(psdkOpts);
   await pollSdk.isReady();
 
-  // while (curSwitch) {
+  var reachedHead = false;
 
-  try {
+  while (curSwitch) {
 
-    console.log("polling");
-    var pollQuery = '{ "startAt" : "' + nStart + '" }';
-    pollQuery = JSON.parse(pollQuery);
-    console.log(pollQuery)
-    const pollDoc = await pollSdk.platform.documents.get(pollLocator, pollQuery);
-    nStart = nStart + pollDoc.length;
-    console.log(pollDoc.length);
-    console.log(pollDoc[0].data.message);
+    try {
 
-    if (pollDoc[0].data.message.startsWith("readme")) {
-      console.log("suc");
+      console.log("polling");
 
-      curIdentityId = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb'; // TODO remove
-      var retSignMsg = await signMsg("blub");
-      console.log("retSignMsg: " + retSignMsg)
-      await submitDocument(retSignMsg);
+      var pollQuery = '{ "startAt" : "' + nStart + '" }';
+      console.log(pollQuery)
+      pollQuery = JSON.parse(pollQuery);
+      const pollDoc = await pollSdk.platform.documents.get(pollLocator, pollQuery);
+
+      if (pollDoc.length == 0 || reachedHead == false) {
+        if (pollDoc.length == 0) reachedHead = true;
+        nStart = nStart + pollDoc.length;
+        await new Promise(r => setTimeout(r, 5000));  // sleep x ms
+        continue;
+      }
+      console.log("polldoc length: " + pollDoc.length)
+
+      for (let index = 0; index < pollDoc.length; ++index) {
+        var requestMsg = pollDoc[index].data.message;
+        if (requestMsg == null) return;
+
+        if (requestMsg.startsWith(curIdentityId)) {
+          console.log("Found message starting with IdentityId");
+
+          // sign response message with text of request message
+          var responseMsgSigned = await signMsg(requestMsg);
+          console.log("responseMsgSigned: " + responseMsgSigned)
+
+          await submitDocument(responseMsgSigned);
+        }
+      }
+      nStart = nStart + pollDoc.length;
+      // await pollSdk.disconnect();
+
+    } catch (e) {
+      console.log("caught error polling " + e)
     }
-    // await pollSdk.disconnect();
-    await new Promise(r => setTimeout(r, 5000));  // sleep x ms
-  } catch (e) {
-    console.log("caught polling " + e)
   }
-  // }
-  return true;
+  console.log("return")
+  return;
 }
 // while (true) {
 // polling();
@@ -254,25 +266,22 @@ async function polling() {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   try {
-    // TODO: add button for extension in tab
-    // chrome.tabs.create({url: chrome.extension.getURL("popup.html")})
-    // console.log(chrome.extension.getURL("popup.html"));
     if (request.greeting == 'importMnemonic') { curMnemonic = request.mnemonic; console.log(curMnemonic); }
     if (request.greeting == 'getDocuments') {
       curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
       curApps = JSON.parse(curApps);
     }
-    if (request.greeting == "switch") {
-      (async function dappSigning() {
-        curSwitch = request.switch;
-        console.log("curSwitch: " + curSwitch)
-        await chrome.storage.local.set({ switch: curSwitch });
-        if (curSwitch) {
-          polling();
-        }
-        // exit somehow
-      })();
-    }
+    // if (request.greeting == "switch") {
+    //   (async function dappSigning() {
+    //     curSwitch = request.switch;
+    //     console.log("curSwitch: " + curSwitch)
+    //     await chrome.storage.local.set({ switch: curSwitch });
+    //     if (curSwitch) {
+    //       polling();
+    //     }
+    //     // exit somehow or add "switch" case
+    //   })();
+    // }
 
     /////////////////// start switch - case ////////////////////
 
@@ -289,9 +298,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
           break;
 
+        case "switch":
+          (async function dappSigning() {
+            curSwitch = request.switch;
+            console.log("curSwitch: " + curSwitch)
+            await chrome.storage.local.set({ switch: curSwitch });
+            if (curSwitch) {
+              polling();
+            }
+            sendResponse({ complete: true });
+            disconnect();
+          })();
+          break
+
 
         case "createWallet":
-
           (async function createWallet() {
             console.log('createWallet');
 
@@ -306,8 +327,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // var savedBalance = await getLocalStorage(['balance']);
             sendResponse({ complete: true });
             disconnect();
-          })()
-
+          })();
           break;
 
 
@@ -329,11 +349,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ complete: true });
             disconnect();
           })()
-
           break;
 
 
         case "getBalance":
+          // TODO: use events api to auto update balance
           (async function getBalance() {
             console.log('getBalance');
             console.log(await sdk.account.getUnconfirmedBalance())
@@ -344,7 +364,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ complete: true });
             disconnect();
           })()
-
           break;
 
 
@@ -376,7 +395,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ complete: true });
             disconnect();
           })()
-
           break;
 
 
@@ -399,7 +417,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ complete: true });
             disconnect();
           })()
-
           break;
 
 
@@ -415,7 +432,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ complete: true });
             disconnect();
           })()
-
           break;
 
 
@@ -443,7 +459,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ complete: true });
             disconnect();
           })()
-
           break;
 
 
@@ -461,8 +476,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ complete: true });
             disconnect();
           })()
-
           break;
+
 
         default:
           // error

@@ -91,8 +91,9 @@ document.addEventListener('DOMContentLoaded', function () {
   signingSwitch.addEventListener('change', function () {
     // chrome.extension.getBackgroundPage().console.log("switch changed")
     // signingSwitch.checked = true;
-    chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked });
+    chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) { });
   }, false);
+  
 
   //connect
   connectBtn.addEventListener('click', function () {
@@ -228,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
       alert('Not enough funds detected!\nYou need to pay 0.0001 Dash as fee to create identity.')
       return;
     }
-    
+
     identityIdBtn.disabled = true;
     showLoading('spinnerCreateIdentity', true);
     chrome.runtime.sendMessage({ greeting: "registerIdentity", identityId: identityIdText.value }, async function (response) {
