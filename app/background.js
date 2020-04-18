@@ -1,24 +1,41 @@
 var curMnemonic = null;
 var curAddress = '';
 var curBalance = '';
-var curIdentity = '';
+var curIdentityId = '';
 var curApps = '';
 var curName = '';
 var sdkOpts = {};
 var sdk = null;
 var platform = null;
-var identity = null;
-// var newWin = null;
+var identityId = null;
 const connectMaxRetries = 3;
 var connectTries = 0;
 var curSwitch = false;
-var curIdentHDPrivKey = null;
-var curIdentPrivKey = '';
+var curIdentityHDPrivKey = null;
+var curIdentityPrivKey = '';
 var curidentPubKey = '';
 var curIdentAddr = '';
 var pollSdk = null;
 
+////////////////////////////////////
+// development environment settings:
+curMnemonic = 'napkin oven gasp job romance park call isolate kite exotic bachelor control';
+curAddress = 'yNx9SY6FPdNLM4zrwkfGCziNaqGnfsguCa';
+curBalance = '1';
+curIdentityId = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb';
+chrome.storage.local.set({ mnemonic: 'napkin oven gasp job romance park call isolate kite exotic bachelor control' });
+chrome.storage.local.set({ address: 'yNx9SY6FPdNLM4zrwkfGCziNaqGnfsguCa' });
+chrome.storage.local.set({ balance: '1' });
+chrome.storage.local.set({ identityId: 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb' });
+
+// productive environment settings:
 sdkOpts.network = 'testnet';
+const pRecordLocator = 'myContract.login';
+const pContractID = "7kXTykyrTW192bCTKiMuEX2s15KExZaHKos8GrWCF21D";
+const pDocument = "login";
+// pTarget = "myName"
+
+////////////////////////////////////
 
 function connect() {
   return new Promise((resolve, reject) => {
@@ -95,7 +112,7 @@ chrome.runtime.onInstalled.addListener(function () {
   chrome.storage.local.set({ mnemonic: '' });
   chrome.storage.local.set({ address: '' });
   chrome.storage.local.set({ balance: '' });
-  chrome.storage.local.set({ identity: '' });
+  chrome.storage.local.set({ identityId: '' });
   chrome.storage.local.set({ name: '' });
   chrome.storage.local.set({ switch: '' });
   // chrome.storage.local.set({ tab: chrome.extension.getURL("popup.html") });
@@ -109,13 +126,16 @@ chrome.storage.local.get('mnemonic', function (data) {
     curMnemonic = null;
 });
 
+////////////// experimental code for dapp signing - some stuff hardcoded for now ////////////
+
 async function getIdentityKeys() {
-  curIdentHDPrivKey = await sdk.account.getIdentityHDKey(0, 'user')
-  curIdentPrivKey = curIdentHDPrivKey.privateKey;
-  var pk = curIdentPrivKey;
-  curIdentityPublicKey = curIdentHDPrivKey.publicKey;
+  curIdentityHDPrivKey = await sdk.account.getIdentityHDKey(0, 'user')
+  console.log("curIdentHDPrivKey: " + curIdentityHDPrivKey)
+  curIdentityPrivKey = curIdentityHDPrivKey.privateKey;
+  var pk = curIdentityPrivKey;
+  curIdentityPublicKey = curIdentityHDPrivKey.publicKey;
   var pubk = curIdentityPublicKey;
-  console.log("IdentityPrivateKey " + curIdentPrivKey)
+  console.log("IdentityPrivateKey " + curIdentityPrivKey)
   // those are identical after converting toAddress()
   console.log("IdentityPublicKey.toAddress() : " + pubk.toAddress().toString())
   console.log("identityPrivateKey.toAddress: " + pk.toAddress().toString())
@@ -124,18 +144,18 @@ async function getIdentityKeys() {
 
 async function signMsg(msg) {
   try {
-    const message = "readme Fri, 03 Apr 2020 16:50:59 GMT";
+    const message = "readme Fri, 03 Apr 2020 16:50:59 GMT"; // TODO
     const messageDash = new Dash.Core.Message(message);
     console.log("message: " + messageDash);
-    console.log("curIdentPrivKey: " + curIdentPrivKey)
+    console.log("curIdentPrivKey: " + curIdentityPrivKey)
 
     // Cannot read property 'sign' of undefined
     // const signedMsg = await pollSdk.account.sign(messageDash, curIdentPrivKey);
-    var signedMsg = await messageDash.sign(curIdentPrivKey);
+    var signedMsg = await messageDash.sign(curIdentityPrivKey);
 
     console.log("sign(msg, privKey): " + signedMsg)
 
-    const verify = await messageDash.verify(curIdentPrivKey.toAddress().toString(), signedMsg.toString());
+    const verify = await messageDash.verify(curIdentityPrivKey.toAddress().toString(), signedMsg.toString());
     console.log("verify(identAddr, signed msg):  " + verify)
   } catch (e) {
     console.log("caught signMsg " + e)
@@ -147,15 +167,16 @@ async function signMsg(msg) {
 async function submitDocument(msg) {
 
   try {
-    //TODO change to curIdentity
-    var tidentity = await pollSdk.platform.identities.get('J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb');
+    //TODO change to curIdentityId
+    // var tidentity = await pollSdk.platform.identities.get('J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb');
+    var tidentity = await pollSdk.platform.identities.get(curIdentityId);
 
     var docProperties = {
       message: msg
     }
     // Create the note document TODO: change record locator
     var noteDocument = await pollSdk.platform.documents.create(
-      'myContract.login',
+      pRecordLocator,
       tidentity,
       docProperties,
     );
@@ -177,13 +198,14 @@ async function submitDocument(msg) {
 
 async function polling() {
 
-  pContractID = "7kXTykyrTW192bCTKiMuEX2s15KExZaHKos8GrWCF21D";
-  pDocument = "login";
-  // pTarget = "myName"
+  // TODO: remove later
+  getIdentityKeys()
 
   var psdkOpts = {};
   psdkOpts.network = 'testnet';
-  psdkOpts.mnemonic = 'napkin oven gasp job romance park call isolate kite exotic bachelor control';
+  // psdkOpts.mnemonic = 'napkin oven gasp job romance park call isolate kite exotic bachelor control';
+  psdkOpts.mnemonic = curMnemonic;
+
   curApps = '{ "myContract" : { "contractId" : "' + pContractID + '" } }';
   curApps = JSON.parse(curApps);
   psdkOpts.apps = curApps;
@@ -210,7 +232,7 @@ async function polling() {
     if (pollDoc[0].data.message.startsWith("readme")) {
       console.log("suc");
 
-      curIdentity = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb'; // TODO remove
+      curIdentityId = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb'; // TODO remove
       var retSignMsg = await signMsg("blub");
       console.log("retSignMsg: " + retSignMsg)
       await submitDocument(retSignMsg);
@@ -243,7 +265,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.greeting == "switch") {
       (async function dappSigning() {
         curSwitch = request.switch;
-        console.log(curSwitch)
+        console.log("curSwitch: " + curSwitch)
         await chrome.storage.local.set({ switch: curSwitch });
         if (curSwitch) {
           polling();
@@ -301,8 +323,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             await chrome.storage.local.set({ mnemonic: curMnemonic });
             await chrome.storage.local.set({ address: curAddress });
             await chrome.storage.local.set({ balance: curBalance });
-            // await chrome.storage.local.set({ identity: curIdentity });
-            await chrome.storage.local.set({ identity: "" });
+            // await chrome.storage.local.set({ identityId: curIdentityId });
+            await chrome.storage.local.set({ identityId: "" });
 
             sendResponse({ complete: true });
             disconnect();
@@ -361,10 +383,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "registerIdentity":
           (async function registerIdentity() {
             console.log('registerIdentity');
-            identity = await sdk.platform.identities.register('user'); // literally 'user', do not change
-            console.log({ identity });
-            curIdentity = identity;
-            await chrome.storage.local.set({ identity: identity });
+            // import identityId
+            if (request.identityId != '') {
+              identityId = request.identityId;
+            }
+            // create identityId
+            else {
+              identityId = await sdk.platform.identities.register('user'); // literally 'user', do not change
+            }
+            console.log({ identityId: identityId });
+            curIdentityId = identityId;
+            await chrome.storage.local.set({ identityId: identityId });
             getIdentityKeys();
 
             sendResponse({ complete: true });
@@ -379,8 +408,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('registerName');
             curName = request.name;
             // TODO: bug when having several identitys, importing 1st and then registering name
-            identity = await sdk.platform.identities.get(curIdentity);
-            const nameRegistration = await sdk.platform.names.register(curName, identity);
+            identityId = await sdk.platform.identities.get(curIdentityId);
+            const nameRegistration = await sdk.platform.names.register(curName, identityId);
             console.log({ nameRegistration });
             await chrome.storage.local.set({ name: curName });
             sendResponse({ complete: true });
@@ -400,8 +429,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log(documents);
             var documentJson = JSON.stringify(documents, null, 2)
 
-            let a = URL.createObjectURL(new Blob([documentJson]))
-            // console.log(a)
+            // todo: fix encoding warning in firefox
+            let a = URL.createObjectURL(new Blob([documentJson]), { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
+
             chrome.windows.create({
               type: 'popup',
               url: a
@@ -436,7 +466,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         default:
           // error
-          console.log('ERROR: Unknown Message!');
+          console.log('ERROR Unknown Message: ' + String(request.greeting));
+          disconnect();
+          break;
       }
     })
       .catch((e) => {

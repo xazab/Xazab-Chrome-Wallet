@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', function () {
   let sendFundsBtn = document.getElementById('sendBtn');
   let amountText = document.getElementById('amountText');
   let toAddressText = document.getElementById('toAddressText');
-  let regIdentityBtn = document.getElementById('identityBtn');
-  let identityText = document.getElementById('identityText');
-  let regNameBtn = document.getElementById('nameBtn');
+  let identityIdBtn = document.getElementById('identityBtn');
+  let identityIdText = document.getElementById('identityText');
+  let nameBtn = document.getElementById('nameBtn');
   let nameText = document.getElementById('nameText');
   let mnemonicText = document.getElementById('mnemonicText');
   let mnemonicBtn = document.getElementById('mnemonicBtn');
@@ -64,22 +64,22 @@ document.addEventListener('DOMContentLoaded', function () {
       sendFundsBtn.disabled = true;
     }
   });
-  chrome.storage.local.get('identity', function (data) {
-    identityText.value = data.identity;
-    if (identityText.value != '')
-      regIdentityBtn.disabled = true;
+  chrome.storage.local.get('identityId', function (data) {
+    identityIdText.value = data.identityId;
+    if (identityIdText.value != '')
+      identityIdBtn.disabled = true;
     else if (addressText.value == '') {
-      regIdentityBtn.disabled = true;
+      identityIdBtn.disabled = true;
     }
   });
   chrome.storage.local.get('name', function (data) {
-    if (data.name == '' && identityText.value == '') {
+    if (data.name == '' && identityIdText.value == '') {
       nameText.readOnly = true;
-      regNameBtn.disabled = true;
+      nameBtn.disabled = true;
     }
     else if (data.name != '') {
       nameText.readOnly = true;
-      regNameBtn.disabled = true;
+      nameBtn.disabled = true;
     }
     nameText.value = data.name;
   });
@@ -91,8 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
   signingSwitch.addEventListener('change', function () {
     // chrome.extension.getBackgroundPage().console.log("switch changed")
     // signingSwitch.checked = true;
-    chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) {
-    });
+    chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked });
   }, false);
 
   //connect
@@ -121,13 +120,13 @@ document.addEventListener('DOMContentLoaded', function () {
           balanceText.value = cookies.balance;
           mnemonicText.value = cookies.mnemonic;
         });
-        regIdentityBtn.disabled = false;
+        identityIdBtn.disabled = false;
         showLoading('spinnerCreateWallet', false);
       }
       else {
         alert('There was a problem creating the wallet - please try again');
         createBtn.disabled = false;
-        regIdentityBtn.disabled = false;
+        identityIdBtn.disabled = false;
         showLoading('spinnerCreateWallet', false);
       }
     });
@@ -223,21 +222,22 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
 
-  //register identity
-  regIdentityBtn.addEventListener('click', function () {
+  //register identityId
+  identityIdBtn.addEventListener('click', function () {
     if (balanceText.value < '0.0001' || balanceText.value == '') {
       alert('Not enough funds detected!\nYou need to pay 0.0001 Dash as fee to create identity.')
       return;
     }
-    regIdentityBtn.disabled = true;
+    
+    identityIdBtn.disabled = true;
     showLoading('spinnerCreateIdentity', true);
-    chrome.runtime.sendMessage({ greeting: "registerIdentity" }, async function (response) {
+    chrome.runtime.sendMessage({ greeting: "registerIdentity", identityId: identityIdText.value }, async function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      await getLocalStorage(['identity']).then((cookies) => {
-        identityText.value = cookies.identity;
+      await getLocalStorage(['identityId']).then((cookies) => {
+        identityIdText.value = cookies.identityId;
       });
-      if (identityText.value != '') {
-        regNameBtn.disabled = false
+      if (identityIdText.value != '') {
+        nameBtn.disabled = false
         nameText.readOnly = false;
       }
       showLoading('spinnerCreateIdentity', false);
@@ -247,8 +247,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   //register name
-  regNameBtn.addEventListener('click', function () {
-    regNameBtn.disabled = true;
+  nameBtn.addEventListener('click', function () {
+    nameBtn.disabled = true;
     showLoading('spinnerRegisterName', true);
     chrome.runtime.sendMessage({ greeting: "registerName", name: nameText.value }, async function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
@@ -268,16 +268,16 @@ document.addEventListener('DOMContentLoaded', function () {
     showLoading('spinnerImportMnemonic', true);
     chrome.runtime.sendMessage({ greeting: "importMnemonic", mnemonic: mnemonicText.value }, async function (response) {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      await getLocalStorage(['address', 'balance', 'identity']).then((cookies) => {
+      await getLocalStorage(['address', 'balance', 'identityId']).then((cookies) => {
         addressText.value = cookies.address;
         balanceText.value = cookies.balance;
-        identityText.value = cookies.identity;
+        identityIdText.value = cookies.identityId;
       });
       showLoading('spinnerImportMnemonic', false);
       mnemonicBtn.disabled = false;
       if (addressText.value != '') createBtn.disabled = true;
-      if (identityText.value != '') regIdentityBtn.disabled = true;
-      if (identityText.value == '') regIdentityBtn.disabled = false;
+      if (identityIdText.value != '') identityIdBtn.disabled = true;
+      if (identityIdText.value == '') identityIdBtn.disabled = false;
     });
 
   }, false);
