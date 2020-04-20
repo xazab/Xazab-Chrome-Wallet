@@ -226,9 +226,11 @@ async function polling() {
       const pollDoc = await pollSdk.platform.documents.get(pollLocator, pollQuery);
 
       if (pollDoc.length == 0 || reachedHead == false) {
-        if (pollDoc.length == 0) reachedHead = true;
+        if (pollDoc.length == 0) {
+          reachedHead = true;
+          await new Promise(r => setTimeout(r, 5000));  // sleep x ms
+        }
         nStart = nStart + pollDoc.length;
-        await new Promise(r => setTimeout(r, 5000));  // sleep x ms
         continue;
       }
       console.log("polldoc length: " + pollDoc.length)
@@ -240,11 +242,35 @@ async function polling() {
         if (requestMsg.startsWith(curIdentityId)) {
           console.log("Found message starting with IdentityId");
 
-          // sign response message with text of request message
-          var responseMsgSigned = await signMsg(requestMsg);
-          console.log("responseMsgSigned: " + responseMsgSigned)
+          var title = chrome.i18n.getMessage("notificationTitle");
+          var content = chrome.i18n.getMessage("notificationContent");
+          var buttons = [{ "title": "Yes" }, { "title": "No" }];
 
-          await submitDocument(responseMsgSigned);
+          chrome.notifications.create({
+            "type": "basic",
+            "iconUrl": chrome.extension.getURL("img/icon128.png"),
+            "title": title + "Request",
+            "message": content + "Received message with your IdentityID. Confirm Request?",
+            "buttons": buttons
+          });
+          chrome.notifications.onButtonClicked.addListener(async (id, index) => {
+            chrome.notifications.clear(id);
+            console.log("You chose: " + buttons[index].title);
+            console.log(requestMsg) // TODO: test what happens when 2 messages arrive before confirming anything
+            if (buttons[index].title == "Yes") {
+              var responseMsgSigned = await signMsg(requestMsg);
+              console.log("responseMsgSigned: " + responseMsgSigned)
+              await submitDocument(responseMsgSigned);
+            }
+          });
+          // var bConfirm = confirm("Received message with your IdentityID. Confirm Response?");
+          // if pressed "No" in Dialog, abort and dont respond
+          // if (bConfirm == false) { continue; }
+          // sign response message with text of request message
+          // var responseMsgSigned = await signMsg(requestMsg);
+          // console.log("responseMsgSigned: " + responseMsgSigned)
+
+          // await submitDocument(responseMsgSigned);
         }
       }
       nStart = nStart + pollDoc.length;
@@ -292,7 +318,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "connect":
           (async function connect() {
             console.log('connect');
-            alert("connected");
             sendResponse({ complete: true })
           })()
 

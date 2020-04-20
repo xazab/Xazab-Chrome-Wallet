@@ -104,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function () {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       connectBtn.disabled = false;
       showLoading('spinnerTestConnection', false);
+      // TODO firefox: will autohide popup.html -> terminate here and log some error
+      window.alert("connected");
+      // window.close();
     });
   }, false);
 

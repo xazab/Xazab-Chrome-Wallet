@@ -9,8 +9,10 @@
         "128": "./img/icon128.png"
     },
     "permissions": [
-        "storage"
-        // "chrome-extension://*"
+        "storage",
+        "chrome-extension://*",
+        "moz-extension://*",
+        "notifications"
     ],
     "background": {
         "scripts": [
@@ -23,5 +25,5 @@
     "browser_action": {
         "default_popup": "popup.html"
     },
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'; "
 }
