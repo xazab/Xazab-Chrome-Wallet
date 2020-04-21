@@ -12,7 +12,8 @@
         "storage",
         "chrome-extension://*",
         "moz-extension://*",
-        "notifications"
+        "notifications",
+        "activeTab"
     ],
     "background": {
         "scripts": [

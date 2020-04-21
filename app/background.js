@@ -126,6 +126,7 @@ chrome.storage.local.get('mnemonic', function (data) {
     curMnemonic = null;
 });
 
+
 ////////////// experimental code for dapp signing - some stuff hardcoded for now ////////////
 
 async function getIdentityKeys() {
@@ -167,14 +168,12 @@ async function signMsg(msg) {
 async function submitDocument(msg) {
 
   try {
-    //TODO change to curIdentityId
-    // var tidentity = await pollSdk.platform.identities.get('J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb');
     var tidentity = await pollSdk.platform.identities.get(curIdentityId);
 
     var docProperties = {
       message: msg
     }
-    // Create the note document TODO: change record locator
+    // Create the note document
     var noteDocument = await pollSdk.platform.documents.create(
       pRecordLocator,
       tidentity,
@@ -242,42 +241,44 @@ async function polling() {
         if (requestMsg.startsWith(curIdentityId)) {
           console.log("Found message starting with IdentityId");
 
-          var title = chrome.i18n.getMessage("notificationTitle");
-          var content = chrome.i18n.getMessage("notificationContent");
-          var buttons = [{ "title": "Yes" }, { "title": "No" }];
+          //// Confirm Notification
+          // var buttons = [{ "title": "Yes" }, { "title": "No" }];
+          // chrome.notifications.create({
+          //   "type": "basic",
+          //   "iconUrl": chrome.extension.getURL("img/icon128.png"),
+          //   "title": "Request",
+          //   "message": "Received message with your IdentityID. Confirm Request?"
+          //   "buttons": buttons
+          // });
+          // chrome.notifications.onButtonClicked.addListener(async (id, index) => {
+          //   chrome.notifications.clear(id);
+          //   console.log("You chose: " + buttons[index].title);
+          //   console.log(requestMsg) // TODO: test what happens when 2 messages arrive before confirming anything
+          //   if (buttons[index].title == "Yes") {
+          //     var responseMsgSigned = await signMsg(requestMsg);
+          //     console.log("responseMsgSigned: " + responseMsgSigned)
+          //     await submitDocument(responseMsgSigned);
+          //   }
+          // });
 
-          chrome.notifications.create({
-            "type": "basic",
-            "iconUrl": chrome.extension.getURL("img/icon128.png"),
-            "title": title + "Request",
-            "message": content + "Received message with your IdentityID. Confirm Request?",
-            "buttons": buttons
-          });
-          chrome.notifications.onButtonClicked.addListener(async (id, index) => {
-            chrome.notifications.clear(id);
-            console.log("You chose: " + buttons[index].title);
-            console.log(requestMsg) // TODO: test what happens when 2 messages arrive before confirming anything
-            if (buttons[index].title == "Yes") {
-              var responseMsgSigned = await signMsg(requestMsg);
-              console.log("responseMsgSigned: " + responseMsgSigned)
-              await submitDocument(responseMsgSigned);
-            }
-          });
-          // var bConfirm = confirm("Received message with your IdentityID. Confirm Response?");
-          // if pressed "No" in Dialog, abort and dont respond
-          // if (bConfirm == false) { continue; }
-          // sign response message with text of request message
-          // var responseMsgSigned = await signMsg(requestMsg);
-          // console.log("responseMsgSigned: " + responseMsgSigned)
-
-          // await submitDocument(responseMsgSigned);
+          // Confirm Dialog
+          var bConfirm = confirm("Received message with your IdentityID. Confirm Response?");
+          if (bConfirm == false) {  // if pressed "No" in Dialog, abort and dont respond
+            continue;
+          } else {  // sign response message with text of request message
+            var responseMsgSigned = await signMsg(requestMsg);  
+            console.log("responseMsgSigned: " + responseMsgSigned)
+            await submitDocument(responseMsgSigned);
+          }
         }
       }
       nStart = nStart + pollDoc.length;
       // await pollSdk.disconnect();
 
     } catch (e) {
+      // NOTE: firefox not supporting buttons in notification, also not supporting alert+confirm dialog in background
       console.log("caught error polling " + e)
+      return;
     }
   }
   console.log("return")
@@ -319,6 +320,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function connect() {
             console.log('connect');
             sendResponse({ complete: true })
+            var alertWindow = 'alert("message")';
+            chrome.tabs.executeScript({code : alertWindow});
           })()
 
           break;
