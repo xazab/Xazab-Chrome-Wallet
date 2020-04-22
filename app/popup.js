@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // signingSwitch.checked = true;
     chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) { });
   }, false);
-  
+
 
   //connect
   connectBtn.addEventListener('click', function () {
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
       chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
       connectBtn.disabled = false;
       showLoading('spinnerTestConnection', false);
-      // TODO firefox: will autohide popup.html -> terminate here and log some error
+      // TODO firefox: will autohide popup.html -> set autohide to false like chrome default
       window.alert("connected");
       // window.close();
     });

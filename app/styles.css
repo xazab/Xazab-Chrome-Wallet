@@ -4,6 +4,19 @@ body {
    font-family: 'Open Sans', sans-serif;
    font-size: 0.85em;
 }
+#dialog {
+  font-size: 0.95em;
+  margin:0;
+  padding:0;
+  overflow: hidden;
+}
+#dialog:hover {
+  overflow: auto;
+
+}
+#dialog textarea {
+  height: 5em;
+}
 
 textarea {
    font-family: 'Open Sans', sans-serif;
@@ -13,7 +26,7 @@ textarea {
 }
 
 /* Style buttons */
-.buttonload {
+.buttonload, .buttonConfirm, .buttonDeny {
    background-color: rgb(0, 141, 228);
    /* Green background */
    border: none;
@@ -26,8 +39,19 @@ textarea {
    font-size: 0.88em;
    /* border-radius: 15px; */
    box-shadow: 0 0px #999;
- }
- button:hover {background-color: rgb(0, 60, 97);}
+}
+.buttonConfirm {
+  background-color: rgb(47, 143, 55);
+  width: 90px;
+  font-size: 1.0em;
+}
+.buttonDeny {
+  background-color: rgb(155, 44, 44);
+  width: 90px;
+  font-size: 1.0em;
+}
+
+button:hover {background-color: rgb(0, 60, 97);}
  
  /* button::-moz-focus-inner {
   border: 0;

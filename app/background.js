@@ -15,18 +15,19 @@ var curIdentityHDPrivKey = null;
 var curIdentityPrivKey = '';
 var curidentPubKey = '';
 var curIdentAddr = '';
+var curDappRequests = ["blub"];
 var pollSdk = null;
 
 ////////////////////////////////////
 // development environment settings:
-curMnemonic = 'napkin oven gasp job romance park call isolate kite exotic bachelor control';
-curAddress = 'yNx9SY6FPdNLM4zrwkfGCziNaqGnfsguCa';
-curBalance = '1';
-curIdentityId = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb';
-chrome.storage.local.set({ mnemonic: curMnemonic });
-chrome.storage.local.set({ address: curAddress });
-chrome.storage.local.set({ balance: curBalance });
-chrome.storage.local.set({ identityId: curIdentityId });
+// curMnemonic = 'brick dinosaur view lemon canal horse owner rail fat clean face tobacco';
+// curAddress = 'ybPY8q7hJ3QycxyahsqTpJdL9jyXfUWsvs';
+// curBalance = '1';
+// curIdentityId = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb';
+// chrome.storage.local.set({ mnemonic: curMnemonic });
+// chrome.storage.local.set({ address: curAddress });
+// chrome.storage.local.set({ balance: curBalance });
+// chrome.storage.local.set({ identityId: curIdentityId });
 
 // productive environment settings:
 sdkOpts.network = 'testnet';
@@ -192,6 +193,7 @@ async function submitDocument(msg) {
   return true;
 }
 
+
 async function polling() {
 
   // TODO: remove later
@@ -240,16 +242,25 @@ async function polling() {
 
         if (requestMsg.startsWith(curIdentityId)) {
           console.log("Found message starting with IdentityId");
+          curDappRequests.push(requestMsg);
 
-          //// Confirm Notification
-          // var buttons = [{ "title": "Yes" }, { "title": "No" }];
-          // chrome.notifications.create({
-          //   "type": "basic",
-          //   "iconUrl": chrome.extension.getURL("img/icon128.png"),
-          //   "title": "Request",
-          //   "message": "Received message with your IdentityID. Confirm Request?"
-          //   "buttons": buttons
-          // });
+          var views = chrome.extension.getViews({ type: "popup" });
+          //views => [] //popup is closed
+          //views => [DOMWindow] //popup is open
+          console.log(views)
+
+          // OS Request-DappSigning Notification
+          chrome.notifications.create({
+            "type": "basic",
+            "iconUrl": chrome.extension.getURL("img/icon128.png"),
+            "title": "Request",
+            "message": "Received message with your IdentityID. Confirm Request?"
+          });
+          chrome.notifications.onClicked.addListener(async (id) => {
+            dappSigningDialog();
+            chrome.notifications.clear(id);
+          });
+
           // chrome.notifications.onButtonClicked.addListener(async (id, index) => {
           //   chrome.notifications.clear(id);
           //   console.log("You chose: " + buttons[index].title);
@@ -262,14 +273,14 @@ async function polling() {
           // });
 
           // Confirm Dialog
-          var bConfirm = confirm("Received message with your IdentityID. Confirm Response?");
-          if (bConfirm == false) {  // if pressed "No" in Dialog, abort and dont respond
-            continue;
-          } else {  // sign response message with text of request message
-            var responseMsgSigned = await signMsg(requestMsg);  
-            console.log("responseMsgSigned: " + responseMsgSigned)
-            await submitDocument(responseMsgSigned);
-          }
+          // var bConfirm = confirm("Received message with your IdentityID. Confirm Response?");
+          // if (bConfirm == false) {  // if pressed "No" in Dialog, abort and dont respond
+          //   continue;
+          // } else {  // sign response message with text of request message
+          //   var responseMsgSigned = await signMsg(requestMsg);
+          //   console.log("responseMsgSigned: " + responseMsgSigned)
+          //   await submitDocument(responseMsgSigned);
+          // }
         }
       }
       nStart = nStart + pollDoc.length;
@@ -288,6 +299,35 @@ async function polling() {
 // polling();
 // }
 ////////////////////////////////////
+
+
+async function setDappResponse(decision) {
+  console.log(decision);
+  if (decision == "confirm") {
+    var responseMsgSigned = await signMsg(curDappRequests[0]);
+    console.log("responseMsgSigned: " + responseMsgSigned)
+    await submitDocument(responseMsgSigned);
+  } else {
+
+  }
+};
+
+function getDappRequests() {
+  console.log("curdapprequest: " + curDappRequests[0])
+  return curDappRequests;
+}
+
+function dappSigningDialog() {
+  chrome.windows.create({
+    url: chrome.extension.getURL('dialog.html'),
+    type: 'popup',
+    // focused: true, // not supported by firefox
+    top: 300,
+    left: 300,
+    width: 510,
+    height: 290
+  });
+}
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -321,10 +361,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('connect');
             sendResponse({ complete: true })
             var alertWindow = 'alert("message")';
-            chrome.tabs.executeScript({code : alertWindow});
+            chrome.tabs.executeScript({ code: alertWindow });
           })()
 
           break;
+
+        // case "dappSigningDialog":
+        //   (function dappSigningDialog() {
+        //     chrome.windows.create({
+        //       url: chrome.extension.getURL('dialog.html'),
+        //       type: 'popup',
+        //       // focused: true,
+        //       top: 300,
+        //       left: 300,
+        //       width: 510,
+        //       height: 290
+        //     });
+
+        //   })()
 
         case "switch":
           (async function dappSigning() {

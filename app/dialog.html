@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>ConfirmRequest: Dapp Signing</title>
+    <link rel="stylesheet" type="text/css" href="./styles.css">
+    <script defer src="./lib/awesomecss/js/all.js"></script>
+</head>
+
+<body id="dialog">
+    <table style="text-align: left; width: 490px; height: 240px;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+            <tr>
+                <td style="vertical-align: top;"><img src="img/icon128.png"></td>
+                <td style="vertical-align: top;">
+                    <p>Received Request to sign message:</p>
+                    <p><textarea readonly="readonly" cols="30" rows="5" id="requestText"></textarea><br></p>
+                    <p><b>Do you confirm this message?</b></p>
+
+                    <button id="confirm" class="buttonConfirm">Confirm</button> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+                    <button id="deny" class="buttonDeny">Deny</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <script src="dialog.js"></script>
+</body>
+
+</html>
