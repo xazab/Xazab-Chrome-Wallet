@@ -20,21 +20,21 @@ var pollSdk = null;
 
 ////////////////////////////////////
 // development environment settings:
-// curMnemonic = 'brick dinosaur view lemon canal horse owner rail fat clean face tobacco';
-// curAddress = 'ybPY8q7hJ3QycxyahsqTpJdL9jyXfUWsvs';
-// curBalance = '1';
-// curIdentityId = 'J5dEwvo6yTn8NUTTUF2UhMt79jUskEP3uXcQS1tF3dtb';
-// chrome.storage.local.set({ mnemonic: curMnemonic });
-// chrome.storage.local.set({ address: curAddress });
-// chrome.storage.local.set({ balance: curBalance });
-// chrome.storage.local.set({ identityId: curIdentityId });
+curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
+curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
+curBalance = '1';
+curIdentityId = 'FJ85ReAdCiBBRy39JcrYJo8YkoJLa5oSMpziXYoSJ2a7';
+chrome.storage.local.set({ mnemonic: curMnemonic });
+chrome.storage.local.set({ address: curAddress });
+chrome.storage.local.set({ balance: curBalance });
+chrome.storage.local.set({ identityId: curIdentityId });
 
 // productive environment settings:
 sdkOpts.network = 'testnet';
-const pRecordLocator = 'myContract.login';
-const pContractID = "7kXTykyrTW192bCTKiMuEX2s15KExZaHKos8GrWCF21D";
-const pDocument = "login";
-// pTarget = "myName"
+const pRecordLocator = 'myContract.message';
+const pContractID = "GjUfAtc3FnbFe9HH78GaCSJV7DraAG1ctJeNeujhoqyH";
+const pDocument = "message";
+// pTarget = curIdentityId;
 
 ////////////////////////////////////
 
@@ -207,7 +207,7 @@ async function polling() {
   curApps = JSON.parse(curApps);
   psdkOpts.apps = curApps;
 
-  var nStart = 1;
+  var nStart = 0; // TODO: check if 0 or 1 correct
   var pollLocator = "myContract." + pDocument;
 
   pollSdk = new Dash.Client(psdkOpts);
@@ -237,7 +237,7 @@ async function polling() {
       console.log("polldoc length: " + pollDoc.length)
 
       for (let index = 0; index < pollDoc.length; ++index) {
-        var requestMsg = pollDoc[index].data.message;
+        var requestMsg = pollDoc[index].data.plaintext;
         if (requestMsg == null) return;
 
         if (requestMsg.startsWith(curIdentityId)) {
@@ -418,7 +418,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function importMnemonic() {
             console.log('importMnemonic');
             curAddress = await sdk.account.getUnusedAddress().address;
-            curBalance = ((await sdk.account.getUnconfirmedBalance()) / 100000000);
+            curBalance = ((await sdk.account.getTotalBalance()) / 100000000);
 
             getIdentityKeys();
 
@@ -442,7 +442,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log(await sdk.account.getTotalBalance())
             console.log(await sdk.account.getConfirmedBalance())
 
-            await chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
+            await chrome.storage.local.set({ balance: ((await sdk.account.getTotalBalance()) / 100000000) });
             sendResponse({ complete: true });
             disconnect();
           })()
@@ -491,9 +491,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             else {
               identityId = await sdk.platform.identities.register('user'); // literally 'user', do not change
             }
-            console.log({ identityId: identityId });
-            curIdentityId = identityId;
-            await chrome.storage.local.set({ identityId: identityId });
+            console.log({ identityId: identityId.id });
+            curIdentityId = identityId.id;
+            await chrome.storage.local.set({ identityId: identityId.id });
             getIdentityKeys();
 
             sendResponse({ complete: true });
@@ -551,10 +551,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // const contract = await sdk.platform.contracts.get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
             console.dir({ contract }, { depth: 5 });
             var contractJson = JSON.stringify(contract, null, 2)
-            const newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
-            newWin.document.open();
-            newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
-            newWin.document.close();
+
+            let a = URL.createObjectURL(new Blob([contractJson]), { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
+
+            chrome.windows.create({
+              type: 'popup',
+              url: a
+            });
+            // const newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
+            // newWin.document.open();
+            // newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
+            // newWin.document.close();
             sendResponse({ complete: true });
             disconnect();
           })()

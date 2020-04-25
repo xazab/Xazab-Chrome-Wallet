@@ -217,10 +217,10 @@ document.addEventListener('DOMContentLoaded', function () {
       // toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
       toAddressText.value = "";
     }
-    if (exampleQuerySelector.value == "Example Login") {
-      documentNameText.value = 'login';
-      queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = '7kXTykyrTW192bCTKiMuEX2s15KExZaHKos8GrWCF21D';
+    if (exampleQuerySelector.value == "Example Message") {
+      documentNameText.value = 'message';
+      queryObjectText.value = '{ "startAt": 0 }';
+      contractIdText.value = 'GjUfAtc3FnbFe9HH78GaCSJV7DraAG1ctJeNeujhoqyH';
       toAddressText.value = "";
     }
   });

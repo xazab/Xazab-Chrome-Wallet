@@ -24,7 +24,7 @@ Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet us
 ## Usage:
 - Click the Dash Extension button in the top right corner and click "Create Wallet"
 - Follow Tutorials from the [Dash Development Portal](https://dashplatform.readme.io/docs/tutorial-create-and-fund-a-wallet)
-- Use the [Faucet](http://devnet-evonet-28309188.us-west-2.elb.amazonaws.com/) to receive Testnet-Coins and [Explorer](http://devnet-evonet-28309188.us-west-2.elb.amazonaws.com:3001/insight/) to check balance if needed
+- Use the [Faucet](http://faucet.evonet.networks.dash.org/) to receive Testnet-Coins and [Explorer](http://insight.evonet.networks.dash.org:3001/insight/) to check balance if needed
 
 ## TODO:
 - import identity/name with mnemonic
