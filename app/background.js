@@ -1,38 +1,45 @@
-var curMnemonic = null;
+// TODO: test identity stuff, bc much changes before next commit
+
+var curMnemonic = null; // must be null for dashjs init
 var curAddress = '';
 var curBalance = '';
 var curIdentityId = '';
-var curApps = '';
 var curName = '';
-var sdkOpts = {};
-var sdk = null;
-var platform = null;
-var identityId = null;
-const connectMaxRetries = 3;
-var connectTries = 0;
 var curSwitch = false;
-var curIdentityHDPrivKey = null;
+
+var sdk = null;
+var sdkOpts = {};
+var platform = null;
+var curApps = '';
+var tmpIdentity = {};  //check remove
+
+var curIdentityHDPrivKey = {};  // TODO: testing
 var curIdentityPrivKey = '';
-var curidentPubKey = '';
-var curIdentAddr = '';
-var curDappRequests = ["blub"];
+var curIdentityPubKey = '';
+var curIdentityAddress = '';
+
+var connectTries = 0;
+const connectMaxRetries = 3;
+
 var pollSdk = null;
+var curDappRequests = ["blub"];
+
 
 ////////////////////////////////////
 // development environment settings:
-curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
-curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
-curBalance = '1';
-curIdentityId = 'FJ85ReAdCiBBRy39JcrYJo8YkoJLa5oSMpziXYoSJ2a7';
-chrome.storage.local.set({ mnemonic: curMnemonic });
-chrome.storage.local.set({ address: curAddress });
-chrome.storage.local.set({ balance: curBalance });
-chrome.storage.local.set({ identityId: curIdentityId });
+// curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
+// curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
+// curBalance = '1';
+// curIdentityId = 'FJ85ReAdCiBBRy39JcrYJo8YkoJLa5oSMpziXYoSJ2a7';
+// chrome.storage.local.set({ mnemonic: curMnemonic });
+// chrome.storage.local.set({ address: curAddress });
+// chrome.storage.local.set({ balance: curBalance });
+// chrome.storage.local.set({ identityId: curIdentityId });
 
 // productive environment settings:
 sdkOpts.network = 'testnet';
-const pRecordLocator = 'myContract.message';
 const pContractID = "GjUfAtc3FnbFe9HH78GaCSJV7DraAG1ctJeNeujhoqyH";
+const pRecordLocator = 'myContract.message';
 const pDocument = "message";
 // pTarget = curIdentityId;
 
@@ -107,24 +114,43 @@ function getLocalStorage(arrKeys) {
   });
 }
 
+// chrome.storage.local.get("mnemonic", function (result) {
+//   console.log("log");
+//   console.log(result.mnemonic);
+//   if(result.mnemonic == '') {console.log("empty string")}
+//   if(result.mnemonic == undefined) {console.log("undefined")}
+// });
+
 chrome.runtime.onInstalled.addListener(function () {
   console.log("Dash Chrome-Wallet installed.");
 
-  chrome.storage.local.set({ mnemonic: '' });
-  chrome.storage.local.set({ address: '' });
-  chrome.storage.local.set({ balance: '' });
-  chrome.storage.local.set({ identityId: '' });
-  chrome.storage.local.set({ name: '' });
-  chrome.storage.local.set({ switch: '' });
+  // check for fresh install with no set cookies
+  var testCookie;
+  chrome.storage.local.get("mnemonic", function (result) {
+    testCookie = result.mnemonic;
+  });
+  if (testCookie == undefined) {
+    console.log("No Cookies detected, initializing.")
+    chrome.storage.local.set({ mnemonic: '' }); // must be '' for popup.js
+    chrome.storage.local.set({ address: '' });
+    chrome.storage.local.set({ balance: '' });
+    chrome.storage.local.set({ identityId: '' });
+    chrome.storage.local.set({ name: '' });
+    chrome.storage.local.set({ switch: '' });
+  } else {
+    console.log("Cookies detected.")
+  }
   // chrome.storage.local.set({ tab: chrome.extension.getURL("popup.html") });
-
 });
 
+// set curMnemonic for connect() function
 chrome.storage.local.get('mnemonic', function (data) {
-  if (data.mnemonic != '' && data.mnemoic != undefined) {
+  if (data.mnemonic != '' && data.mnemonic != undefined) { // first run: onInstalled not finished when reached here -> so undefined
     curMnemonic = data.mnemonic;
-  } else if (curMnemonic == undefined)  // TODO: test if still needed
-    curMnemonic = null;
+    console.log(data.mnemonic + "blub")
+  }
+  // else if (curMnemonic == undefined)  // TODO: test if still needed - testing
+  //   curMnemonic = null;
 });
 
 
@@ -295,11 +321,6 @@ async function polling() {
   console.log("return")
   return;
 }
-// while (true) {
-// polling();
-// }
-////////////////////////////////////
-
 
 async function setDappResponse(decision) {
   console.log(decision);
@@ -360,8 +381,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           (async function connect() {
             console.log('connect');
             sendResponse({ complete: true })
-            var alertWindow = 'alert("message")';
-            chrome.tabs.executeScript({ code: alertWindow });
+            // var alertWindow = 'alert("message")';
+            // chrome.tabs.executeScript({ code: alertWindow });
           })()
 
           break;
@@ -456,7 +477,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.toAddress == '' && request.amount == '') {
               transaction = await sdk.account.createTransaction({
                 recipient: 'yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf', // Evonet faucet
-                satoshis: 10000000, // 0.1 Dash
+                satoshis: 100000000, // 1 Dash
               });
             }
             else if (request.toAddress != '' && request.amount != '') {
@@ -483,17 +504,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "registerIdentity":
           (async function registerIdentity() {
             console.log('registerIdentity');
-            // import identityId
+            // import identityID if given '<string>' from popup.js
             if (request.identityId != '') {
-              identityId = request.identityId;
+              tmpIdentity.id = request.identityId;
             }
-            // create identityId
-            else {
-              identityId = await sdk.platform.identities.register('user'); // literally 'user', do not change
+            // create identity if given '' from popup.js
+            else if (request.identityId == '') {
+              tmpIdentity = await sdk.platform.identities.register(); // TODO: testing
             }
-            console.log({ identityId: identityId.id });
-            curIdentityId = identityId.id;
-            await chrome.storage.local.set({ identityId: identityId.id });
+            console.log({ tmpidentity: tmpIdentity.id });
+            curIdentityId = tmpIdentity.id;
+            await chrome.storage.local.set({ identityId: tmpIdentity.id });
             getIdentityKeys();
 
             sendResponse({ complete: true });
@@ -507,8 +528,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('registerName');
             curName = request.name;
             // TODO: bug when having several identitys, importing 1st and then registering name
-            identityId = await sdk.platform.identities.get(curIdentityId);
-            const nameRegistration = await sdk.platform.names.register(curName, identityId);
+            tmpIdentity = await sdk.platform.identities.get(curIdentityId);
+            const nameRegistration = await sdk.platform.names.register(curName, tmpIdentity);
             console.log({ nameRegistration });
             await chrome.storage.local.set({ name: curName });
             sendResponse({ complete: true });
@@ -564,6 +585,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // newWin.document.close();
             sendResponse({ complete: true });
             disconnect();
+          })()
+          break;
+          
+          
+        case "resetWallet":
+          (async function resetWallet() {
+
           })()
           break;
 

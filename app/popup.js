@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (exampleQuerySelector.value == "Example Message") {
       documentNameText.value = 'message';
-      queryObjectText.value = '{ "startAt": 0 }';
+      queryObjectText.value = '{ "startAt": 1 }';
       contractIdText.value = 'GjUfAtc3FnbFe9HH78GaCSJV7DraAG1ctJeNeujhoqyH';
       toAddressText.value = "";
     }
