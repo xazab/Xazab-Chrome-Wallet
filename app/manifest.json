@@ -10,8 +10,8 @@
     },
     "permissions": [
         "storage",
-        "chrome-extension://*",
-        "moz-extension://*",
+        "chrome-extension://*/",
+        "moz-extension://*/",
         "notifications",
         "activeTab"
     ],

@@ -529,6 +529,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             curName = request.name;
             // TODO: bug when having several identitys, importing 1st and then registering name
             tmpIdentity = await sdk.platform.identities.get(curIdentityId);
+            console.log(tmpIdentity)
             const nameRegistration = await sdk.platform.names.register(curName, tmpIdentity);
             console.log({ nameRegistration });
             await chrome.storage.local.set({ name: curName });
