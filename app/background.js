@@ -38,10 +38,10 @@ var curDappRequests = ["blub"];
 
 // productive environment settings:
 sdkOpts.network = 'testnet';
-const pContractID = "GjUfAtc3FnbFe9HH78GaCSJV7DraAG1ctJeNeujhoqyH";
+const pContractID = "mA1kafwtR8HGoZamz72fmUWGGXKjDFLqmirtZbJYYoT";
 const pRecordLocator = 'myContract.message';
 const pDocument = "message";
-// pTarget = curIdentityId;
+pTarget = curIdentityId;
 
 ////////////////////////////////////
 
@@ -114,6 +114,7 @@ function getLocalStorage(arrKeys) {
   });
 }
 
+// DEBUG
 // chrome.storage.local.get("mnemonic", function (result) {
 //   console.log("log");
 //   console.log(result.mnemonic);
@@ -206,15 +207,22 @@ async function submitDocument(msg) {
       tidentity,
       docProperties,
     );
+
+    const documentBatch = {
+      create: [noteDocument],
+    	replace: [],
+    	delete: [],
+    }
+
     // Sign and submit the document
     // TypeError: Cannot read property 'getIdentityHDKey' of undefined
     console.log(tidentity)
     console.log(noteDocument)
-    await pollSdk.platform.documents.broadcast(noteDocument, tidentity);
+    await pollSdk.platform.documents.broadcast(documentBatch, tidentity);
   } catch (e) {
     console.error('Something went wrong:', e);
   } finally {
-    console.log("submited login document with message: " + msg)
+    console.log("submitted login document with message: " + msg)
   }
   return true;
 }
@@ -233,7 +241,7 @@ async function polling() {
   curApps = JSON.parse(curApps);
   psdkOpts.apps = curApps;
 
-  var nStart = 0; // TODO: check if 0 or 1 correct
+  var nStart = 1;
   var pollLocator = "myContract." + pDocument;
 
   pollSdk = new Dash.Client(psdkOpts);
@@ -263,10 +271,10 @@ async function polling() {
       console.log("polldoc length: " + pollDoc.length)
 
       for (let index = 0; index < pollDoc.length; ++index) {
-        var requestMsg = pollDoc[index].data.plaintext;
+        var requestMsg = pollDoc[index].data.identityid;
         if (requestMsg == null) return;
 
-        if (requestMsg.startsWith(curIdentityId)) {
+        if (requestMsg.startsWith(pTarget)) {
           console.log("Found message starting with IdentityId");
           curDappRequests.push(requestMsg);
 
@@ -315,7 +323,7 @@ async function polling() {
     } catch (e) {
       // NOTE: firefox not supporting buttons in notification, also not supporting alert+confirm dialog in background
       console.log("caught error polling " + e)
-      return;
+      // return;
     }
   }
   console.log("return")
@@ -428,6 +436,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // var savedAddress = await getLocalStorage(['address']);
             await chrome.storage.local.set({ balance: '0' });
             // var savedBalance = await getLocalStorage(['balance']);
+
+            // run automated faucet:
+            // var xmlHttp = new XMLHttpRequest();
+            // xmlHttp.open( "GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + address, false ); // false for synchronous request
+            // xmlHttp.send( null );
+            // console.log(xmlHttp.responseText);
+        
             sendResponse({ complete: true });
             disconnect();
           })();
