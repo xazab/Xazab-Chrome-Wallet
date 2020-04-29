@@ -15,10 +15,12 @@ confirmBtn.addEventListener('click', function () {
     chrome.runtime.getBackgroundPage(function (bgWindow) {
         bgWindow.setDappResponse("confirm")
     });
+    close();
 });
 
 denyBtn.addEventListener('click', function () {
     chrome.runtime.getBackgroundPage(function (bgWindow) {
         bgWindow.setDappResponse("deny")
     });
+    close();
 });

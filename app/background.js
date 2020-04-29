@@ -199,7 +199,9 @@ async function submitDocument(msg) {
     var tidentity = await pollSdk.platform.identities.get(curIdentityId);
 
     var docProperties = {
-      message: msg
+      identityid: '',
+      header: '',
+      body: msg,
     }
     // Create the note document
     var noteDocument = await pollSdk.platform.documents.create(
@@ -227,6 +229,11 @@ async function submitDocument(msg) {
   return true;
 }
 
+chrome.notifications.onClicked.addListener(async (id) => {
+  console.log("Notification clicked")
+  dappSigningDialog();
+  chrome.notifications.clear(id);
+});
 
 async function polling() {
 
@@ -284,17 +291,15 @@ async function polling() {
           console.log(views)
 
           // OS Request-DappSigning Notification
+          console.log("Creating Notification")
           chrome.notifications.create({
-            "type": "basic",
-            "iconUrl": chrome.extension.getURL("img/icon128.png"),
-            "title": "Request",
-            "message": "Received message with your IdentityID. Confirm Request?"
+            type: "basic",
+            iconUrl: chrome.extension.getURL("img/icon128.png"),
+            title: "Request",
+            message: "Received message with your IdentityID. Confirm Request?",
+            // requireInteraction: true
           });
-          chrome.notifications.onClicked.addListener(async (id) => {
-            dappSigningDialog();
-            chrome.notifications.clear(id);
-          });
-
+          
           // chrome.notifications.onButtonClicked.addListener(async (id, index) => {
           //   chrome.notifications.clear(id);
           //   console.log("You chose: " + buttons[index].title);
@@ -347,6 +352,7 @@ function getDappRequests() {
 }
 
 function dappSigningDialog() {
+  console.log("dappSigningDialog created")
   chrome.windows.create({
     url: chrome.extension.getURL('dialog.html'),
     type: 'popup',
