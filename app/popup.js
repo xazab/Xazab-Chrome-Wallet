@@ -227,6 +227,12 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
       contractIdText.value = 'mA1kafwtR8HGoZamz72fmUWGGXKjDFLqmirtZbJYYoT';
       toAddressText.value = "";
     }
+    if (exampleQuerySelector.value == "Example WDS") {
+      documentNameText.value = 'LoginRequest';
+      queryObjectText.value = '{ "startAt": 1 }';
+      contractIdText.value = 'ABk1Bd63Gs2rCwz4kBCuMwda2b2gVne9x6Piu4JXExEy';
+      toAddressText.value = "";
+    }
   });
 
 

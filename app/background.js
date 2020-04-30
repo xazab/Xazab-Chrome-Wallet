@@ -22,14 +22,14 @@ var connectTries = 0;
 const connectMaxRetries = 3;
 
 var pollSdk = null;
-var curDappRequests = ["blub"];
+var curDappRequests = [];
 
 // set to true when notification comes in and show dappSigningDialog when popup opens next time
 var boolNotif = false;
 
 
 ////////////////////////////////////
-// development environment settings:
+//// development environment settings:
 // curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
 // curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
 // curBalance = '1';
@@ -39,14 +39,33 @@ var boolNotif = false;
 // chrome.storage.local.set({ balance: curBalance });
 // chrome.storage.local.set({ identityId: curIdentityId });
 
-// productive environment settings:
-sdkOpts.network = 'testnet';
-const pContractID = "mA1kafwtR8HGoZamz72fmUWGGXKjDFLqmirtZbJYYoT";
-const pRecordLocator = 'myContract.message';
-const pDocument = "message";
-pTarget = curIdentityId;
+//// Dapp-Signing-Polling-Settings:
+//// test dapp-signing Message contract:
+// sdkOpts.network = 'testnet';
+// const pContractID = "mA1kafwtR8HGoZamz72fmUWGGXKjDFLqmirtZbJYYoT";
+// const pContractName = 'myContract';
+// const pRequestDocument = "message";
+// const pRequestProp = "body"
+// const pRequestTarget = curIdentityId;
 
 ////////////////////////////////////
+//// test dapp-signing WDS contract:
+sdkOpts.network = 'testnet';
+const pContractID = "ABk1Bd63Gs2rCwz4kBCuMwda2b2gVne9x6Piu4JXExEy";
+const pContractName = 'myContract';
+const pRequestDocument = "LoginRequest";
+const pRequestProp = "reference"
+
+// const pTargetStr = curIdentityId;
+const pRequestTarget = "45xcVv3zQnsdZTsCYiS1RfCM7oWErnXpeCWZEK5EZM2W";  
+
+const pResponseDocument = "LoginResponse";
+const pResponseProp = "status";
+
+
+
+////////////////////////////////////
+
 
 function connect() {
   return new Promise((resolve, reject) => {
@@ -202,21 +221,19 @@ async function submitDocument(msg) {
     var tidentity = await pollSdk.platform.identities.get(curIdentityId);
 
     var docProperties = {
-      identityid: '',
-      header: '',
-      body: msg,
+      status: msg
     }
     // Create the note document
     var noteDocument = await pollSdk.platform.documents.create(
-      pRecordLocator,
+      pContractName + "." + pResponseDocument,
       tidentity,
       docProperties,
     );
 
     const documentBatch = {
       create: [noteDocument],
-    	replace: [],
-    	delete: [],
+      replace: [],
+      delete: [],
     }
 
     // Sign and submit the document
@@ -252,12 +269,13 @@ async function polling() {
   psdkOpts.apps = curApps;
 
   var nStart = 1;
-  var pollLocator = "myContract." + pDocument;
+  var pollLocator = "myContract." + pRequestDocument;
 
   pollSdk = new Dash.Client(psdkOpts);
   await pollSdk.isReady();
 
-  var reachedHead = false;
+  // var reachedHead = false;
+  var reachedHead = true; // for testing
 
   while (curSwitch) {
 
@@ -281,12 +299,15 @@ async function polling() {
       console.log("polldoc length: " + pollDoc.length)
 
       for (let index = 0; index < pollDoc.length; ++index) {
-        var requestMsg = pollDoc[index].data.identityid;  // get document data
+        var requestMsg = pollDoc[index].data.reference;  // get document data , TODO: change to pRequestProp
         if (requestMsg == null) return;
 
-        if (requestMsg.startsWith(pTarget)) {
-          console.log("Found message starting with IdentityId");
+        if (requestMsg.startsWith(pRequestTarget)) {
+          console.log("Found message starting with " + pRequestTarget);
           curDappRequests.push(requestMsg);
+          // debug, remove
+          console.log("requestMsg:")
+          console.log(requestMsg)
 
           var views = chrome.extension.getViews({ type: "popup" });
           //views => [] //popup is closed
@@ -308,7 +329,7 @@ async function polling() {
           while (boolNotif == true) {
             await new Promise(r => setTimeout(r, 5000));
           }
-          
+
           // chrome.notifications.onButtonClicked.addListener(async (id, index) => {
           //   chrome.notifications.clear(id);
           //   console.log("You chose: " + buttons[index].title);
@@ -348,6 +369,7 @@ async function setDappResponse(decision) {
   console.log(decision);
   if (decision == "confirm") {
     var responseMsgSigned = await signMsg(curDappRequests[0]);
+    console.log("currDappRequest: " + curDappRequests[0])
     console.log("responseMsgSigned: " + responseMsgSigned)
     await submitDocument(responseMsgSigned);
   } else {
@@ -458,7 +480,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // xmlHttp.open( "GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + address, false ); // false for synchronous request
             // xmlHttp.send( null );
             // console.log(xmlHttp.responseText);
-        
+
             sendResponse({ complete: true });
             disconnect();
           })();
@@ -619,8 +641,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             disconnect();
           })()
           break;
-          
-          
+
+
         case "resetWallet":
           (async function resetWallet() {
 
