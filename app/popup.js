@@ -217,7 +217,7 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
         '["normalizedParentDomainName", "==", "dash"]\n' +
         '],\n' +
         '"startAt": 1 }\n';
-      contractIdText.value = '77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3';
+      contractIdText.value = '295xRRRMGYyAruG39XdAibaU9jMAzxhknkkAxFE7uVkW';
       // toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
       toAddressText.value = "";
     }
