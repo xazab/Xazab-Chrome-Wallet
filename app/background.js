@@ -24,6 +24,9 @@ const connectMaxRetries = 3;
 var pollSdk = null;
 var curDappRequests = ["blub"];
 
+// set to true when notification comes in and show dappSigningDialog when popup opens next time
+var boolNotif = false;
+
 
 ////////////////////////////////////
 // development environment settings:
@@ -278,7 +281,7 @@ async function polling() {
       console.log("polldoc length: " + pollDoc.length)
 
       for (let index = 0; index < pollDoc.length; ++index) {
-        var requestMsg = pollDoc[index].data.identityid;
+        var requestMsg = pollDoc[index].data.identityid;  // get document data
         if (requestMsg == null) return;
 
         if (requestMsg.startsWith(pTarget)) {
@@ -299,6 +302,12 @@ async function polling() {
             message: "Received message with your IdentityID. Confirm Request?",
             // requireInteraction: true
           });
+
+          // sleep until notification is checked
+          boolNotif = true;
+          while (boolNotif == true) {
+            await new Promise(r => setTimeout(r, 5000));
+          }
           
           // chrome.notifications.onButtonClicked.addListener(async (id, index) => {
           //   chrome.notifications.clear(id);
@@ -344,6 +353,7 @@ async function setDappResponse(decision) {
   } else {
 
   }
+  boolNotif = false;
 };
 
 function getDappRequests() {
@@ -424,7 +434,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               polling();
             }
             sendResponse({ complete: true });
-            disconnect();
+            // disconnect();
           })();
           break
 

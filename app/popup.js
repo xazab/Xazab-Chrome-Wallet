@@ -87,6 +87,10 @@ document.addEventListener('DOMContentLoaded', function () {
     signingSwitch.checked = data.switch;
   });
 
+if (chrome.extension.getBackgroundPage().boolNotif == true) {
+  chrome.extension.getBackgroundPage().dappSigningDialog();
+}
+  
   //switch
   signingSwitch.addEventListener('change', function () {
     // chrome.extension.getBackgroundPage().console.log("switch changed")
