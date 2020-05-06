@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   chrome.storage.local.get('switch', function (data) {
     signingSwitch.checked = data.switch;
   });
+  pinText.value = chrome.extension.getBackgroundPage().curPin;
 
 if (chrome.extension.getBackgroundPage().boolNotif == true) {
   chrome.extension.getBackgroundPage().dappSigningDialog();
@@ -98,7 +99,7 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
   signingSwitch.addEventListener('change', function () {
     // chrome.extension.getBackgroundPage().console.log("switch changed")
     // signingSwitch.checked = true;
-    pinText.value = Math.floor(Math.random() * 9000) + 1000;
+    // pinText.value = Math.floor(Math.random() * 9000) + 1000;
     chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) { });
   }, false);
 

@@ -18,6 +18,7 @@ var curIdentityPrivKey = '';
 var curIdentityPubKey = '';
 var curIdentityAddress = '';
 var curDocDomainID = '';
+var curPin = Math.floor(Math.random() * 9000) + 1000;
 
 var connectTries = 0;
 const connectMaxRetries = 3;
@@ -60,7 +61,10 @@ const pRequestDocument = "LoginRequest";
 const pRequestProp = "reference";
 
 // const pTargetStr = curIdentityId;
-const pRequestTarget = "45xcVv3zQnsdZTsCYiS1RfCM7oWErnXpeCWZEK5EZM2W";
+// const pRequestTarget = "45xcVv3zQnsdZTsCYiS1RfCM7oWErnXpeCWZEK5EZM2W";
+// set pRequestTarget = curDocDomainID in polling()
+var pRequestTarget = '';
+
 
 
 const pResponseDocument = "LoginResponse";
@@ -269,6 +273,7 @@ async function polling() {
 
   // get docID for current user
   await getDocID();
+  pRequestTarget = curDocDomainID;
 
   // TODO remove when DashJS removed curApps
   var psdkOpts = {};
