@@ -17,6 +17,7 @@ var curIdentityHDPrivKey = {};  // TODO: testing
 var curIdentityPrivKey = '';
 var curIdentityPubKey = '';
 var curIdentityAddress = '';
+var curDocDomainID = '';
 
 var connectTries = 0;
 const connectMaxRetries = 3;
@@ -30,14 +31,16 @@ var boolNotif = false;
 
 ////////////////////////////////////
 //// development environment settings:
-// curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
-// curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
-// curBalance = '1';
-// curIdentityId = 'FJ85ReAdCiBBRy39JcrYJo8YkoJLa5oSMpziXYoSJ2a7';
-// chrome.storage.local.set({ mnemonic: curMnemonic });
-// chrome.storage.local.set({ address: curAddress });
-// chrome.storage.local.set({ balance: curBalance });
-// chrome.storage.local.set({ identityId: curIdentityId });
+curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
+curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
+curBalance = '1';
+curIdentityId = 'FJ85ReAdCiBBRy39JcrYJo8YkoJLa5oSMpziXYoSJ2a7';
+curName = 'readme'
+chrome.storage.local.set({ mnemonic: curMnemonic });
+chrome.storage.local.set({ address: curAddress });
+chrome.storage.local.set({ balance: curBalance });
+chrome.storage.local.set({ identityId: curIdentityId });
+chrome.storage.local.set({ name: curName});
 
 //// Dapp-Signing-Polling-Settings:
 //// test dapp-signing Message contract:
@@ -49,19 +52,23 @@ var boolNotif = false;
 // const pRequestTarget = curIdentityId;
 
 ////////////////////////////////////
-//// test dapp-signing WDS contract:
+//// Dapp-Signing WDS contract:
 sdkOpts.network = 'testnet';
 const pContractID = "ABk1Bd63Gs2rCwz4kBCuMwda2b2gVne9x6Piu4JXExEy";
 const pContractName = 'myContract';
 const pRequestDocument = "LoginRequest";
-const pRequestProp = "reference"
+const pRequestProp = "reference";
 
 // const pTargetStr = curIdentityId;
-const pRequestTarget = "45xcVv3zQnsdZTsCYiS1RfCM7oWErnXpeCWZEK5EZM2W";  
+const pRequestTarget = "45xcVv3zQnsdZTsCYiS1RfCM7oWErnXpeCWZEK5EZM2W";
+
 
 const pResponseDocument = "LoginResponse";
 const pResponseProp = "status";
 
+//// DPNS-Contract for docID
+const domainContractID = "295xRRRMGYyAruG39XdAibaU9jMAzxhknkkAxFE7uVkW";
+const domainRequestDocument = "domain";
 
 
 ////////////////////////////////////
@@ -170,7 +177,7 @@ chrome.runtime.onInstalled.addListener(function () {
 chrome.storage.local.get('mnemonic', function (data) {
   if (data.mnemonic != '' && data.mnemonic != undefined) { // first run: onInstalled not finished when reached here -> so undefined
     curMnemonic = data.mnemonic;
-    console.log(data.mnemonic + "blub")
+    console.log("chrome storage data.mnemonic from bg: " + data.mnemonic)
   }
   // else if (curMnemonic == undefined)  // TODO: test if still needed - testing
   //   curMnemonic = null;
@@ -258,7 +265,10 @@ chrome.notifications.onClicked.addListener(async (id) => {
 async function polling() {
 
   // TODO: remove later
-  getIdentityKeys()
+  getIdentityKeys();
+
+  // get docID for current user
+  await getDocID();
 
   // TODO remove when DashJS removed curApps
   var psdkOpts = {};
@@ -302,7 +312,7 @@ async function polling() {
         var requestMsg = pollDoc[index].data.reference;  // get document data , TODO: change to pRequestProp
         if (requestMsg == null) return;
 
-        if (requestMsg.startsWith(pRequestTarget)) {
+        if (requestMsg.startsWith(pRequestTarget)) {  // check for Target docID
           console.log("Found message starting with " + pRequestTarget);
           curDappRequests.push(requestMsg);
           // debug, remove
@@ -330,26 +340,6 @@ async function polling() {
             await new Promise(r => setTimeout(r, 5000));
           }
 
-          // chrome.notifications.onButtonClicked.addListener(async (id, index) => {
-          //   chrome.notifications.clear(id);
-          //   console.log("You chose: " + buttons[index].title);
-          //   console.log(requestMsg) // TODO: test what happens when 2 messages arrive before confirming anything
-          //   if (buttons[index].title == "Yes") {
-          //     var responseMsgSigned = await signMsg(requestMsg);
-          //     console.log("responseMsgSigned: " + responseMsgSigned)
-          //     await submitDocument(responseMsgSigned);
-          //   }
-          // });
-
-          // Confirm Dialog
-          // var bConfirm = confirm("Received message with your IdentityID. Confirm Response?");
-          // if (bConfirm == false) {  // if pressed "No" in Dialog, abort and dont respond
-          //   continue;
-          // } else {  // sign response message with text of request message
-          //   var responseMsgSigned = await signMsg(requestMsg);
-          //   console.log("responseMsgSigned: " + responseMsgSigned)
-          //   await submitDocument(responseMsgSigned);
-          // }
         }
       }
       nStart = nStart + pollDoc.length;
@@ -395,6 +385,35 @@ function dappSigningDialog() {
     height: 290
   });
 }
+
+async function getDocID() {
+  var psdkOpts = {};
+  psdkOpts.network = 'testnet';
+  psdkOpts.mnemonic = curMnemonic;
+  curApps = '{ "myContract" : { "contractId" : "' + domainContractID + '" } }';
+  curApps = JSON.parse(curApps);
+  psdkOpts.apps = curApps;
+
+  var tRecordLocator = "myContract.domain";
+  var tQueryObject = '{ "where": [' +
+  '["normalizedParentDomainName", "==", "dash"],' +
+  '["normalizedLabel", "==", "readme"]' +
+  '],' +
+  '"startAt": 1 }';
+
+  docSdk = new Dash.Client(psdkOpts);
+  await docSdk.isReady();
+
+  var queryJson = JSON.parse(tQueryObject);
+  const documents = await docSdk.platform.documents.get(tRecordLocator, queryJson);
+  // console.log(documents);
+  console.log(documents[0].id)
+  curDocDomainID = documents[0].id
+  console.log("saved document domain ID")
+}
+
+
+////////////// END experimental code for dapp signing ////////////
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -609,9 +628,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               type: 'popup',
               url: a
             });
-            // chrome.tabs.create({ url: a });
-
-            // newWin = window.open(a, "Document Query", "width=800,height=500");
 
             sendResponse({ complete: true });
             disconnect();

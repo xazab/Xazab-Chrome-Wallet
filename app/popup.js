@@ -15,14 +15,14 @@ function getLocalStorage(arrKeys) {
       });
     }
     catch (e) {
-      chrome.extension.getBackgroundPage().console.log('Erroring  getting values for', key, 'from local storage');
+      chrome.extension.getBackgroundPage().console.log('Erroring getting values for', key, 'from local storage');
       reject(e);
     }
   });
 }
 
 // on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
 
   let connectBtn = document.getElementById('connectBtn');
   let createBtn = document.getElementById('createBtn');
@@ -47,9 +47,12 @@ document.addEventListener('DOMContentLoaded', function () {
   let contractIdText = document.getElementById('contractIdText');
   let getContractBtn = document.getElementById('getContractBtn');
   let signingSwitch = document.getElementById('switch1');
+  let pinText = document.getElementById('pinText');
+  
 
 
   // disable button rules (executed each time popup opened)
+  // TODO check if just use chrome.extension.getBackgroundPage().curMnemonic, since eg devmode local.storage not written
   chrome.storage.local.get('mnemonic', function (data) {
     mnemonicText.value = data.mnemonic;
     if (data.mnemonic != '')
@@ -95,6 +98,7 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
   signingSwitch.addEventListener('change', function () {
     // chrome.extension.getBackgroundPage().console.log("switch changed")
     // signingSwitch.checked = true;
+    pinText.value = Math.floor(Math.random() * 9000) + 1000;
     chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) { });
   }, false);
 
