@@ -14,14 +14,18 @@ Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet us
 ## Requirements:
 - Google Chrome Browser
 
-## Installation
+## Installation (Option 1: suggested)
 - Go to [Release page](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.2) and download .zip for Windows/MacOS or .tar for Linux and extract directory on disk
 - Start "Google Chrome Browser"
 - type "chrome://extensions" into addressline or open `Three Dots(Menu) -> More Tools -> Extensions`
 - Activate "Developer Mode" in the top right corner
 - Click "Load Unpacked" in top left corner and choose extracted directory
 
-## Quick run Installation (only temporary)
+## Uninstall (for Option 1)
+- type "chrome://extensions" into addressline or open `Three Dots(Menu) -> More Tools -> Extensions`
+- Hit "Remove" below the Chrome Wallet extension description
+
+## Installation (Option 2: Quick run, temporary from console)
 - need firefox installed
 - clone repo
 - enter root and run `npm install` and after that `npm run start:firefox`
