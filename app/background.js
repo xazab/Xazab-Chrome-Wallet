@@ -32,16 +32,16 @@ var boolNotif = false;
 
 ////////////////////////////////////
 //// development environment settings:
-curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
-curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
-curBalance = '1';
-curIdentityId = 'FJ85ReAdCiBBRy39JcrYJo8YkoJLa5oSMpziXYoSJ2a7';
-curName = 'readme'
-chrome.storage.local.set({ mnemonic: curMnemonic });
-chrome.storage.local.set({ address: curAddress });
-chrome.storage.local.set({ balance: curBalance });
-chrome.storage.local.set({ identityId: curIdentityId });
-chrome.storage.local.set({ name: curName});
+// curMnemonic = 'grid bind gasp long fox catch inch radar purchase winter woman cactus';
+// curAddress = 'yRaSjQLmnVUapXCSuxtCYZNf4ZhkjB5nDh';
+// curBalance = '1';
+// curIdentityId = 'FJ85ReAdCiBBRy39JcrYJo8YkoJLa5oSMpziXYoSJ2a7';
+// curName = 'readme'
+// chrome.storage.local.set({ mnemonic: curMnemonic });
+// chrome.storage.local.set({ address: curAddress });
+// chrome.storage.local.set({ balance: curBalance });
+// chrome.storage.local.set({ identityId: curIdentityId });
+// chrome.storage.local.set({ name: curName});
 
 //// Dapp-Signing-Polling-Settings:
 //// test dapp-signing Message contract:
@@ -499,7 +499,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             await chrome.storage.local.set({ balance: '0' });
             // var savedBalance = await getLocalStorage(['balance']);
 
-            // run automated faucet:
+            // run automated faucet: TODO: add manifest permission to load it
             // var xmlHttp = new XMLHttpRequest();
             // xmlHttp.open( "GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + address, false ); // false for synchronous request
             // xmlHttp.send( null );
