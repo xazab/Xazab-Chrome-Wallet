@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   let nameText = document.getElementById('nameText');
   let mnemonicText = document.getElementById('mnemonicText');
   let mnemonicBtn = document.getElementById('mnemonicBtn');
+  let resetBtn = document.getElementById('resetBtn');
 
   let exampleQuerySelector = document.getElementById('exampleQuerySelector');
   let documentNameText = document.getElementById('documentNameText');
@@ -89,7 +90,9 @@ document.addEventListener('DOMContentLoaded', async function () {
   chrome.storage.local.get('switch', function (data) {
     signingSwitch.checked = data.switch;
   });
-  pinText.value = chrome.extension.getBackgroundPage().curPin;
+  chrome.storage.local.get('pin', function (data) {
+    pinText.value = data.pin;
+  });
 
 if (chrome.extension.getBackgroundPage().boolNotif == true) {
   chrome.extension.getBackgroundPage().dappSigningDialog();
@@ -116,6 +119,19 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
       // TODO firefox: will autohide popup.html -> set autohide to false like chrome default
       window.alert("connected");
       // window.close();
+    });
+  }, false);
+
+
+  //reset
+  resetBtn.addEventListener('click', function () {
+    resetBtn.disabled = true;
+    showLoading('spinnerTestConnection', true);
+    chrome.runtime.sendMessage({ greeting: "resetWallet" }, function (response) {
+      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      resetBtn.disabled = false;
+      showLoading('spinnerTestConnection', false);
+      window.close();
     });
   }, false);
 
@@ -235,7 +251,7 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
     if (exampleQuerySelector.value == "Example WDS") {
       documentNameText.value = 'LoginRequest';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'ABk1Bd63Gs2rCwz4kBCuMwda2b2gVne9x6Piu4JXExEy';
+      contractIdText.value = '9GHRxvyYDmWz7pBKRjPnxjsJbbgKLngtejWWp3kEY1vB';
       toAddressText.value = "";
     }
   });

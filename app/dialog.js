@@ -6,7 +6,7 @@ var denyBtn = document.getElementById('deny');
 var requestText = document.getElementById('requestText')
 
 chrome.runtime.getBackgroundPage(function (bgWindow) {
-    requestText.value = bgWindow.getDappRequests()[0];
+    requestText.value = bgWindow.pRequestDocument[bgWindow.curDocNr]  + "\nPin Verified: " + bgWindow.uidpin_verified;
     // bgWindow.setPassword(password);
     // window.close();     // Close dialog
 });

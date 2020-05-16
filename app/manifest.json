@@ -10,15 +10,13 @@
     },
     "permissions": [
         "storage",
-        "chrome-extension://*/",
-        "moz-extension://*/",
-        "notifications",
-        "activeTab"
+        "notifications"
     ],
     "background": {
         "scripts": [
             "./lib/browser-polyfill.min.js",
             "./lib/dash.min.js",
+            "./lib/dashmachine-crypto-lib.js",
             "background.js"
         ],
         "persistent": false
