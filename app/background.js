@@ -670,18 +670,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const mnemonic = await sdk.wallet.exportWallet();
             curMnemonic = mnemonic;
             const address = await sdk.account.getUnusedAddress();
-            await chrome.storage.local.set({ mnemonic: mnemonic });
+            curAddress = address.address;
+            await chrome.storage.local.set({ mnemonic: curMnemonic });
             // var savedMM = await getLocalStorage(['mnemonic']);
-            await chrome.storage.local.set({ address: address.address });
+            await chrome.storage.local.set({ address: curAddress });
             // var savedAddress = await getLocalStorage(['address']);
             await chrome.storage.local.set({ balance: '0' });
             // var savedBalance = await getLocalStorage(['balance']);
 
-            // run automated faucet: TODO: add manifest permission to load it
-            // var xmlHttp = new XMLHttpRequest();
-            // xmlHttp.open( "GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + address, false ); // false for synchronous request
-            // xmlHttp.send( null );
-            // console.log(xmlHttp.responseText);
+            // run automated faucet
+            console.log("run automated faucet for address " + curAddress)
+            var httpReq = new XMLHttpRequest();
+            httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
+            httpReq.addEventListener("load", function (e) {
+              console.log(httpReq.responseText);
+            }, false)
+            httpReq.send(null);
 
             sendResponse({ complete: true });
             disconnect();
