@@ -151,6 +151,20 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
         });
         identityIdBtn.disabled = false;
         showLoading('spinnerCreateWallet', false);
+        
+        // TODO: execute getBalance button here till dashjs sendTX + getBalance bug fixed
+        //       then delete here and execute in sendFunds background.js
+        getBalanceBtn.disabled = true;
+        showLoading('spinnerGetBalance', true);
+        chrome.runtime.sendMessage({ greeting: "getBalance", sleep: "true" }, async function (response) {
+          chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+          await getLocalStorage(['balance']).then((cookies) => {
+            balanceText.value = cookies.balance;
+          });
+          getBalanceBtn.disabled = false;
+          showLoading('spinnerGetBalance', false);
+        });
+        ////////////
       }
       else {
         alert('There was a problem creating the wallet - please try again');

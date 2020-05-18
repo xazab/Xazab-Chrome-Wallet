@@ -370,7 +370,7 @@ async function polling() {
           if (pollDoc.length == 0) {
             reachedHead[i] = true;
             // console.log("reached head")
-            await new Promise(r => setTimeout(r, 5000));  // sleep x ms
+            await new Promise(r => setTimeout(r, 1800));  // sleep x ms
           }
           nStart[i] = nStart[i] + pollDoc.length;
           continue;
@@ -717,6 +717,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "getBalance":
           // TODO: use events api to auto update balance
           (async function getBalance() {
+
+            if (request.wait != '') {
+              await new Promise(r => setTimeout(r, 20000));  // sleep x ms
+            }
             console.log('getBalance');
             console.log(await sdk.account.getUnconfirmedBalance())
             console.log(await sdk.account.getTotalBalance())
