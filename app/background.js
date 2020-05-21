@@ -192,6 +192,22 @@ chrome.storage.local.get('mnemonic', function (data) {
     curMnemonic = null;
   }
 });
+
+// set all other data from cookies if exists TODO: check restart, scratch, continue
+chrome.storage.local.get('address', function (data) {
+  curAddress = data.address;
+  console.log("address: " + curAddress)
+});
+chrome.storage.local.get('balance', function (data) {
+  curBalance = data.balance;
+});
+chrome.storage.local.get('identityId', function (data) {
+  curIdentityId = data.identityId;
+});
+chrome.storage.local.get('name', function (data) {
+  curName = data.name;
+});
+
 // set switch to false on "browser load" - TODO: remove switch from cookies
 chrome.storage.local.set({ switch: false });
 chrome.storage.local.set({ pin: curPin });
@@ -562,11 +578,11 @@ async function getDocID() {
     '],' +
     '"startAt": 1 }';
 
-  docSdk = new Dash.Client(psdkOpts);
+  var docSdk = new Dash.Client(psdkOpts);
   await docSdk.isReady();
 
   var queryJson = JSON.parse(tQueryObject);
-  if(curName=='') {
+  if(curName =='') {
     curSwitch = false;
     await chrome.storage.local.set({ switch: false });
     throw "Name not set, please create a Username for your Identity";
