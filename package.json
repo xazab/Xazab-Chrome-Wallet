@@ -6,7 +6,7 @@
     "test": "test"
   },
   "scripts": {
-    "start:firefox": "web-ext run --source-dir ./app/",
+    "start:firefox": "web-ext run --browser-console --source-dir ./app/",
     "lint:firefox": "web-ext lint --source-dir ./app/",
     "sign:firefox": "web-ext sign --source-dir ./app/",
     "build:firefox": "web-ext build --source-dir ./app/"
@@ -25,6 +25,7 @@
   "devDependencies": {
     "gulp": "^4.0.2",
     "minify": "^5.1.1",
-    "web-ext": "^4.1.0"
-  }
+    "web-ext": "^4.2.0"
+  },
+  "dependencies": {}
 }
