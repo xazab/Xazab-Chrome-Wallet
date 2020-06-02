@@ -16,7 +16,7 @@
       <tr>
         <td style="vertical-align: top; text-align: left;"><button class="buttonload" id="createBtn">
             Create Wallet <i id="spinnerCreateWallet" class="fas fa-sync fa-spin" style="display: none;"></i></button>
-          <br>Address:<br><textarea style="width: 260px; height: 33px;" readonly="readonly" cols="1" rows="1" id="addressText"></textarea> </td>
+          <br>Address:<br><input class="span2" type="text" placeholder="" style="width: 260px; height: 33px;" readonly="readonly" cols="1" rows="1" id="addressText"></textarea> </td>
         <td style="vertical-align: top;"><button class="buttonload" id="identityBtn">Create Identity <i id="spinnerCreateIdentity" class="fas fa-sync fa-spin" style="display: none;"></i></button><textarea style="width: 260px; height: 35px;" id="identityText" cols="1" rows="1"></textarea></td>
       </tr>
       <tr>
@@ -38,6 +38,7 @@
             <option>Example DPNS</option>
             <option>Example Message</option>
             <option>Example WDS</option>
+            <option>Example Note</option>
           </select>
           Document:<textarea style="width: 260px; height: 25px;" cols="1" rows="1" id="documentNameText"></textarea>Query Object:<textarea style="width: 260px; height: 50px;" cols="1" rows="1" id="queryObjectText"></textarea><button class="buttonload" id="getDocumentsBtn">Retrieve
             Documents <i id="spinnerGetDocuments" class="fas fa-sync fa-spin" style="display: none;"></i></button>
@@ -57,7 +58,8 @@
       </tr>
       <tr>
         <td style="vertical-align: top;"><button class="buttonload" type="button" id="connectBtn">Test Connection <i id="spinnerTestConnection" class="fas fa-sync fa-spin" style="display: none;"></i></button> </td>
-        <td style="vertical-align: top;"> <a href="" target="_blank">Open Tab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> <br> Dapp Signing: <label class="switch"><input id="switch1" type="checkbox"><span class="slider"></span></label>&nbsp;&nbsp;&nbsp;PIN:&nbsp;<textarea style="width: 66px; height: 15px;" readonly="readonly" cols="1" rows="1" id="pinText"></textarea><br>
+        <td style="vertical-align: top;"> <a href="" target="_blank">Open Tab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> <br> Dapp Signing Orig: <label class="switch"><input id="switch1" type="checkbox"><span class="slider"></span></label>&nbsp;PIN:&nbsp;<textarea style="width: 66px; height: 15px;" readonly="readonly" cols="1" rows="1" id="pinText"></textarea><br>
+          Dapp Signing Simple: <label class="switch"><input id="switch2" type="checkbox"><span class="slider"></span></label>
         </td>
 
       </tr>

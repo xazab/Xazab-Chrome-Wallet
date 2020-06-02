@@ -6,7 +6,11 @@ var denyBtn = document.getElementById('deny');
 var requestText = document.getElementById('requestText')
 
 chrome.runtime.getBackgroundPage(function (bgWindow) {
-    requestText.value = bgWindow.pRequestDocument[bgWindow.curDocNr]  + "\nPin Verified: " + bgWindow.uidpin_verified;
+
+    if(bgWindow.curSwitch == true)
+        requestText.value = bgWindow.pRequestDocument[bgWindow.curDocNr]  + "\nPin Verified: " + bgWindow.uidpin_verified;
+    else if (bgWindow.curSwitch2 == true)
+        requestText.value = bgWindow.curDappRequests[0].targetcontent;
     // bgWindow.setPassword(password);
     // window.close();     // Close dialog
 });

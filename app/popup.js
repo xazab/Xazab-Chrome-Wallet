@@ -21,6 +21,11 @@ function getLocalStorage(arrKeys) {
   });
 }
 
+var wls = window.localStorage;
+
+// wls.setItem("mnemonic", "blub2")
+// console.log(wls.getItem("mnemonic"))
+
 // on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async function () {
 
@@ -49,7 +54,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   let getContractBtn = document.getElementById('getContractBtn');
   let signingSwitch = document.getElementById('switch1');
   let pinText = document.getElementById('pinText');
-  
+  let simpleSwitch = document.getElementById('switch2');
+
 
 
   // disable button rules (executed each time popup opened)
@@ -93,17 +99,34 @@ document.addEventListener('DOMContentLoaded', async function () {
   chrome.storage.local.get('pin', function (data) {
     pinText.value = data.pin;
   });
+  chrome.storage.local.get('switch2', function (data) {
+    simpleSwitch.checked = data.switch2;
+  });
 
-if (chrome.extension.getBackgroundPage().boolNotif == true) {
-  chrome.extension.getBackgroundPage().dappSigningDialog();
-}
-  
+  // wait for background, mostly not responding after browser/system restart TODO: remove direct background access
+  async function waitForBG() {
+    if ((await chrome.extension.getBackgroundPage().boolNotif) == true) {
+      await chrome.extension.getBackgroundPage().dappSigningDialog();
+    }
+  }
+  waitForBG();
+
   //switch
   signingSwitch.addEventListener('change', function () {
-    // chrome.extension.getBackgroundPage().console.log("switch changed")
-    // signingSwitch.checked = true;
-    // pinText.value = Math.floor(Math.random() * 9000) + 1000;
+    if (chrome.extension.getBackgroundPage().curName == '') {
+      window.alert("Please create a Username first! Aborting.")
+      return false;
+    }
     chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) { });
+  }, false);
+
+  //switch2
+  simpleSwitch.addEventListener('change', function () {
+    if (chrome.extension.getBackgroundPage().curName == '') {
+      window.alert("Please create a Username first! Aborting.")
+      return false;
+    }
+    chrome.runtime.sendMessage({ greeting: "switch2", switch: simpleSwitch.checked }, function (response) { });
   }, false);
 
 
@@ -151,7 +174,7 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
         });
         identityIdBtn.disabled = false;
         showLoading('spinnerCreateWallet', false);
-        
+
         // TODO: execute getBalance button here till dashjs sendTX + getBalance bug fixed
         //       then delete here and execute in sendFunds background.js
         getBalanceBtn.disabled = true;
@@ -259,13 +282,19 @@ if (chrome.extension.getBackgroundPage().boolNotif == true) {
     if (exampleQuerySelector.value == "Example Message") {
       documentNameText.value = 'message';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'mA1kafwtR8HGoZamz72fmUWGGXKjDFLqmirtZbJYYoT';
+      contractIdText.value = 'ConeoUukuVZ9dG2P9U34AgrrDqe7ukveA6n5XGUxqAoT';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example WDS") {
       documentNameText.value = 'LoginRequest';
       queryObjectText.value = '{ "startAt": 1 }';
       contractIdText.value = '9GHRxvyYDmWz7pBKRjPnxjsJbbgKLngtejWWp3kEY1vB';
+      toAddressText.value = "";
+    }
+    if (exampleQuerySelector.value == "Example Note") {
+      documentNameText.value = 'note';
+      queryObjectText.value = '{ "startAt": 1 }';
+      contractIdText.value = 'HeRMurhKjLvLrFTmRBQC5VSco7VURpqktoT4GVaPS2EW';
       toAddressText.value = "";
     }
   });
