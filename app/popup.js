@@ -177,16 +177,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // TODO: execute getBalance button here till dashjs sendTX + getBalance bug fixed
         //       then delete here and execute in sendFunds background.js
-        getBalanceBtn.disabled = true;
-        showLoading('spinnerGetBalance', true);
-        chrome.runtime.sendMessage({ greeting: "getBalance", sleep: "true" }, async function (response) {
-          chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-          await getLocalStorage(['balance']).then((cookies) => {
-            balanceText.value = cookies.balance;
-          });
-          getBalanceBtn.disabled = false;
-          showLoading('spinnerGetBalance', false);
-        });
+        // getBalanceBtn.disabled = true;
+        // showLoading('spinnerGetBalance', true);
+        // chrome.runtime.sendMessage({ greeting: "getBalance", sleep: "true" }, async function (response) {
+        //   chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+        //   await getLocalStorage(['balance']).then((cookies) => {
+        //     balanceText.value = cookies.balance;
+        //   });
+        //   getBalanceBtn.disabled = false;
+        //   showLoading('spinnerGetBalance', false);
+        // });
         ////////////
       }
       else {
