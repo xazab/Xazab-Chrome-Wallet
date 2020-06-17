@@ -57,7 +57,7 @@ var wls = window.localStorage;
 //// development environment settings:
 //// prividentkey: tprv8nSVgPnsKBP8SgQY8jJKszuTgqTK2rYB5WtQe8sC7xGZQWcANaqrHD1znfBxhqhZV3dMAowmDPoXmHZSqR4JDnRvVd4GUe92S7qNSRR3JXK
 // curMnemonic = 'amount deliver thunder trash stadium tunnel vital ladder organ slender way length';
-// curAddress = '';
+// curAddress = 'yQJCdsva7KUBkto6EPDLWPxf3Zkpnfy7P8';
 // curBalance = '1';
 // curIdentityId = 'Epcz2GjLJurkT77HGc5mH6r4JRWVDcA2RCC7pHxE6U6N';
 // curName = 'readme'

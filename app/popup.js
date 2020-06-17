@@ -291,6 +291,12 @@ document.addEventListener('DOMContentLoaded', async function () {
       contractIdText.value = '9GHRxvyYDmWz7pBKRjPnxjsJbbgKLngtejWWp3kEY1vB';
       toAddressText.value = "";
     }
+    if (exampleQuerySelector.value == "Example Users") {
+      documentNameText.value = 'Users';
+      queryObjectText.value = '{ "startAt": 1 }';
+      contractIdText.value = '3bhAjxGB5rZ8sTB1nEj1fC6SCZV6c3XEbX8Lm2arVbjA';
+      toAddressText.value = "";
+    }
     if (exampleQuerySelector.value == "Example Note") {
       documentNameText.value = 'note';
       queryObjectText.value = '{ "startAt": 1 }';
