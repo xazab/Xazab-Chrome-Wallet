@@ -229,16 +229,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       // TODO: execute getBalance button here till dashjs sendTX + getBalance bug fixed
       //       then delete here and execute in sendFunds background.js
-      getBalanceBtn.disabled = true;
-      showLoading('spinnerGetBalance', true);
-      chrome.runtime.sendMessage({ greeting: "getBalance" }, async function (response) {
-        chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-        await getLocalStorage(['balance']).then((cookies) => {
-          balanceText.value = cookies.balance;
-        });
-        getBalanceBtn.disabled = false;
-        showLoading('spinnerGetBalance', false);
-      });
+      // getBalanceBtn.disabled = true;
+      // showLoading('spinnerGetBalance', true);
+      // chrome.runtime.sendMessage({ greeting: "getBalance" }, async function (response) {
+      //   chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      //   await getLocalStorage(['balance']).then((cookies) => {
+      //     balanceText.value = cookies.balance;
+      //   });
+      //   getBalanceBtn.disabled = false;
+      //   showLoading('spinnerGetBalance', false);
+      // });
       ////////////
     });
   }, false);
@@ -275,20 +275,20 @@ document.addEventListener('DOMContentLoaded', async function () {
         '["normalizedParentDomainName", "==", "dash"]\n' +
         '],\n' +
         '"startAt": 1 }\n';
-      contractIdText.value = '295xRRRMGYyAruG39XdAibaU9jMAzxhknkkAxFE7uVkW';
+      contractIdText.value = '7DVe2cDyZMf8sDjQ46XqDzbeGKncrmkD6L96QohLmLbg';
       // toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Message") {
       documentNameText.value = 'message';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'ConeoUukuVZ9dG2P9U34AgrrDqe7ukveA6n5XGUxqAoT';
+      contractIdText.value = '6ow8zziDutSZP778QE88gWkyB2T9H7rdQaKXwUF2Fman';
       toAddressText.value = "";
     }
-    if (exampleQuerySelector.value == "Example WDS") {
-      documentNameText.value = 'LoginRequest';
+    if (exampleQuerySelector.value == "Example Note") {
+      documentNameText.value = 'note';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = '9GHRxvyYDmWz7pBKRjPnxjsJbbgKLngtejWWp3kEY1vB';
+      contractIdText.value = '6WqEuw8KqX9fTh7eEa9qNPKHkgPi9hv2BWQXHTSHiwwe';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Users") {
@@ -297,12 +297,13 @@ document.addEventListener('DOMContentLoaded', async function () {
       contractIdText.value = '3bhAjxGB5rZ8sTB1nEj1fC6SCZV6c3XEbX8Lm2arVbjA';
       toAddressText.value = "";
     }
-    if (exampleQuerySelector.value == "Example Note") {
-      documentNameText.value = 'note';
+    if (exampleQuerySelector.value == "Example WDS") {
+      documentNameText.value = 'LoginRequest';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'HeRMurhKjLvLrFTmRBQC5VSco7VURpqktoT4GVaPS2EW';
+      contractIdText.value = '9GHRxvyYDmWz7pBKRjPnxjsJbbgKLngtejWWp3kEY1vB';
       toAddressText.value = "";
     }
+    
   });
 
 

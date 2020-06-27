@@ -7,10 +7,14 @@ var requestText = document.getElementById('requestText')
 
 chrome.runtime.getBackgroundPage(function (bgWindow) {
 
-    if(bgWindow.curSwitch == true)
-        requestText.value = bgWindow.pRequestDocument[bgWindow.curDocNr]  + "\nPin Verified: " + bgWindow.uidpin_verified;
-    else if (bgWindow.curSwitch2 == true)
-        requestText.value = bgWindow.curDappRequests[0].targetcontent;
+    if (bgWindow.curSwitch == true) // WDS
+        requestText.value = bgWindow.pRequestDocument[bgWindow.curDocNr] + "\nPin Verified: " + bgWindow.uidpin_verified;
+    else if (bgWindow.curSwitch2 == true) { // SDS
+        if (bgWindow.dsHeader == 'RequestDocumentST')
+            requestText.value = bgWindow.curDappRequests[0].STcontent;
+        else if (bgWindow.dsHeader == 'RequestTX') 
+            requestText.value = "Send " + bgWindow.curDappRequests[0].TXamount + " Dash to Address " + bgWindow.curDappRequests[0].TXaddr;
+    }
     // bgWindow.setPassword(password);
     // window.close();     // Close dialog
 });

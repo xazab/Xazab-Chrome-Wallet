@@ -1,3 +1,17 @@
+// curMnemonic = 'amount deliver thunder trash stadium tunnel vital ladder organ slender way length';
+// curAddress = 'yQJCdsva7KUBkto6EPDLWPxf3Zkpnfy7P8';
+// curIdentityId = 'Epcz2GjLJurkT77HGc5mH6r4JRWVDcA2RCC7pHxE6U6N';
+// docID= '4gibhaxmaUrf1SpwBegZ9EaKSfFeZLyGruZMne1GatSx'
+// curName = 'readme'
+// Document ID for user readme: 4gibhaxmaUrf1SpwBegZ9EaKSfFeZLyGruZMne1GatSx
+
+// curMnemonic2 = 'velvet timber under input escape rich gauge final submit burst glow garage';
+// curAddress2 = 'yM8bRVwE3bQmqrnvG1oSpyXky2gjGErR5a';
+// curIdentityId2 = 'DX66EJdogM6c2yG6ULTZYCzoqqRBm64XHuU42YbSK9tu';
+// curName2 = 'mydapp'
+
+
+
 var curMnemonic = null; // must be null for dashjs init
 var curAddress = '';
 var curBalance = '';
@@ -9,8 +23,10 @@ var curSwitch2 = false;
 var sdk = null;
 var account = null;
 var sdkOpts = {};
+var psdkOpts = {};
 var platform = null;
 var curApps = '';
+var psdkApps = '';
 var tmpIdentity = {};  //check remove
 
 var curIdentityHDPrivKey = {};
@@ -31,7 +47,8 @@ var curDappRequests = [];
 var uidpin_verified = false;
 
 // set to true when notification comes in and show dappSigningDialog when popup opens next time
-var boolNotif = false;
+var dsNotif = false;
+var dsHeader = '';
 
 var wls = window.localStorage;
 
@@ -55,7 +72,7 @@ var wls = window.localStorage;
 
 ////////////////////////////////////
 //// development environment settings:
-//// prividentkey: tprv8nSVgPnsKBP8SgQY8jJKszuTgqTK2rYB5WtQe8sC7xGZQWcANaqrHD1znfBxhqhZV3dMAowmDPoXmHZSqR4JDnRvVd4GUe92S7qNSRR3JXK
+//// IdentHDPrivKey: tprv8ofwmyJJyfdUwV62ezSCVZbpLLVfTTmKdmCkfbEfAhqh8H7tNkgbmjGccbfGVJvGjS1j6S5GZBu1AGQcCUq3eQDBLojGSTJ13Q5fDF4HXq4
 // curMnemonic = 'amount deliver thunder trash stadium tunnel vital ladder organ slender way length';
 // curAddress = 'yQJCdsva7KUBkto6EPDLWPxf3Zkpnfy7P8';
 // curBalance = '1';
@@ -80,6 +97,7 @@ var wls = window.localStorage;
 sdkOpts.network = 'testnet';
 const pContractName = 'myContract';
 
+
 ////////////////////////////////////
 //// Dapp-Signing WDS contract constants and variables:
 const pContractID = "DBVuaTbU8PY9weNrg8RZPerNnv4oEdRWwSa4qXUG7ji4";
@@ -95,14 +113,10 @@ const alicePublicKey = "Ag/YNnbAfG0IpNeH4pfMzgqIsgooR36s5MzzYJV76TpO"; // vendor
 const pResponseDocument = ["LoginResponse", "SignupResponse", "TweetResponse"];
 const pResponseProp = "status";
 
-//// DPNS-Contract for docID
-const domainContractID = "7PBvxeGpj7SsWfvDSa31uqEMt58LAiJww7zNcVRP1uEM";
-const domainRequestDocument = "domain";
-
 ////////////////////////////////////
 ///// Dapp Signing Simple
 //// Contract Details
-const pContractID2 = "ConeoUukuVZ9dG2P9U34AgrrDqe7ukveA6n5XGUxqAoT"
+const pContractID2 = "6ow8zziDutSZP778QE88gWkyB2T9H7rdQaKXwUF2Fman"
 var pRequestDocument2 = ["message"];
 const pRequestProp2Header = "header";
 const pRequestProp2Ref = "reference";
@@ -110,9 +124,15 @@ const pRequestProp2Ref = "reference";
 var messageSubmitContractID = [''];
 var messageSubmitDocName = [''];
 var messageSubmitDocContent = [''];
+var messageAmountTx = [''];
+var messageAddrTx = [''];
+
+//// DPNS-Contract for docID
+const domainContractID = "7DVe2cDyZMf8sDjQ46XqDzbeGKncrmkD6L96QohLmLbg";
+const domainRequestDocument = "domain";
 
 //// Vendor Details
-const vendorDocDomainId = "3w9znscBUiz8YdPNAtnMEDpdjZcECvybdLEuVGXmBN4y" // vendor, readme
+const vendorDocDomainId = "DX66EJdogM6c2yG6ULTZYCzoqqRBm64XHuU42YbSK9tu" // vendor, readme
 // const vendorPublicKey = "A0/qSE6tis4l6BtQlTXB2PHW+WV+Iy0rpF5hAvX8hDRz"; // vendor, alice
 
 ////////////////////////////////////
@@ -125,8 +145,20 @@ async function connect() {
   console.log("SDK Init \nMnemonic: " + curMnemonic + " \ncurApps: " + curApps)
   try {
     sdk = new Dash.Client(sdkOpts);
-    account = await sdk.wallet.getAccount();
+    account = await sdk.getWalletAccount();
     await account.isReady();
+    account.on('FETCHED/CONFIRMED_TRANSACTION', (data) => {
+      console.log('FETCHED/CONFIRMED_TRANSACTION');
+      console.dir(data)
+      window.alert('clicked!')
+      var alertWindow = 'alert("message")';
+      chrome.tabs.executeScript({ code: alertWindow });
+    });
+    // var handler = function () {
+    //   console.log('FETCHED/CONFIRMED_TRANSACTION');
+    //   alert('clicked!');
+    // };
+    // account.on('FETCHED/CONFIRMED_TRANSACTION', handler);
 
   } catch (e) {
     console.log('error connecting sdk', e);
@@ -285,12 +317,11 @@ chrome.storage.local.set({ pin: curPin });
 
 
 
-
-////////////// code for dapp signing ////////////
+////////////// code for dapp signing v1 ////////////
 
 async function getIdentityKeys() {
   console.log("start getIdentityKeys");
-  curIdentityHDPrivKey = await account.getIdentityHDKeyByIndex(0,0);
+  curIdentityHDPrivKey = await account.getIdentityHDKeyByIndex(0, 0);
   console.log("curIdentHDPrivKey: " + curIdentityHDPrivKey);
   curIdentityPrivKey = curIdentityHDPrivKey.privateKey;
   var pk = curIdentityPrivKey;
@@ -408,19 +439,34 @@ async function submitWdsResponseDocument(msg) {
   return true;
 }
 
+async function submitSimpleDappTransaction(addr, amount) {
+  var transaction = null;
+  console.log(amount)
+  var satAmount = amount * 100000000;
+  console.log(satAmount)
+  transaction = await account.createTransaction({
+    recipient: addr,
+    satoshis: satAmount,
+  });
+  console.dir(transaction)
+  const result = await account.broadcastTransaction(transaction);
+  console.log('Transaction broadcast!\nTransaction ID:', result);
+  return true;
+}
+
 async function submitSimpleDappDocument(contractid, docName, docContent) {
 
   try {
 
-    var psdkOpts = {};
+    psdkOpts = {};
     psdkOpts.network = 'testnet';
-    psdkOpts.mnemonic = curMnemonic;
-    curApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
-    curApps = JSON.parse(curApps);
-    psdkOpts.apps = curApps;
+    psdkOpts.wallet = {};
+    psdkOpts.wallet.mnemonic = curMnemonic;
+    psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
+    psdkApps = JSON.parse(psdkApps);
+    psdkOpts.apps = psdkApps;
 
     var docSdk = new Dash.Client(psdkOpts);
-    await docSdk.isReady();
 
     var tidentity = await docSdk.platform.identities.get(curIdentityId);
 
@@ -476,18 +522,18 @@ async function polling() {
   pRequestTarget = curDocDomainID;
 
   // TODO remove when DashJS removed curApps
-  var psdkOpts = {};
+  psdkOpts = {};
   psdkOpts.network = 'testnet';
-  psdkOpts.mnemonic = curMnemonic;
-  curApps = '{ "myContract" : { "contractId" : "' + pContractID + '" } }';
-  curApps = JSON.parse(curApps);
-  psdkOpts.apps = curApps;
+  psdkOpts.wallet = {};
+  psdkOpts.wallet.mnemonic = curMnemonic;
+  psdkApps = '{ "myContract" : { "contractId" : "' + pContractID + '" } }';
+  psdkApps = JSON.parse(psdkApps);
+  psdkOpts.apps = psdkApps;
 
   var nStart = [1, 1, 1];
   var pollLocator = ["myContract." + pRequestDocument[0], "myContract." + pRequestDocument[1], "myContract." + pRequestDocument[2]];
 
   pollSdk = new Dash.Client(psdkOpts);
-  await pollSdk.isReady();
 
   var reachedHead = [false, false, false];
   // for testing (remove later):
@@ -635,8 +681,8 @@ async function polling() {
             });
 
             // sleep until notification is checked
-            boolNotif = true;
-            while (boolNotif == true) {
+            dsNotif = true;
+            while (dsNotif == true) {
               await new Promise(r => setTimeout(r, 5000));
             }
           }
@@ -668,18 +714,18 @@ async function polling2() {
   pRequestTarget = curDocDomainID;
 
   // TODO remove when DashJS removed curApps
-  var psdkOpts = {};
+  psdkOpts = {};
   psdkOpts.network = 'testnet';
-  psdkOpts.mnemonic = curMnemonic;
-  curApps = '{ "myContract" : { "contractId" : "' + pContractID2 + '" } }';
-  curApps = JSON.parse(curApps);
-  psdkOpts.apps = curApps;
+  psdkOpts.wallet = {};
+  psdkOpts.wallet.mnemonic = curMnemonic;
+  psdkApps = '{ "myContract" : { "contractId" : "' + pContractID2 + '" } }';
+  psdkApps = JSON.parse(psdkApps);
+  psdkOpts.apps = psdkApps;
 
   var nStart = [1];
   var pollLocator = ["myContract." + pRequestDocument2[0]];
 
   pollSdk = new Dash.Client(psdkOpts);
-  await pollSdk.isReady();
 
   var reachedHead = [false];
   // for testing (remove later):
@@ -732,15 +778,25 @@ async function polling2() {
             //message Response DocData
             if (i == 0) {
               // TODO only one object like orig dapp signing
-              console.log('loginResponseDocOpts');
-              console.dir(loginResponseDocOpts[i]);
-              messageSubmitContractID[i] = requestMsg.targetcontract;
-              messageSubmitDocName[i] = requestMsg.targetdocument;
-              messageSubmitDocContent[i] = requestMsg.targetcontent;
-              console.log("Target Contract: " + requestMsg.targetcontract);
-              console.log("Target Document: " + requestMsg.targetdocument);
-              console.log("Target Contract: " + requestMsg.targetcontent);
-              console.dir(loginResponseDocOpts[i]);
+              if (requestMsg.header != undefined) dsHeader = requestMsg.header;
+
+              if (dsHeader == 'RequestST') {
+                messageSubmitContractID[i] = requestMsg.STcontract;
+                messageSubmitDocName[i] = requestMsg.STdocument;
+                messageSubmitDocContent[i] = requestMsg.STcontent;
+                console.log("Target Contract: " + requestMsg.STcontract);
+                console.log("Target Document: " + requestMsg.STdocument);
+                console.log("Target Contract: " + requestMsg.STcontent);
+              } else if (dsHeader == 'RequestTX') {
+                messageAmountTx[i] = requestMsg.TXamount;
+                messageAddrTx[i] = requestMsg.TXaddr;
+                console.log("Address Tx: " + requestMsg.TXaddr);
+                console.log("Amount Tx: " + requestMsg.TXamount);
+              } else {
+                console.log("Exit. No valid header specified")
+                pollSdk.disconnect();
+                return;
+              }
             }
 
             // OS Request-DappSigning Notification
@@ -754,8 +810,8 @@ async function polling2() {
             });
 
             // sleep until notification is checked
-            boolNotif = true;
-            while (boolNotif == true) {
+            dsNotif = true;
+            while (dsNotif == true) {
               await new Promise(r => setTimeout(r, 5000));
             }
           }
@@ -771,7 +827,7 @@ async function polling2() {
       }
     }
   }
-  await pollSdk.disconnect();
+  pollSdk.disconnect();
   console.log("return")
   return;
 }
@@ -781,6 +837,7 @@ async function polling2() {
 
 async function setDappResponse(decision) {
   console.log(decision);
+  dsNotif = false;
   if (decision == "confirm" && curSwitch == true) {
     // var responseMsgSigned = await signMsg(curDappRequests[0].reference);
     // console.log("currDappRequest reference: " + curDappRequests[0].reference)
@@ -788,10 +845,11 @@ async function setDappResponse(decision) {
     // await submitDocument(responseMsgSigned);
     await submitWdsResponseDocument(loginResponseDocOpts[curDocNr]);
   } else if (decision == "confirm" && curSwitch2 == true) {
-    await submitSimpleDappDocument(messageSubmitContractID[0], messageSubmitDocName[0], messageSubmitDocContent[0]);
-
+    if (dsHeader == 'RequestST')
+      await submitSimpleDappDocument(messageSubmitContractID[0], messageSubmitDocName[0], messageSubmitDocContent[0]);
+    else if (dsHeader == 'RequestTX')
+      await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
   }
-  boolNotif = false;
 };
 
 function getDappRequests() {
@@ -813,12 +871,13 @@ function dappSigningDialog() {
 }
 
 async function getDocID() {
-  var psdkOpts = {};
+  psdkOpts = {};
   psdkOpts.network = 'testnet';
-  psdkOpts.mnemonic = curMnemonic;
-  curApps = '{ "myContract" : { "contractId" : "' + domainContractID + '" } }';
-  curApps = JSON.parse(curApps);
-  psdkOpts.apps = curApps;
+  psdkOpts.wallet = {};
+  psdkOpts.wallet.mnemonic = curMnemonic;
+  psdkApps = '{ "myContract" : { "contractId" : "' + domainContractID + '" } }';
+  psdkApps = JSON.parse(psdkApps);
+  psdkOpts.apps = psdkApps;
 
   var tRecordLocator = "myContract.domain";
   var tQueryObject = '{ "where": [' +
@@ -827,28 +886,32 @@ async function getDocID() {
     '],' +
     '"startAt": 1 }';
 
-  var docSdk = new Dash.Client(psdkOpts);
-  await docSdk.isReady();
+  try {
+    var docSdk = new Dash.Client(psdkOpts);
 
-  var queryJson = JSON.parse(tQueryObject);
-  if (curName == '') {
-    curSwitch = false;
-    await chrome.storage.local.set({ switch: false });
-    throw "Name not set, please create a Username for your Identity";
-  }
-  const documents = await docSdk.platform.documents.get(tRecordLocator, queryJson);
-  // await new Promise(r => setTimeout(r, 2000));  // sleep x ms
-  // TODO: remove later, just a fix for current dashjs error 13
-  console.log(documents)
-  if (documents[0] == null || documents[0] == undefined) {
-    console.log("Couldnt connect to network, aborting polling! Please try again in a few moments.");
-    curSwitch = false;
-    await chrome.storage.local.set({ switch: false });
-    docSdk.disconnect();
-  } else {
-    console.log("Document ID for user " + curName + ": " + documents[0].id)
-    curDocDomainID = documents[0].id
-    console.log("saved document domain ID")
+    var queryJson = JSON.parse(tQueryObject);
+    if (curName == '') {
+      curSwitch = false;
+      await chrome.storage.local.set({ switch: false });
+      throw "Name not set, please create a Username for your Identity";
+    }
+    const documents = await docSdk.platform.documents.get(tRecordLocator, queryJson);
+    // await new Promise(r => setTimeout(r, 2000));  // sleep x ms
+    // TODO: remove later, just a fix for current dashjs error 13
+    console.log(documents)
+    if (documents[0] == null || documents[0] == undefined) {
+      console.log("Couldnt connect to network, aborting polling! Please try again in a few moments.");
+      curSwitch = false;
+      await chrome.storage.local.set({ switch: false });
+    } else {
+      console.log("Document ID for user " + curName + ": " + documents[0].id)
+      curDocDomainID = documents[0].id
+      console.log("saved document domain ID")
+    }
+  } catch (e) {
+    console.error('Something went wrong:', e);
+  } finally {
+    docSdk.disconnect()
   }
 }
 
@@ -863,7 +926,11 @@ async function changePinLoop() {
 ////////////// END experimental code for dapp signing ////////////
 
 // if (curMnemonic != "" && curMnemonic != null) {
-connect();
+(async function start() {
+  await connect();
+})();
+
+
 // }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -995,7 +1062,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log(curMnemonic);
           await disconnect();
           await connect();
-          
+
           // var tmp = (await account.getUnusedAddress())
           curAddress = (await account.getUnusedAddress()).address;
           console.log(curAddress)
@@ -1024,13 +1091,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           // const account = await sdk.wallet.getAccount();
           // await account.isReady();
 
-          if (request.wait != '') {
-            await new Promise(r => setTimeout(r, 20000));  // sleep x ms
-          }
+          // if (request.wait != '') {
+          //   await new Promise(r => setTimeout(r, 20000));  // sleep x ms
+          // }
           console.log('getBalance');
           // console.log(await account.getUnconfirmedBalance())
-          console.log(await account.getTotalBalance())
+          // console.log(await account.getTotalBalance())
           // console.log(await account.getConfirmedBalance())
+          // console.log(e2)
 
           await chrome.storage.local.set({ balance: ((await account.getTotalBalance()) / 100000000) });
           sendResponse({ complete: true });
@@ -1079,11 +1147,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log('registerIdentity');
           // import identityID if given '<string>' from popup.js
           if (request.identityId != '') {
+            console.log("importing identity")
             tmpIdentity.id = request.identityId;
           }
           // create identity if given '' from popup.js
           else if (request.identityId == '') {
-            tmpIdentity = await sdk.platform.identities.register(); // TODO: testing
+            console.log("creating identity")
+            tmpIdentity = await sdk.platform.identities.register();
           }
           console.log({ tmpidentity: tmpIdentity.id });
           curIdentityId = tmpIdentity.id;
