@@ -780,7 +780,7 @@ async function polling2() {
               // TODO only one object like orig dapp signing
               if (requestMsg.header != undefined) dsHeader = requestMsg.header;
 
-              if (dsHeader == 'RequestST') {
+              if (dsHeader == 'RequestDocumentST') {
                 messageSubmitContractID[i] = requestMsg.STcontract;
                 messageSubmitDocName[i] = requestMsg.STdocument;
                 messageSubmitDocContent[i] = requestMsg.STcontent;
@@ -845,7 +845,7 @@ async function setDappResponse(decision) {
     // await submitDocument(responseMsgSigned);
     await submitWdsResponseDocument(loginResponseDocOpts[curDocNr]);
   } else if (decision == "confirm" && curSwitch2 == true) {
-    if (dsHeader == 'RequestST')
+    if (dsHeader == 'RequestDocumentST')
       await submitSimpleDappDocument(messageSubmitContractID[0], messageSubmitDocName[0], messageSubmitDocContent[0]);
     else if (dsHeader == 'RequestTX')
       await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
