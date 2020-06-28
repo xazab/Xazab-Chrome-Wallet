@@ -59,7 +59,9 @@ var wls = window.localStorage;
     console.log("Local Storage Not Supported")
     throw ("Local Storage Not Supported")
   }
+  // console.log(wls.getItem('mnemonic'))
   // wls.setItem("mnemonic", "blub")
+
   // wls.setItem("address", "")
 
   //show number of objects stored
@@ -136,6 +138,27 @@ const vendorDocDomainId = "DX66EJdogM6c2yG6ULTZYCzoqqRBm64XHuU42YbSK9tu" // vend
 // const vendorPublicKey = "A0/qSE6tis4l6BtQlTXB2PHW+WV+Iy0rpF5hAvX8hDRz"; // vendor, alice
 
 ////////////////////////////////////
+
+console.log("background.js starting");
+
+// var manifestData = chrome.runtime.getManifest();
+// console.log(manifestData.version);
+// console.log(manifestData.name);
+// console.dir(navigator.userAgent)
+// console.dir(chrome.tabs)  
+// console.dir(chrome.windows["WindowState"])
+
+// Detect NWJS instance or Browser instance
+if (chrome.windows["WindowState"].HIDDEN == "hidden") {
+  console.log("Desktop NWJS Mode")
+  chrome.tabs.query({}, function (tab) {
+    chrome.tabs.update(tab[0].id, {
+      url: chrome.extension.getURL("popup.html"),
+    });
+  })
+} else if (chrome.windows["WindowState"].DOCKED == "docked") {
+  console.log("Browser Extension Mode")
+}
 
 async function connect() {
   sdkOpts.network = 'testnet';
