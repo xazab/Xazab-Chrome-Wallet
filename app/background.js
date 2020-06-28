@@ -710,8 +710,9 @@ async function polling2() {
   getIdentityKeys();
 
   // get docID for current user
-  await getDocID();
-  pRequestTarget = curDocDomainID;
+  // await getDocID();
+  // pRequestTarget = curDocDomainID;
+  pRequestTarget = curName;
 
   // TODO remove when DashJS removed curApps
   psdkOpts = {};
@@ -761,8 +762,10 @@ async function polling2() {
           var requestMsg = pollDoc[index].data;  // get document data , TODO: change to pRequestProp
           if (requestMsg.reference == null) return;
 
-          if (requestMsg.reference.startsWith(pRequestTarget)) {  // check for Target docID
-            console.log("Found message starting with " + pRequestTarget);
+          // if (requestMsg.reference.startsWith(pRequestTarget)) {  // check for Target docID
+          if (requestMsg.reference == pRequestTarget) {  // check for Target docID
+
+            console.log("Received message for " + pRequestTarget);
             curDappRequests = [];
             curDappRequests.push(requestMsg);
             // debug, remove
@@ -780,14 +783,14 @@ async function polling2() {
               // TODO only one object like orig dapp signing
               if (requestMsg.header != undefined) dsHeader = requestMsg.header;
 
-              if (dsHeader == 'RequestDocumentST') {
+              if (dsHeader == 'Request Document ST') {
                 messageSubmitContractID[i] = requestMsg.STcontract;
                 messageSubmitDocName[i] = requestMsg.STdocument;
                 messageSubmitDocContent[i] = requestMsg.STcontent;
                 console.log("Target Contract: " + requestMsg.STcontract);
                 console.log("Target Document: " + requestMsg.STdocument);
                 console.log("Target Contract: " + requestMsg.STcontent);
-              } else if (dsHeader == 'RequestTX') {
+              } else if (dsHeader == 'Request Transaction TX') {
                 messageAmountTx[i] = requestMsg.TXamount;
                 messageAddrTx[i] = requestMsg.TXaddr;
                 console.log("Address Tx: " + requestMsg.TXaddr);
@@ -845,9 +848,9 @@ async function setDappResponse(decision) {
     // await submitDocument(responseMsgSigned);
     await submitWdsResponseDocument(loginResponseDocOpts[curDocNr]);
   } else if (decision == "confirm" && curSwitch2 == true) {
-    if (dsHeader == 'RequestDocumentST')
+    if (dsHeader == 'Request Document ST')
       await submitSimpleDappDocument(messageSubmitContractID[0], messageSubmitDocName[0], messageSubmitDocContent[0]);
-    else if (dsHeader == 'RequestTX')
+    else if (dsHeader == 'Request Transaction TX')
       await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
   }
 };

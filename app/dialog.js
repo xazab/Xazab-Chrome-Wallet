@@ -10,10 +10,10 @@ chrome.runtime.getBackgroundPage(function (bgWindow) {
     if (bgWindow.curSwitch == true) // WDS
         requestText.value = bgWindow.pRequestDocument[bgWindow.curDocNr] + "\nPin Verified: " + bgWindow.uidpin_verified;
     else if (bgWindow.curSwitch2 == true) { // SDS
-        if (bgWindow.dsHeader == 'RequestDocumentST')
-            requestText.value = bgWindow.curDappRequests[0].STcontent;
-        else if (bgWindow.dsHeader == 'RequestTX') 
-            requestText.value = "Send " + bgWindow.curDappRequests[0].TXamount + " Dash to Address " + bgWindow.curDappRequests[0].TXaddr;
+        if (bgWindow.dsHeader == 'Request Document ST')
+            requestText.value = bgWindow.curDappRequests[0].dappname + ": " + bgWindow.dsHeader + "\n" + bgWindow.curDappRequests[0].STcontent;
+        else if (bgWindow.dsHeader == 'Request Transaction TX') 
+            requestText.value = bgWindow.curDappRequests[0].dappname + ": " + bgWindow.dsHeader + "\n" + "Send " + bgWindow.curDappRequests[0].TXamount + " Dash to Address " + bgWindow.curDappRequests[0].TXaddr;
     }
     // bgWindow.setPassword(password);
     // window.close();     // Close dialog
