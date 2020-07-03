@@ -1,24 +1,31 @@
 {
   "name": "Dash-Chrome-Wallet-NWJS",
   "main": "index.html",
-  "chromium-args": "--enable-logging=stderr --mixed-content --load-extension='./../app'",
+  "chromium-args": "--enable-logging=stderr --mixed-content --load-extension='./app'",
   "dependencies": {
     "nw": "^0.46.3"
   },
-  "version": "1.0.0",
-  "devDependencies": {},
+  "version": "1.4.0",
+  "devDependencies": {
+    "nwjs-builder-phoenix": "^1.15.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nw ."
+    "start:local": "nw .",
+	"dist": "build --tasks win-x86,win-x64,linux-x86,linux-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
+	"start": "run --x86 --mirror https://dl.nwjs.io/ ."
+  },
+  "build": {
+        "nwVersion": "0.46.3"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "window": {
-	"id":"myNWJS-ID",
+    "id": "myNWJS-ID",
     "title": "Dash Chrome Wallet (Desktop Edition)",
-    "icon": "./../app/img/icon128.png",
+    "icon": "./app/img/icon128.png",
     "frame": true,
     "width": 575,
     "height": 575,

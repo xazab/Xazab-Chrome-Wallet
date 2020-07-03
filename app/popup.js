@@ -190,11 +190,11 @@ document.addEventListener('DOMContentLoaded', async function () {
   //reset
   resetBtn.addEventListener('click', function () {
     resetBtn.disabled = true;
-    showLoading('spinnerTestConnection', true);
+    showLoading('spinnerResetConnection', true);
     chrome.runtime.sendMessage({ greeting: "resetWallet" }, function (response) {
       chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
       resetBtn.disabled = false;
-      showLoading('spinnerTestConnection', false);
+      showLoading('spinnerResetConnection', false);
       window.close();
     });
   }, false);
