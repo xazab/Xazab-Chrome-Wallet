@@ -1,5 +1,7 @@
 node_modules
 nwjs/node_modules
+nwjs/app
+nwjs/dist
 temp
 .tmp
 dist
