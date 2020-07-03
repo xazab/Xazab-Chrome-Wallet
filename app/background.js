@@ -191,11 +191,11 @@ async function connect() {
   return true;
 }
 
-function disconnect() {
+async function disconnect() {
   console.log("disconnect")
   try {
+    await sdk.disconnect();
     account = null;
-    sdk.disconnect();
 
   } catch (e) {
     console.log('error disconnecting sdk', e);
@@ -360,6 +360,7 @@ wls.setItem('pin', curPin)
 
 async function getIdentityKeys() {
   console.log("start getIdentityKeys");
+  // TODO: check if try..catch necessary
   curIdentityHDPrivKey = await account.getIdentityHDKeyByIndex(0, 0);
   console.log("curIdentHDPrivKey: " + curIdentityHDPrivKey);
   curIdentityPrivKey = curIdentityHDPrivKey.privateKey;
@@ -981,194 +982,207 @@ async function changePinLoop() {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   // try not working for account object at this position
-  try {
-    // if (request.greeting == 'importMnemonic') {
-    //   curMnemonic = request.mnemonic;
-    //   console.log(curMnemonic);
-    //   disconnect();
-    //   connect();
-    // }
-    if (request.greeting == 'getDocuments') {
-      curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
-      curApps = JSON.parse(curApps);
-      disconnect();
-      connect();
-    }
 
-    // if (request.greeting == "switch") {
-    //   (async function dappSigning() {
-    //     curSwitch = request.switch;
-    //     console.log("curSwitch: " + curSwitch)
-    //     await chrome.storage.local.set({ switch: curSwitch });
-    //     if (curSwitch) {
-    //       polling();
-    //     }
-    //     // exit somehow or add "switch" case
-    //   })();
-    // }
+  // if (request.greeting == 'importMnemonic') {
+  //   curMnemonic = request.mnemonic;
+  //   console.log(curMnemonic);
+  //   disconnect();
+  //   connect();
+  // }
+  if (request.greeting == 'getDocuments') {
+    curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
+    curApps = JSON.parse(curApps);
+    disconnect();
+    connect();
+  }
 
-    /////////////////// start switch - case ////////////////////
+  // if (request.greeting == "switch") {
+  //   (async function dappSigning() {
+  //     curSwitch = request.switch;
+  //     console.log("curSwitch: " + curSwitch)
+  //     await chrome.storage.local.set({ switch: curSwitch });
+  //     if (curSwitch) {
+  //       polling();
+  //     }
+  //     // exit somehow or add "switch" case
+  //   })();
+  // }
 
-    // connect().then(() => {
+  /////////////////// start switch - case ////////////////////
 
-    switch (String(request.greeting)) {
+  // connect().then(() => {
 
-      case "connect":
-        (async function connectTest() {
-          console.log('connect with ' + curMnemonic);
-          connect();
-          sendResponse({ complete: true })
-          // var alertWindow = 'alert("message")';
-          // chrome.tabs.executeScript({ code: alertWindow });
-        })()
+  switch (String(request.greeting)) {
 
-        break;
+    case "connect":
+      (async function connectTest() {
+        console.log('connect with ' + curMnemonic);
+        connect();
+        sendResponse({ complete: true })
+        // var alertWindow = 'alert("message")';
+        // chrome.tabs.executeScript({ code: alertWindow });
+      })()
 
-      // case "dappSigningDialog":
-      //   (function dappSigningDialog() {
-      //     chrome.windows.create({
-      //       url: chrome.extension.getURL('dialog.html'),
-      //       type: 'popup',
-      //       // focused: true,
-      //       top: 300,
-      //       left: 300,
-      //       width: 510,
-      //       height: 290
-      //     });
+      break;
 
-      //   })()
+    // case "dappSigningDialog":
+    //   (function dappSigningDialog() {
+    //     chrome.windows.create({
+    //       url: chrome.extension.getURL('dialog.html'),
+    //       type: 'popup',
+    //       // focused: true,
+    //       top: 300,
+    //       left: 300,
+    //       width: 510,
+    //       height: 290
+    //     });
 
-      case "switch":
-        (async function dappSigning() {
-          curSwitch = request.switch;
-          console.log("curSwitch: " + curSwitch)
-          // await chrome.storage.local.set({ switch: curSwitch });
-          wls.setItem('switch', curSwitch)
-          if (curSwitch) {
-            polling();
-            // changePinLoop();
-          }
-          sendResponse({ complete: true });
-          // disconnect();
-        })();
-        break
+    //   })()
 
-      case "switch2":
-        (async function dappSigning() {
-          curSwitch2 = request.switch;
-          console.log("curSwitch2: " + curSwitch2)
-          // await chrome.storage.local.set({ switch2: curSwitch2 });
-          wls.setItem('switch2', curSwitch2)
-          if (curSwitch2) {
-            polling2();
-          }
-          sendResponse({ complete: true });
-          // disconnect();
-        })();
-        break
+    case "switch":
+      (async function dappSigning() {
+        curSwitch = request.switch;
+        console.log("curSwitch: " + curSwitch)
+        // await chrome.storage.local.set({ switch: curSwitch });
+        wls.setItem('switch', curSwitch)
+        if (curSwitch) {
+          polling();
+          // changePinLoop();
+        }
+        sendResponse({ complete: true });
+        // disconnect();
+      })();
+      break
 
-      case "createWallet":
-        (async function createWallet() {
-          console.log('createWallet');
+    case "switch2":
+      (async function dappSigning() {
+        curSwitch2 = request.switch;
+        console.log("curSwitch2: " + curSwitch2)
+        // await chrome.storage.local.set({ switch2: curSwitch2 });
+        wls.setItem('switch2', curSwitch2)
+        if (curSwitch2) {
+          polling2();
+        }
+        sendResponse({ complete: true });
+        // disconnect();
+      })();
+      break
 
-          // const account = await sdk.wallet.getAccount();
-          // await account.isReady();
+    case "createWallet":
+      (async function createWallet() {
+        console.log('createWallet');
+
+        // const account = await sdk.wallet.getAccount();
+        // await account.isReady();
+        try {
           const mnemonic = await sdk.wallet.exportWallet();
           curMnemonic = mnemonic;
           const address = await account.getUnusedAddress(); // account null error, dont get catched TODO
           curAddress = address.address;
-          // await chrome.storage.local.set({ mnemonic: curMnemonic });
-          wls.setItem('mnemonic', curMnemonic)
-          // var savedMM = await getLocalStorage(['mnemonic']);
-          // await chrome.storage.local.set({ address: curAddress });
-          wls.setItem('address', curAddress)
-          // var savedAddress = await getLocalStorage(['address']);
-          // await chrome.storage.local.set({ balance: '0' });
-          wls.setItem('balance', '0')
-          // var savedBalance = await getLocalStorage(['balance']);
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
+        // await chrome.storage.local.set({ mnemonic: curMnemonic });
+        wls.setItem('mnemonic', curMnemonic)
+        // var savedMM = await getLocalStorage(['mnemonic']);
+        // await chrome.storage.local.set({ address: curAddress });
+        wls.setItem('address', curAddress)
+        // var savedAddress = await getLocalStorage(['address']);
+        // await chrome.storage.local.set({ balance: '0' });
+        wls.setItem('balance', '0')
+        // var savedBalance = await getLocalStorage(['balance']);
 
-          /////// run automated faucet
-          console.log("run automated faucet for address " + curAddress)
-          var httpReq = new XMLHttpRequest();
-          httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
-          httpReq.addEventListener("load", function (e) {
-            console.log(httpReq.responseText);
-          }, false)
-          httpReq.send(null);
-          /////////////////////////////
+        /////// run automated faucet
+        console.log("run automated faucet for address " + curAddress)
+        var httpReq = new XMLHttpRequest();
+        httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
+        httpReq.addEventListener("load", function (e) {
+          console.log(httpReq.responseText);
+        }, false)
+        httpReq.send(null);
+        /////////////////////////////
 
-          sendResponse({ complete: true });
-          // disconnect();
-        })();
-        break;
+        sendResponse({ complete: true });
+        // disconnect();
+      })();
+      break;
 
 
-      case "importMnemonic":
+    case "importMnemonic":
 
-        (async function importMnemonic() {
-          console.log('importMnemonic');
+      (async function importMnemonic() {
+        console.log('importMnemonic');
 
-          curMnemonic = request.mnemonic;
-          console.log(curMnemonic);
-          await disconnect();
-          await connect();
+        curMnemonic = request.mnemonic;
+        console.log(curMnemonic);
+        await disconnect();
+        await connect();
 
-          // var tmp = (await account.getUnusedAddress())
+        try {
           curAddress = (await account.getUnusedAddress()).address;
           console.log(curAddress)
           curBalance = ((await account.getTotalBalance()) / 100000000);
           console.log(curBalance)
-
           await getIdentityKeys();
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
 
-          // await chrome.storage.local.set({ mnemonic: curMnemonic });
-          wls.setItem('mnemonic', curMnemonic)
-          // await chrome.storage.local.set({ address: curAddress });
-          wls.setItem('address', curAddress)
-          // await chrome.storage.local.set({ balance: curBalance });
-          wls.setItem('balance', curBalance)
-          // await chrome.storage.local.set({ identityId: curIdentityId });
-          // await chrome.storage.local.set({ identityId: "" });
-          wls.setItem('identityId', '')
+        // await chrome.storage.local.set({ mnemonic: curMnemonic });
+        wls.setItem('mnemonic', curMnemonic)
+        // await chrome.storage.local.set({ address: curAddress });
+        wls.setItem('address', curAddress)
+        // await chrome.storage.local.set({ balance: curBalance });
+        wls.setItem('balance', curBalance)
+        // await chrome.storage.local.set({ identityId: curIdentityId });
+        // await chrome.storage.local.set({ identityId: "" });
+        wls.setItem('identityId', '')
 
-          sendResponse({ complete: true });
-          // disconnect();
-        })()
-        break;
+        sendResponse({ complete: true });
+        // disconnect();
+      })()
+      break;
 
 
-      case "getBalance":
-        // TODO: use events api to auto update balance
-        (async function getBalance() {
+    case "getBalance":
+      // TODO: use events api to auto update balance
+      (async function getBalance() {
 
-          // const account = await sdk.wallet.getAccount();
-          // await account.isReady();
+        // const account = await sdk.wallet.getAccount();
+        // await account.isReady();
 
-          // if (request.wait != '') {
-          //   await new Promise(r => setTimeout(r, 20000));  // sleep x ms
-          // }
-          console.log('getBalance');
-          // console.log(await account.getUnconfirmedBalance())
-          // console.log(await account.getTotalBalance())
-          // console.log(await account.getConfirmedBalance())
-          // console.log(e2)
+        // if (request.wait != '') {
+        //   await new Promise(r => setTimeout(r, 20000));  // sleep x ms
+        // }
+        console.log('getBalance');
+        // console.log(await account.getUnconfirmedBalance())
+        // console.log(await account.getTotalBalance())
+        // console.log(await account.getConfirmedBalance())
+        // console.log(e2)
 
-          // await chrome.storage.local.set({ balance: ((await account.getTotalBalance()) / 100000000) });
+        // await chrome.storage.local.set({ balance: ((await account.getTotalBalance()) / 100000000) });
+        try {
           curBalance = ((await account.getTotalBalance()) / 100000000);
-          wls.setItem('balance', curBalance);
-          sendResponse({ complete: true });
-          // disconnect();
-        })()
-        break;
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
+        wls.setItem('balance', curBalance);
+        sendResponse({ complete: true });
+        // disconnect();
+      })()
+      break;
 
 
-      case "sendFunds":
-        (async function sendFunds() {
-          console.log('sendFunds');
+    case "sendFunds":
+      (async function sendFunds() {
+        console.log('sendFunds');
 
-          // const account = await sdk.wallet.getAccount();
-          // await account.isReady();
-
+        // const account = await sdk.wallet.getAccount();
+        // await account.isReady();
+        try {
           var transaction = null;
           if (request.toAddress == '' && request.amount == '') {
             transaction = await account.createTransaction({
@@ -1186,21 +1200,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.dir(transaction)
           const result = await account.broadcastTransaction(transaction);
           console.log('Transaction broadcast!\nTransaction ID:', result);
-          // TODO: this should be working, bug in DashJS i guess, using popup.js for now
-          // await new Promise(r => setTimeout(r, 20000));  // sleep x ms
-          // console.log(await sdk.account.getUnconfirmedBalance())
-          // console.log(await sdk.account.getTotalBalance())
-          // await chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
-          sendResponse({ complete: true });
-          // disconnect();
-        })()
-        break;
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
+
+        // TODO: this should be working, bug in DashJS i guess, using popup.js for now
+        // await new Promise(r => setTimeout(r, 20000));  // sleep x ms
+        // console.log(await sdk.account.getUnconfirmedBalance())
+        // console.log(await sdk.account.getTotalBalance())
+        // await chrome.storage.local.set({ balance: ((await sdk.account.getUnconfirmedBalance()) / 100000000) });
+        sendResponse({ complete: true });
+        // disconnect();
+      })()
+      break;
 
 
-      case "registerIdentity":
-        (async function registerIdentity() {
-          console.log('registerIdentity');
-          // import identityID if given '<string>' from popup.js
+    case "registerIdentity":
+      (async function registerIdentity() {
+        console.log('registerIdentity');
+        // import identityID if given '<string>' from popup.js
+        try {
           if (request.identityId != '') {
             console.log("importing identity")
             tmpIdentity.id = request.identityId;
@@ -1215,127 +1235,135 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           // await chrome.storage.local.set({ identityId: tmpIdentity.id });
           wls.setItem('identityId', tmpIdentity.id)
           getIdentityKeys();
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
 
-          sendResponse({ complete: true });
-          // disconnect();
-        })()
-        break;
+        sendResponse({ complete: true });
+        // disconnect();
+      })()
+      break;
 
 
-      case "registerName":
-        (async function registerName() {
-          console.log('registerName');
-          curName = request.name;
-          // TODO: bug when having several identitys, importing 1st and then registering name
+    case "registerName":
+      (async function registerName() {
+        console.log('registerName');
+        curName = request.name;
+        // TODO: bug when having several identitys, importing 1st and then registering name
+        try {
           tmpIdentity = await sdk.platform.identities.get(curIdentityId);
           console.log(tmpIdentity)
           const nameRegistration = await sdk.platform.names.register(curName, tmpIdentity);
           console.log({ nameRegistration });
           // await chrome.storage.local.set({ name: curName });
           wls.setItem('name', curName)
-          sendResponse({ complete: true });
-          // disconnect();
-        })()
-        break;
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
+
+        sendResponse({ complete: true });
+        // disconnect();
+      })()
+      break;
 
 
-      case "getDocuments":
-        (async function getDocuments() {
-          console.log('getDocuments');
-          const recordLocator = "myContract." + request.documentName; // just use myContract for all
+    case "getDocuments":
+      (async function getDocuments() {
+        console.log('getDocuments');
+        const recordLocator = "myContract." + request.documentName; // just use myContract for all
 
+        try {
           var queryJson = JSON.parse(request.queryObject);
           const documents = await sdk.platform.documents.get(recordLocator, queryJson);
           console.log(documents);
           var documentJson = JSON.stringify(documents, null, 2)
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
 
-          // todo: fix encoding warning in firefox
-          let a = URL.createObjectURL(new Blob([documentJson]), { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
+        // todo: fix encoding warning in firefox
+        let a = URL.createObjectURL(new Blob([documentJson]), { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
 
-          chrome.windows.create({
-            type: 'popup',
-            url: a
-          });
+        chrome.windows.create({
+          type: 'popup',
+          url: a
+        });
 
-          sendResponse({ complete: true });
-          // disconnect();
-        })()
-        break;
+        sendResponse({ complete: true });
+        // disconnect();
+      })()
+      break;
 
 
-      case "getContract":
-        (async function getContract() {
-          console.log('getContract');
+    case "getContract":
+      (async function getContract() {
+        console.log('getContract');
+        try {
           const contract = await sdk.platform.contracts.get(request.contractId);
           // const contract = await sdk.platform.contracts.get('77w8Xqn25HwJhjodrHW133aXhjuTsTv9ozQaYpSHACE3');
           console.dir({ contract }, { depth: 5 });
           var contractJson = JSON.stringify(contract, null, 2)
+        } catch (e) {
+          sendResponse({ complete: false });
+          return;
+        }
+        let a = URL.createObjectURL(new Blob([contractJson]), { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
 
-          let a = URL.createObjectURL(new Blob([contractJson]), { encoding: "UTF-8", type: "text/plain;charset=UTF-8" })
-
-          chrome.windows.create({
-            type: 'popup',
-            url: a
-          });
-          // const newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
-          // newWin.document.open();
-          // newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
-          // newWin.document.close();
-          sendResponse({ complete: true });
-          // disconnect();
-        })()
-        break;
-
-
-      case "resetWallet":
-        (async function resetWallet() {
-          curMnemonic = null; // must be null for dashjs init
-          curAddress = '';
-          curBalance = '';
-          curIdentityId = '';
-          curName = '';
-          curSwitch = false;
-          // chrome.storage.local.set({ mnemonic: '' }); // must be '' for popup.js
-          // chrome.storage.local.set({ address: '' });
-          // chrome.storage.local.set({ balance: '' });
-          // chrome.storage.local.set({ identityId: '' });
-          // chrome.storage.local.set({ name: '' });
-          // chrome.storage.local.set({ switch: '' });
-          wls.setItem('mnemonic', '')
-          wls.setItem('address', '')
-          wls.setItem('balance', '')
-          wls.setItem('identityId', '')
-          wls.setItem('name', '')
-          wls.setItem('switch', '')
-          sendResponse({ complete: true });
-          disconnect();
-          connect();
-        })()
-        break;
-
-
-      default:
-        // error
-        console.log('ERROR Unknown Message: ' + String(request.greeting));
+        chrome.windows.create({
+          type: 'popup',
+          url: a
+        });
+        // const newWin = window.open("about:blank", "Receive Contract", "width=800,height=500");
+        // newWin.document.open();
+        // newWin.document.write('<html><body><pre>' + contractJson + '</pre></body></html>');
+        // newWin.document.close();
+        sendResponse({ complete: true });
         // disconnect();
-        break;
-    }
-    // })
-    //   .catch((e) => {
-    //     console.log('ERROR CONNECTING', e);
-    //     sendResponse({ complete: false });
-    //     disconnect();
-    //   });
+      })()
+      break;
 
+
+    case "resetWallet":
+      (async function resetWallet() {
+        curMnemonic = null; // must be null for dashjs init
+        curAddress = '';
+        curBalance = '';
+        curIdentityId = '';
+        curName = '';
+        curSwitch = false;
+        curSwitch2 = false;
+        // chrome.storage.local.set({ mnemonic: '' }); // must be '' for popup.js
+        // chrome.storage.local.set({ address: '' });
+        // chrome.storage.local.set({ balance: '' });
+        // chrome.storage.local.set({ identityId: '' });
+        // chrome.storage.local.set({ name: '' });
+        // chrome.storage.local.set({ switch: '' });
+        wls.setItem('mnemonic', '')
+        wls.setItem('address', '')
+        wls.setItem('balance', '')
+        wls.setItem('identityId', '')
+        wls.setItem('name', '')
+        wls.setItem('switch', 'false')
+        wls.setItem('switch2', 'false')
+        sendResponse({ complete: true });
+        disconnect();
+        connect();
+      })()
+      break;
+
+
+    default:
+      // error
+      console.log('ERROR Unknown Message: ' + String(request.greeting));
+      // disconnect();
+      break;
   }
-  catch (e) {
-    console.log('error processing request: ', e);
-  }
-  finally {
-    // return true from the event listener to indicate you wish to send a response asynchronously
-    // (this will keep the message channel open to the other end until sendResponse is called).
-    console.log("test if finnally is reached")
-    return true;
-  }
+
+  // return true from the event listener to indicate you wish to send a response asynchronously
+  // (this will keep the message channel open to the other end until sendResponse is called).
+  return true;
 
 });

@@ -236,9 +236,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         ////////////
       }
       else {
-        alert('There was a problem creating the wallet - please try again');
+        // alert('There was a problem creating the wallet - please try again');
         createBtn.disabled = false;
-        identityIdBtn.disabled = false;
+        // identityIdBtn.disabled = true;
         showLoading('spinnerCreateWallet', false);
       }
     });
