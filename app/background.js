@@ -59,16 +59,9 @@ var wls = window.localStorage;
     console.log("Local Storage Not Supported")
     throw ("Local Storage Not Supported")
   }
-  // console.log(wls.getItem('mnemonic'))
-  // wls.setItem("mnemonic", "blub")
-
-  // wls.setItem("address", "")
-
   //show number of objects stored
   // console.log(wls.length)
 
-  //get items from local storage
-  // console.log(wls.getItem("mnemonic"))
 })();
 
 
@@ -170,12 +163,20 @@ async function connect() {
     sdk = new Dash.Client(sdkOpts);
     account = await sdk.getWalletAccount();
     await account.isReady();
-    account.on('FETCHED/CONFIRMED_TRANSACTION', (data) => {
+    // register TX listener
+    account.on('FETCHED/CONFIRMED_TRANSACTION', async (data) => {
       console.log('FETCHED/CONFIRMED_TRANSACTION');
-      console.dir(data)
-      window.alert('clicked!')
-      var alertWindow = 'alert("message")';
-      chrome.tabs.executeScript({ code: alertWindow });
+      // console.log(data);
+      // curBalance = ((await account.getTotalBalance()) / 100000000);
+      curBalance = await account.getTotalBalance() / 100000000;
+      wls.setItem('balance', curBalance);
+
+      chrome.runtime.sendMessage({
+        msg: "refresh balance",
+        data: {
+          greeting: "popup refresh balance command",
+        }
+      });
     });
     // var handler = function () {
     //   console.log('FETCHED/CONFIRMED_TRANSACTION');
@@ -259,19 +260,19 @@ function disconnect() {
 //   });
 // }
 
-function getLocalStorage(arrKeys) {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.storage.local.get(arrKeys, function (result) {
-        resolve(result);
-      });
-    }
-    catch (e) {
-      console.log('Erroring  getting values for', key, 'from local storage');
-      reject(e);
-    }
-  });
-}
+// function getLocalStorage(arrKeys) {
+//   return new Promise((resolve, reject) => {
+//     try {
+//       chrome.storage.local.get(arrKeys, function (result) {
+//         resolve(result);
+//       });
+//     }
+//     catch (e) {
+//       console.log('Erroring  getting values for', key, 'from local storage');
+//       reject(e);
+//     }
+//   });
+// }
 
 // DEBUG
 // chrome.storage.local.get("mnemonic", function (result) {
@@ -285,20 +286,17 @@ chrome.runtime.onInstalled.addListener(async function () {
   console.log("Dash Chrome-Wallet installed.");
 
   // check for fresh install with no set cookies
-  var testCookie;
-  chrome.storage.local.get("mnemonic", function (result) {
-    testCookie = result.mnemonic;
-  });
-  if (testCookie == undefined) {
+  var wlsTest = wls.getItem('mnemonic')
+  if (wlsTest == null) {
     console.log("No Cookies detected, initializing.")
-    chrome.storage.local.set({ mnemonic: '' }); // must be '' for popup.js
-    chrome.storage.local.set({ address: '' });
-    chrome.storage.local.set({ balance: '' });
-    chrome.storage.local.set({ identityId: '' });
-    chrome.storage.local.set({ name: '' });
-    chrome.storage.local.set({ switch: '' });
-    chrome.storage.local.set({ pin: curPin });
-    chrome.storage.local.set({ switch2: '' });
+    wls.setItem('mnemonic', '') // must be '' for popup.js
+    wls.setItem('address', '')
+    wls.setItem('balance', '')
+    wls.setItem('identityId', '')
+    wls.setItem('name', '')
+    wls.setItem('switch', 'false')
+    wls.setItem('pin', curPin)
+    wls.setItem('switch2', 'false')
   } else {
     console.log("Cookies detected.")
   }
@@ -306,36 +304,54 @@ chrome.runtime.onInstalled.addListener(async function () {
   // chrome.storage.local.set({ tab: chrome.extension.getURL("popup.html") });
 });
 
+var wlsMnemonic = wls.getItem('mnemonic');
+
 // set curMnemonic for connect() function
-chrome.storage.local.get('mnemonic', function (data) {
-  if (data.mnemonic != '' && data.mnemonic != undefined) { // first run: onInstalled not finished when reached here -> so undefined
-    curMnemonic = data.mnemonic;
-    console.log("Mnemonic successfully loaded: " + data.mnemonic)
-  }
-  else if (curMnemonic == undefined) { // TODO: test if still needed - shouldnt happen
-    console.log("No existing Mnemonic found.")
-    curMnemonic = null;
-  }
-});
+if (wlsMnemonic != '' && wlsMnemonic != null) {
+  curMnemonic = wlsMnemonic;
+  console.log("Mnemonic successfully loaded: " + curMnemonic)
+}
+// chrome.storage.local.get('mnemonic', function (data) {
+//   if (data.mnemonic != '' && data.mnemonic != undefined) { // first run: onInstalled not finished when reached here -> so undefined
+//     curMnemonic = data.mnemonic;
+//     console.log("Mnemonic successfully loaded: " + data.mnemonic)
+//   }
+//   else if (curMnemonic == undefined) { // TODO: test if still needed - shouldnt happen
+//     console.log("No existing Mnemonic found.")
+//     curMnemonic = null;
+//   }
+// });
 
 // set all other data from cookies if exists TODO: check restart, scratch, continue
-chrome.storage.local.get('address', function (data) {
-  curAddress = data.address;
-  console.log("address: " + curAddress)
-});
-chrome.storage.local.get('balance', function (data) {
-  curBalance = data.balance;
-});
-chrome.storage.local.get('identityId', function (data) {
-  curIdentityId = data.identityId;
-});
-chrome.storage.local.get('name', function (data) {
-  curName = data.name;
-});
+curAddress = wls.getItem('address')
+console.log("address: " + curAddress)
+curBalance = wls.getItem('balance')
+curIdentityId = wls.getItem('identityId')
+curName = wls.getItem('name')
 
-// set switch to false on "browser load" - TODO: remove switch from cookies
-chrome.storage.local.set({ switch: false });
-chrome.storage.local.set({ pin: curPin });
+
+// chrome.storage.local.get('address', function (data) {
+//   curAddress = data.address;
+//   console.log("address: " + curAddress)
+// });
+// chrome.storage.local.get('balance', function (data) {
+//   curBalance = data.balance;
+// });
+// chrome.storage.local.get('identityId', function (data) {
+//   curIdentityId = data.identityId;
+// });
+// chrome.storage.local.get('name', function (data) {
+//   curName = data.name;
+// });
+
+// set switch to false on "browser load" - TODO: remove switch from cookies, check if still needed? i dont think so, switch2 missing here
+wls.setItem('switch', 'false')
+wls.setItem('switch2', 'false')
+wls.setItem('pin', curPin)
+
+
+// chrome.storage.local.set({ switch: false });
+// chrome.storage.local.set({ pin: curPin });
 
 
 
@@ -918,7 +934,8 @@ async function getDocID() {
     var queryJson = JSON.parse(tQueryObject);
     if (curName == '') {
       curSwitch = false;
-      await chrome.storage.local.set({ switch: false });
+      // await chrome.storage.local.set({ switch: false });
+      wls.setItem('switch', false)
       throw "Name not set, please create a Username for your Identity";
     }
     const documents = await docSdk.platform.documents.get(tRecordLocator, queryJson);
@@ -928,7 +945,8 @@ async function getDocID() {
     if (documents[0] == null || documents[0] == undefined) {
       console.log("Couldnt connect to network, aborting polling! Please try again in a few moments.");
       curSwitch = false;
-      await chrome.storage.local.set({ switch: false });
+      // await chrome.storage.local.set({ switch: false });
+      wls.setItem('switch', false)
     } else {
       console.log("Document ID for user " + curName + ": " + documents[0].id)
       curDocDomainID = documents[0].id
@@ -945,7 +963,8 @@ async function changePinLoop() {
   while (curSwitch) {
     await new Promise(r => setTimeout(r, 600000));  // 10 min
     curPin = Math.floor(Math.random() * 900000) + 100000;
-    chrome.storage.local.set({ pin: curPin });
+    // chrome.storage.local.set({ pin: curPin });
+    wls.setItem('pin', curPin)
   }
 }
 
@@ -961,6 +980,7 @@ async function changePinLoop() {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
+  // try not working for account object at this position
   try {
     // if (request.greeting == 'importMnemonic') {
     //   curMnemonic = request.mnemonic;
@@ -1022,7 +1042,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         (async function dappSigning() {
           curSwitch = request.switch;
           console.log("curSwitch: " + curSwitch)
-          await chrome.storage.local.set({ switch: curSwitch });
+          // await chrome.storage.local.set({ switch: curSwitch });
+          wls.setItem('switch', curSwitch)
           if (curSwitch) {
             polling();
             // changePinLoop();
@@ -1036,7 +1057,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         (async function dappSigning() {
           curSwitch2 = request.switch;
           console.log("curSwitch2: " + curSwitch2)
-          await chrome.storage.local.set({ switch2: curSwitch2 });
+          // await chrome.storage.local.set({ switch2: curSwitch2 });
+          wls.setItem('switch2', curSwitch2)
           if (curSwitch2) {
             polling2();
           }
@@ -1051,26 +1073,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
           // const account = await sdk.wallet.getAccount();
           // await account.isReady();
-
           const mnemonic = await sdk.wallet.exportWallet();
           curMnemonic = mnemonic;
-          const address = account.getUnusedAddress();
+          const address = await account.getUnusedAddress(); // account null error, dont get catched TODO
           curAddress = address.address;
-          await chrome.storage.local.set({ mnemonic: curMnemonic });
+          // await chrome.storage.local.set({ mnemonic: curMnemonic });
+          wls.setItem('mnemonic', curMnemonic)
           // var savedMM = await getLocalStorage(['mnemonic']);
-          await chrome.storage.local.set({ address: curAddress });
+          // await chrome.storage.local.set({ address: curAddress });
+          wls.setItem('address', curAddress)
           // var savedAddress = await getLocalStorage(['address']);
-          await chrome.storage.local.set({ balance: '0' });
+          // await chrome.storage.local.set({ balance: '0' });
+          wls.setItem('balance', '0')
           // var savedBalance = await getLocalStorage(['balance']);
 
           /////// run automated faucet
-          // console.log("run automated faucet for address " + curAddress)
-          // var httpReq = new XMLHttpRequest();
-          // httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
-          // httpReq.addEventListener("load", function (e) {
-          //   console.log(httpReq.responseText);
-          // }, false)
-          // httpReq.send(null);
+          console.log("run automated faucet for address " + curAddress)
+          var httpReq = new XMLHttpRequest();
+          httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
+          httpReq.addEventListener("load", function (e) {
+            console.log(httpReq.responseText);
+          }, false)
+          httpReq.send(null);
           /////////////////////////////
 
           sendResponse({ complete: true });
@@ -1096,13 +1120,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log(curBalance)
 
           await getIdentityKeys();
-          console.log("blub")
 
-          await chrome.storage.local.set({ mnemonic: curMnemonic });
-          await chrome.storage.local.set({ address: curAddress });
-          await chrome.storage.local.set({ balance: curBalance });
+          // await chrome.storage.local.set({ mnemonic: curMnemonic });
+          wls.setItem('mnemonic', curMnemonic)
+          // await chrome.storage.local.set({ address: curAddress });
+          wls.setItem('address', curAddress)
+          // await chrome.storage.local.set({ balance: curBalance });
+          wls.setItem('balance', curBalance)
           // await chrome.storage.local.set({ identityId: curIdentityId });
-          await chrome.storage.local.set({ identityId: "" });
+          // await chrome.storage.local.set({ identityId: "" });
+          wls.setItem('identityId', '')
 
           sendResponse({ complete: true });
           // disconnect();
@@ -1126,7 +1153,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           // console.log(await account.getConfirmedBalance())
           // console.log(e2)
 
-          await chrome.storage.local.set({ balance: ((await account.getTotalBalance()) / 100000000) });
+          // await chrome.storage.local.set({ balance: ((await account.getTotalBalance()) / 100000000) });
+          curBalance = ((await account.getTotalBalance()) / 100000000);
+          wls.setItem('balance', curBalance);
           sendResponse({ complete: true });
           // disconnect();
         })()
@@ -1183,7 +1212,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           }
           console.log({ tmpidentity: tmpIdentity.id });
           curIdentityId = tmpIdentity.id;
-          await chrome.storage.local.set({ identityId: tmpIdentity.id });
+          // await chrome.storage.local.set({ identityId: tmpIdentity.id });
+          wls.setItem('identityId', tmpIdentity.id)
           getIdentityKeys();
 
           sendResponse({ complete: true });
@@ -1201,7 +1231,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log(tmpIdentity)
           const nameRegistration = await sdk.platform.names.register(curName, tmpIdentity);
           console.log({ nameRegistration });
-          await chrome.storage.local.set({ name: curName });
+          // await chrome.storage.local.set({ name: curName });
+          wls.setItem('name', curName)
           sendResponse({ complete: true });
           // disconnect();
         })()
@@ -1264,14 +1295,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           curIdentityId = '';
           curName = '';
           curSwitch = false;
-          chrome.storage.local.set({ mnemonic: '' }); // must be '' for popup.js
-          chrome.storage.local.set({ address: '' });
-          chrome.storage.local.set({ balance: '' });
-          chrome.storage.local.set({ identityId: '' });
-          chrome.storage.local.set({ name: '' });
-          chrome.storage.local.set({ switch: '' });
+          // chrome.storage.local.set({ mnemonic: '' }); // must be '' for popup.js
+          // chrome.storage.local.set({ address: '' });
+          // chrome.storage.local.set({ balance: '' });
+          // chrome.storage.local.set({ identityId: '' });
+          // chrome.storage.local.set({ name: '' });
+          // chrome.storage.local.set({ switch: '' });
+          wls.setItem('mnemonic', '')
+          wls.setItem('address', '')
+          wls.setItem('balance', '')
+          wls.setItem('identityId', '')
+          wls.setItem('name', '')
+          wls.setItem('switch', '')
           sendResponse({ complete: true });
           disconnect();
+          connect();
         })()
         break;
 
@@ -1296,6 +1334,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   finally {
     // return true from the event listener to indicate you wish to send a response asynchronously
     // (this will keep the message channel open to the other end until sendResponse is called).
+    console.log("test if finnally is reached")
     return true;
   }
 

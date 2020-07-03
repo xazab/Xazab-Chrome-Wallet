@@ -7,24 +7,21 @@ function showLoading(el, show) {
   }
 }
 
-function getLocalStorage(arrKeys) {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.storage.local.get(arrKeys, function (result) {
-        resolve(result);
-      });
-    }
-    catch (e) {
-      chrome.extension.getBackgroundPage().console.log('Erroring getting values for', key, 'from local storage');
-      reject(e);
-    }
-  });
-}
+// function getLocalStorage(arrKeys) {
+//   return new Promise((resolve, reject) => {
+//     try {
+//       chrome.storage.local.get(arrKeys, function (result) {
+//         resolve(result);
+//       });
+//     }
+//     catch (e) {
+//       chrome.extension.getBackgroundPage().console.log('Erroring getting values for', key, 'from local storage');
+//       reject(e);
+//     }
+//   });
+// }
 
 var wls = window.localStorage;
-
-// wls.setItem("mnemonic", "blub2")
-// console.log(wls.getItem("mnemonic"))
 
 // on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async function () {
@@ -60,48 +57,92 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // disable button rules (executed each time popup opened)
   // TODO check if just use chrome.extension.getBackgroundPage().curMnemonic, since eg devmode local.storage not written
-  chrome.storage.local.get('mnemonic', function (data) {
-    mnemonicText.value = data.mnemonic;
-    if (data.mnemonic != '')
-      createBtn.disabled = true;
-  });
-  chrome.storage.local.get('address', function (data) {
-    addressText.value = data.address;
-  });
-  chrome.storage.local.get('balance', function (data) {
-    balanceText.value = data.balance;
-    if (balanceText.value == '' || balanceText.value == '0') {
-      sendFundsBtn.disabled = true;
-    }
-  });
-  chrome.storage.local.get('identityId', function (data) {
-    identityIdText.value = data.identityId;
-    if (identityIdText.value != '')
-      identityIdBtn.disabled = true;
-    else if (addressText.value == '') {
-      identityIdBtn.disabled = true;
-    }
-  });
-  chrome.storage.local.get('name', function (data) {
-    if (data.name == '' && identityIdText.value == '') {
-      nameText.readOnly = true;
-      nameBtn.disabled = true;
-    }
-    else if (data.name != '') {
-      nameText.readOnly = true;
-      nameBtn.disabled = true;
-    }
-    nameText.value = data.name;
-  });
-  chrome.storage.local.get('switch', function (data) {
-    signingSwitch.checked = data.switch;
-  });
-  chrome.storage.local.get('pin', function (data) {
-    pinText.value = data.pin;
-  });
-  chrome.storage.local.get('switch2', function (data) {
-    simpleSwitch.checked = data.switch2;
-  });
+  mnemonicText.value = wls.getItem('mnemonic')
+  if (mnemonicText.value != '')
+    createBtn.disabled = true;
+
+  addressText.value = wls.getItem('address')
+
+  balanceText.value = wls.getItem('balance')
+  if (balanceText.value == '' || balanceText.value == '0')
+    sendFundsBtn.disabled = true;
+
+  identityIdText.value = wls.getItem('identityId')
+  if (identityIdText.value != '')
+    identityIdBtn.disabled = true;
+  else if (addressText.value == '') {
+    identityIdBtn.disabled = true;
+  }
+
+  nameText.value = wls.getItem('name')
+  if (nameText.value == '' && identityIdText.value == '') {
+    nameText.readOnly = true;
+    nameBtn.disabled = true;
+  }
+  else if (nameText.value != '') {
+    nameText.readOnly = true;
+    nameBtn.disabled = true;
+  }
+
+
+
+  pinText.value = wls.getItem('pin')
+
+  // Firefox and Chrome reading boolean from wls as String
+  if (typeof wls.getItem('switch2') === "string") {
+    simpleSwitch.checked = (wls.getItem('switch2') == 'true')
+    signingSwitch.checked = (wls.getItem('switch') == 'true')
+  }
+  else if (typeof wls.getItem('switch2') === "boolean") {
+    simpleSwitch.checked = wls.getItem('switch2')
+    signingSwitch.checked = wls.getItem('switch')
+    console.log("wls switch as Boolean")
+  } else {
+    console.log("Error reading typeof Switch")
+  }
+
+  // chrome.storage.local.get('mnemonic', function (data) {
+  //   mnemonicText.value = data.mnemonic;
+  //   if (data.mnemonic != '')
+  //     createBtn.disabled = true;
+  // });
+  // chrome.storage.local.get('address', function (data) {
+  //   addressText.value = data.address;
+  // });
+  // chrome.storage.local.get('balance', function (data) {
+  //   balanceText.value = data.balance;
+  //   if (balanceText.value == '' || balanceText.value == '0') {
+  //     sendFundsBtn.disabled = true;
+  //   }
+  // });
+  // chrome.storage.local.get('identityId', function (data) {
+  //   identityIdText.value = data.identityId;
+  //   if (identityIdText.value != '')
+  //     identityIdBtn.disabled = true;
+  //   else if (addressText.value == '') {
+  //     identityIdBtn.disabled = true;
+  //   }
+  // });
+  // chrome.storage.local.get('name', function (data) {
+  //   if (data.name == '' && identityIdText.value == '') {
+  //     nameText.readOnly = true;
+  //     nameBtn.disabled = true;
+  //   }
+  //   else if (data.name != '') {
+  //     nameText.readOnly = true;
+  //     nameBtn.disabled = true;
+  //   }
+  //   nameText.value = data.name;
+  // });
+  // chrome.storage.local.get('switch', function (data) {
+  //   signingSwitch.checked = data.switch;
+  // });
+  // chrome.storage.local.get('pin', function (data) {
+  //   pinText.value = data.pin;
+  // });
+  // chrome.storage.local.get('switch2', function (data) {
+  //   simpleSwitch.checked = data.switch2;
+  // });
 
   // wait for background, mostly not responding after browser/system restart TODO: remove direct background access
   async function waitForBG() {
@@ -136,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     showLoading('spinnerTestConnection', true);
     chrome.runtime.sendMessage({ greeting: "connect" }, function (response) {
       //check return response then send alert
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
       connectBtn.disabled = false;
       showLoading('spinnerTestConnection', false);
       // TODO firefox: will autohide popup.html -> set autohide to false like chrome default
@@ -151,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     resetBtn.disabled = true;
     showLoading('spinnerTestConnection', true);
     chrome.runtime.sendMessage({ greeting: "resetWallet" }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
       resetBtn.disabled = false;
       showLoading('spinnerTestConnection', false);
       window.close();
@@ -165,13 +206,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     showLoading('spinnerCreateWallet', true);
     chrome.runtime.sendMessage({ greeting: "createWallet" }, async function (response) {
       if (response.complete) {
-        await getLocalStorage(['address', 'balance', 'mnemonic']).then((cookies) => {
-          chrome.extension.getBackgroundPage().console.log("COOKIES:", JSON.stringify(cookies));
-          chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-          addressText.value = cookies.address;
-          balanceText.value = cookies.balance;
-          mnemonicText.value = cookies.mnemonic;
-        });
+        // await getLocalStorage(['address', 'balance', 'mnemonic']).then((cookies) => {
+        //   chrome.extension.getBackgroundPage().console.log("COOKIES:", JSON.stringify(cookies));
+        //   chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
+        //   addressText.value = cookies.address;
+        //   balanceText.value = cookies.balance;
+        //   mnemonicText.value = cookies.mnemonic;
+        // });
+
+        addressText.value = wls.getItem('address');
+        balanceText.value = wls.getItem('balance');
+        mnemonicText.value = wls.getItem('mnemonic');
+
         identityIdBtn.disabled = false;
         showLoading('spinnerCreateWallet', false);
 
@@ -180,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         // getBalanceBtn.disabled = true;
         // showLoading('spinnerGetBalance', true);
         // chrome.runtime.sendMessage({ greeting: "getBalance", sleep: "true" }, async function (response) {
-        //   chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+        //   chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
         //   await getLocalStorage(['balance']).then((cookies) => {
         //     balanceText.value = cookies.balance;
         //   });
@@ -204,10 +250,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     getBalanceBtn.disabled = true;
     showLoading('spinnerGetBalance', true);
     chrome.runtime.sendMessage({ greeting: "getBalance" }, async function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      await getLocalStorage(['balance']).then((cookies) => {
-        balanceText.value = cookies.balance;
-      });
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
+      // await getLocalStorage(['balance']).then((cookies) => {
+      //   balanceText.value = cookies.balance;
+      // });
+
+      balanceText.value = wls.getItem('balance')
+
       getBalanceBtn.disabled = false;
       showLoading('spinnerGetBalance', false);
       if (balanceText.value != '0') { sendFundsBtn.disabled = false }
@@ -220,10 +269,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     sendFundsBtn.disabled = true;
     showLoading('spinnerSendFunds', true);
     chrome.runtime.sendMessage({ greeting: "sendFunds", toAddress: toAddressText.value, amount: amountText.value }, async function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      await getLocalStorage(['balance']).then((cookies) => {
-        balanceText.value = cookies.balance;
-      });
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
+      // await getLocalStorage(['balance']).then((cookies) => {
+      //   balanceText.value = cookies.balance;
+      // });
+      balanceText.value = wls.getItem('balance')
       sendFundsBtn.disabled = false;
       showLoading('spinnerSendFunds', false);
 
@@ -232,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       // getBalanceBtn.disabled = true;
       // showLoading('spinnerGetBalance', true);
       // chrome.runtime.sendMessage({ greeting: "getBalance" }, async function (response) {
-      //   chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      //   chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
       //   await getLocalStorage(['balance']).then((cookies) => {
       //     balanceText.value = cookies.balance;
       //   });
@@ -249,7 +299,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     getDocumentsBtn.disabled = true;
     showLoading('spinnerGetDocuments', true);
     chrome.runtime.sendMessage({ greeting: "getDocuments", documentName: documentNameText.value, queryObject: queryObjectText.value, contractId: contractIdText.value }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
       // queryObjectText.value = response.document;
       getDocumentsBtn.disabled = false;
       showLoading('spinnerGetDocuments', false);
@@ -262,7 +312,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     getContractBtn.disabled = true;
     showLoading('spinnerGetContract', true);
     chrome.runtime.sendMessage({ greeting: "getContract", contractId: contractIdText.value }, function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
       getContractBtn.disabled = false;
       showLoading('spinnerGetContract', false);
     });
@@ -303,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       contractIdText.value = '9GHRxvyYDmWz7pBKRjPnxjsJbbgKLngtejWWp3kEY1vB';
       toAddressText.value = "";
     }
-    
+
   });
 
 
@@ -317,10 +367,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     identityIdBtn.disabled = true;
     showLoading('spinnerCreateIdentity', true);
     chrome.runtime.sendMessage({ greeting: "registerIdentity", identityId: identityIdText.value }, async function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      await getLocalStorage(['identityId']).then((cookies) => {
-        identityIdText.value = cookies.identityId;
-      });
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
+      // await getLocalStorage(['identityId']).then((cookies) => {
+      //   identityIdText.value = cookies.identityId;
+      // });
+
+      identityIdText.value = wls.getItem('identityId')
+
       if (identityIdText.value != '') {
         nameBtn.disabled = false
         nameText.readOnly = false;
@@ -336,10 +389,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     nameBtn.disabled = true;
     showLoading('spinnerRegisterName', true);
     chrome.runtime.sendMessage({ greeting: "registerName", name: nameText.value }, async function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      await getLocalStorage(['name']).then((cookies) => {
-        nameText.value = cookies.name;
-      });
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
+      // await getLocalStorage(['name']).then((cookies) => {
+      //   nameText.value = cookies.name;
+      // });
+
+      nameText.value = wls.getItem('name')
+
       nameText.readOnly = true;
       showLoading('spinnerRegisterName', false);
     });
@@ -352,19 +408,38 @@ document.addEventListener('DOMContentLoaded', async function () {
     mnemonicBtn.disabled = true;
     showLoading('spinnerImportMnemonic', true);
     chrome.runtime.sendMessage({ greeting: "importMnemonic", mnemonic: mnemonicText.value }, async function (response) {
-      chrome.extension.getBackgroundPage().console.log("Response bg -> popup: " + response.complete);
-      await getLocalStorage(['address', 'balance', 'identityId']).then((cookies) => {
-        addressText.value = cookies.address;
-        balanceText.value = cookies.balance;
-        identityIdText.value = cookies.identityId;
-      });
+      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
+      // await getLocalStorage(['address', 'balance', 'identityId']).then((cookies) => {
+      //   addressText.value = cookies.address;
+      //   balanceText.value = cookies.balance;
+      //   identityIdText.value = cookies.identityId;
+      // });
+
+      addressText.value = wls.getItem('address');
+      balanceText.value = wls.getItem('balance');
+      identityIdText.value = wls.getItem('identityId');
+
       showLoading('spinnerImportMnemonic', false);
       mnemonicBtn.disabled = false;
       if (addressText.value != '') createBtn.disabled = true;
       if (identityIdText.value != '') identityIdBtn.disabled = true;
       if (identityIdText.value == '') identityIdBtn.disabled = false;
+      if (balanceText.value != '0') sendFundsBtn.disabled = false;
     });
 
   }, false);
 
 }, false); // on DOMContentLoaded
+
+
+chrome.runtime.onMessage.addListener(
+  function (request, sender, sendResponse) {
+    if (request.msg === "refresh balance") {
+      balanceText.value = wls.getItem('balance')
+      //  To do something
+      chrome.extension.getBackgroundPage().console.log("popup listener");
+      // console.log(request.data.subject)
+      // console.log(request.data.content)
+    }
+  }
+);
