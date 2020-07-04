@@ -11,7 +11,6 @@
 // curName2 = 'mydapp'
 
 
-
 var curMnemonic = null; // must be null for dashjs init
 var curAddress = '';
 var curBalance = '';
@@ -803,7 +802,7 @@ async function polling2() {
           if (requestMsg.reference == null) return;
 
           // if (requestMsg.reference.startsWith(pRequestTarget)) {  // check for Target docID
-          if (requestMsg.reference == pRequestTarget) {  // check for Target docID
+          if (requestMsg.reference == pRequestTarget) {  // check for username match
 
             console.log("Received message for " + pRequestTarget);
             curDappRequests = [];
@@ -836,9 +835,10 @@ async function polling2() {
                 console.log("Address Tx: " + requestMsg.TXaddr);
                 console.log("Amount Tx: " + requestMsg.TXamount);
               } else {
-                console.log("Exit. No valid header specified")
-                pollSdk.disconnect();
-                return;
+                console.log("Skipping - Header specified: " + dsHeader)
+                continue;
+                // pollSdk.disconnect();
+                // return;
               }
             }
 
