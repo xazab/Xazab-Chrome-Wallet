@@ -11,12 +11,29 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:local": "nw .",
-	"dist": "build --tasks win-x86,win-x64,linux-x86,linux-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
-	"start": "run --x86 --mirror https://dl.nwjs.io/ ."
+    "start:old": "nw .",
+    "dist": "build --tasks win-x86,linux-x86,linux-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
+    "start": "run --x86 --mirror https://dl.nwjs.io/ ."
   },
   "build": {
-        "nwVersion": "0.46.3"
+    "nwVersion": "0.46.3",
+    "packed": false,
+    "targets": [
+      "zip"
+    ],
+	"files": [
+	  "**/*"
+	],
+	"excludes": [
+	  "**/node_modules",
+      "**/node_modules/**/*"
+	],
+    "win": {
+      "icon": "./app/img/icon128.ico"
+    },
+    "mac": {
+      "icon": "./app/img/icon128.png"
+    }
   },
   "keywords": [],
   "author": "",

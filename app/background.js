@@ -1096,7 +1096,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         /////// run automated faucet
         console.log("run automated faucet for address " + curAddress)
         var httpReq = new XMLHttpRequest();
-        httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
+        // Rion faucet
+        // httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
+        // dashameter faucet
+        httpReq.open("GET", "https://us-central1-evodrip.cloudfunctions.net/evofaucet/drip/" + curAddress, true); // true for async
         httpReq.addEventListener("load", function (e) {
           console.log(httpReq.responseText);
         }, false)

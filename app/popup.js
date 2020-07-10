@@ -341,19 +341,18 @@ document.addEventListener('DOMContentLoaded', async function () {
       contractIdText.value = '6WqEuw8KqX9fTh7eEa9qNPKHkgPi9hv2BWQXHTSHiwwe';
       toAddressText.value = "";
     }
-    if (exampleQuerySelector.value == "Example Users") {
+    if (exampleQuerySelector.value == "Example NFA") {
+      documentNameText.value = 'mynfa';
+      queryObjectText.value = '{ "startAt": 1 }';
+      contractIdText.value = 'A3UXWqSnnTUKex1zEisp7L6ZBxcRqhGJi6Rjf4tMhJ36';
+      toAddressText.value = "";
+    }
+    if (exampleQuerySelector.value == "Example Jembe") {
       documentNameText.value = 'Users';
       queryObjectText.value = '{ "startAt": 1 }';
       contractIdText.value = '3bhAjxGB5rZ8sTB1nEj1fC6SCZV6c3XEbX8Lm2arVbjA';
       toAddressText.value = "";
     }
-    if (exampleQuerySelector.value == "Example WDS") {
-      documentNameText.value = 'LoginRequest';
-      queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = '9GHRxvyYDmWz7pBKRjPnxjsJbbgKLngtejWWp3kEY1vB';
-      toAddressText.value = "";
-    }
-
   });
 
 
