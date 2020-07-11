@@ -1,5 +1,5 @@
 {
-  "name": "Dash-Chrome-Wallet",
+  "name": "Dash-Chrome-Wallet-Desktop",
   "main": "index.html",
   "chromium-args": "--enable-logging=stderr --mixed-content --load-extension='./app'",
   "dependencies": {

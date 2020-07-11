@@ -3,20 +3,23 @@ Chrome- and Firefox-Extension Cryptocurrency Wallet for [Dash Platform](https://
 
 <img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/chrome-wallet.PNG" width="300" />
 
-## Changelog
+## Major Changelogs
+- v1.4.0 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.4.0) (3. July 2020) 
 - v1.3.1 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.3.1) (17 May 2020)
 - v1.2 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.2) (9 April 2020)
 - v1.1 update to DashJS 2.0 (27 March 2020)
 - v1.0 Initial Release
 
 ## Description:
-Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet using [DashJS](https://github.com/dashevo/DashJS) with DAPI (Decentralized API) showing Payments, Usernames, Documents and Contracts features
+Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet using [DashJS](https://github.com/dashevo/DashJS) with DAPI (Decentralized API) showing Payments, Usernames, Documents and Contracts features.
+Now also Standalone Desktop Versions for Windows, Linux and Mac available!
 
 ## Requirements:
-- Google Chrome Browser
+- None
 
-## Installation (Option 1: suggested)
-- Go to [Release page](https://github.com/readme55/Dash-Chrome-Wallet/releases) and download .zip for Windows/MacOS or .tar for Linux and extract directory on disk
+## Installation (Option 1: Google Chrome Extension)
+- Go to [Release page](https://github.com/readme55/Dash-Chrome-Wallet/releases) and download `Dash-Chrome-Wallet-Extension-v1.x.x.zip` (all OS)
+and extract directory on disk
 - Start "Google Chrome Browser"
 - type "chrome://extensions" into addressline or open `Three Dots(Menu) -> More Tools -> Extensions`
 - Activate "Developer Mode" in the top right corner
@@ -26,7 +29,12 @@ Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet us
 - type "chrome://extensions" into addressline or open `Three Dots(Menu) -> More Tools -> Extensions`
 - Hit "Remove" below the Chrome Wallet extension description
 
-## Installation (Option 2: Quick run, temporary from console)
+## Installation (Option 2: Desktop version)
+- Go to [Release page](https://github.com/readme55/Dash-Chrome-Wallet/releases) and download `Dash-Chrome-Wallet-Desktop-v1.x.x-win-x86.zip` (e.g. for Windows)
+and extract directory on disk
+- Open directory and execute `Dash-Chrome-Wallet-Desktop.exe`
+
+## Installation (Option 3: Quick run, temporary from console)
 - need firefox installed
 - clone repo
 - enter root and run `npm install` and after that `npm run start:firefox`
