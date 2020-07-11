@@ -1,5 +1,6 @@
 # Dash Chrome-Wallet
-Chrome- and Firefox-Extension Cryptocurrency Wallet for [Dash Platform](https://www.dashdevs.org) EvoNet-Testnet environment.
+Cryptocurrency Wallet for [Dash Platform](https://www.dashdevs.org) EvoNet-Testnet environment. Browser-Extension (Chrome, Firefox, Brave, Edge) or Standalone Desktop versions (Windows, Linux, Mac) available.
+
 
 <img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/chrome-wallet.PNG" width="300" />
 
@@ -12,7 +13,6 @@ Chrome- and Firefox-Extension Cryptocurrency Wallet for [Dash Platform](https://
 
 ## Description:
 Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet using [DashJS](https://github.com/dashevo/DashJS) with DAPI (Decentralized API) showing Payments, Usernames, Documents and Contracts features.
-Now also Standalone Desktop Versions for Windows, Linux and Mac available!
 
 ## Requirements:
 - None
