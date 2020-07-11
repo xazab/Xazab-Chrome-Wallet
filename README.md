@@ -47,9 +47,10 @@ and extract directory on disk
 
 ## Dapp Signing (experimental)
 - Create Mnemonic, Identity and Username.
-- Activate "Dapp Signing" switch
-- Visit [Web-Dapp-Sample](http://wds.dashmachine.net:8082/), insert your Username and displayed PIN from Chrome-Wallet. Hit "Sign Up"
-- Chrome Wallet will show Notification + Confirmation Dialog for the request. Confirm the dialog and check status on Web-Dapp-Sample
+- Activate "Simple Dapp Signing" switch
+- Visit [Sample Browser Dapps](http://readme-dapps.dashdevs.org), Sign-in with your Username from Chrome-Wallet. 
+- Chrome Wallet will show Notification + Confirmation Dialog for the request. Confirm the dialog to get logged in. 
+- Now start the Dapp and submit some data. You will receive a Confirmation dialog inside Chrome Wallet for each submission.
 
 ## TODO:
 - import identity/name with mnemonic
