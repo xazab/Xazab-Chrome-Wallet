@@ -1,16 +1,3 @@
-// curMnemonic = 'amount deliver thunder trash stadium tunnel vital ladder organ slender way length';
-// curAddress = 'yQJCdsva7KUBkto6EPDLWPxf3Zkpnfy7P8';
-// curIdentityId = 'Epcz2GjLJurkT77HGc5mH6r4JRWVDcA2RCC7pHxE6U6N';
-// docID= '4gibhaxmaUrf1SpwBegZ9EaKSfFeZLyGruZMne1GatSx'
-// curName = 'readme'
-// Document ID for user readme: 4gibhaxmaUrf1SpwBegZ9EaKSfFeZLyGruZMne1GatSx
-
-// curMnemonic2 = 'velvet timber under input escape rich gauge final submit burst glow garage';
-// curAddress2 = 'yM8bRVwE3bQmqrnvG1oSpyXky2gjGErR5a';
-// curIdentityId2 = 'DX66EJdogM6c2yG6ULTZYCzoqqRBm64XHuU42YbSK9tu';
-// curName2 = 'mydapp'
-
-
 var curMnemonic = null; // must be null for dashjs init
 var curAddress = '';
 var curBalance = '';
@@ -65,12 +52,12 @@ var wls = window.localStorage;
 
 
 ////////////////////////////////////
-//// development environment settings:
+//// development environment settings: Uncomment for static credentials in CW
 //// IdentHDPrivKey: tprv8ofwmyJJyfdUwV62ezSCVZbpLLVfTTmKdmCkfbEfAhqh8H7tNkgbmjGccbfGVJvGjS1j6S5GZBu1AGQcCUq3eQDBLojGSTJ13Q5fDF4HXq4
 // curMnemonic = 'amount deliver thunder trash stadium tunnel vital ladder organ slender way length';
-// curAddress = 'yQJCdsva7KUBkto6EPDLWPxf3Zkpnfy7P8';
+// curAddress = 'yhYuPKxNDBuV5gAfhMUhKbHVB95at9Urgs';
 // curBalance = '1';
-// curIdentityId = 'Epcz2GjLJurkT77HGc5mH6r4JRWVDcA2RCC7pHxE6U6N';
+// curIdentityId = 'EBvi3NdsEikoDUXrPZRgKNNVH67oJCKVzHoQYw7G4YYd';
 // curName = 'readme'
 // chrome.storage.local.set({ mnemonic: curMnemonic });
 // chrome.storage.local.set({ address: curAddress });
@@ -78,19 +65,8 @@ var wls = window.localStorage;
 // chrome.storage.local.set({ identityId: curIdentityId });
 // chrome.storage.local.set({ name: curName });
 
-//// Dapp-Signing-Polling-Settings (deprecated)
-//// test dapp-signing Message contract:
 // sdkOpts.network = 'testnet';
-// const pContractID = "mA1kafwtR8HGoZamz72fmUWGGXKjDFLqmirtZbJYYoT";
-// const pContractName = 'myContract';
-// const pRequestDocument = "message";
-// const pRequestProp = "body"
-// const pRequestTarget = curIdentityId;
-
-
-sdkOpts.network = 'testnet';
 const pContractName = 'myContract';
-
 
 ////////////////////////////////////
 //// Dapp-Signing WDS contract constants and variables:
@@ -109,8 +85,7 @@ const pResponseProp = "status";
 
 ////////////////////////////////////
 ///// Dapp Signing Simple
-//// Contract Details
-const pContractID2 = "6ow8zziDutSZP778QE88gWkyB2T9H7rdQaKXwUF2Fman"
+const messageContractId = "B5tT3N8cVjo7bC9yNh3LGKjbvQhWDN6MGHog4oinwLMn"
 var pRequestDocument2 = ["message"];
 const pRequestProp2Header = "header";
 const pRequestProp2Ref = "reference";
@@ -122,12 +97,12 @@ var messageAmountTx = [''];
 var messageAddrTx = [''];
 
 //// DPNS-Contract for docID
-const domainContractID = "7DVe2cDyZMf8sDjQ46XqDzbeGKncrmkD6L96QohLmLbg";
+const domainContractID = "FiBkhut4LFPMJqDWbZrxVeT6Mr6LsH3mTNTSSHJY2ape";
 const domainRequestDocument = "domain";
 
 //// Vendor Details
-const vendorDocDomainId = "DX66EJdogM6c2yG6ULTZYCzoqqRBm64XHuU42YbSK9tu" // vendor, readme
-// const vendorPublicKey = "A0/qSE6tis4l6BtQlTXB2PHW+WV+Iy0rpF5hAvX8hDRz"; // vendor, alice
+// const vendorDocDomainId = "8FDzB5kcpXtFQcWACXck2akHHG4nR9G4mP6gqPBGZVSi" // vendor, mydapp
+// const vendorPublicKey = "A0/qSE6tis4l6BtQlTXB2PHW+WV+Iy0rpF5hAvX8hDRz"; // vendor, mydapp
 
 ////////////////////////////////////
 
@@ -153,7 +128,7 @@ if (chrome.windows["WindowState"].HIDDEN == "hidden") {
 }
 
 async function connect() {
-  sdkOpts.network = 'testnet';
+  // sdkOpts.network = 'testnet';
   sdkOpts.wallet = {};
   sdkOpts.wallet.mnemonic = curMnemonic;
   sdkOpts.apps = curApps;
@@ -498,7 +473,7 @@ async function submitSimpleDappDocument(contractid, docName, docContent) {
   try {
 
     psdkOpts = {};
-    psdkOpts.network = 'testnet';
+    // psdkOpts.network = 'testnet';
     psdkOpts.wallet = {};
     psdkOpts.wallet.mnemonic = curMnemonic;
     psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
@@ -562,7 +537,7 @@ async function polling() {
 
   // TODO remove when DashJS removed curApps
   psdkOpts = {};
-  psdkOpts.network = 'testnet';
+  // psdkOpts.network = 'testnet';
   psdkOpts.wallet = {};
   psdkOpts.wallet.mnemonic = curMnemonic;
   psdkApps = '{ "myContract" : { "contractId" : "' + pContractID + '" } }';
@@ -715,8 +690,8 @@ async function polling() {
               type: "basic",
               iconUrl: chrome.extension.getURL("img/icon128.png"),
               title: "Request",
-              message: "Received message with your IdentityDocId. Confirm Request?",
-              // requireInteraction: true
+              message: "Received message with your Identity ID. Confirm Request?",
+              requireInteraction: true  // TODO: test if works with https, currently no difference
             });
 
             // sleep until notification is checked
@@ -755,10 +730,10 @@ async function polling2() {
 
   // TODO remove when DashJS removed curApps
   psdkOpts = {};
-  psdkOpts.network = 'testnet';
+  // psdkOpts.network = 'testnet';
   psdkOpts.wallet = {};
   psdkOpts.wallet.mnemonic = curMnemonic;
-  psdkApps = '{ "myContract" : { "contractId" : "' + pContractID2 + '" } }';
+  psdkApps = '{ "myContract" : { "contractId" : "' + messageContractId + '" } }';
   psdkApps = JSON.parse(psdkApps);
   psdkOpts.apps = psdkApps;
 
@@ -880,7 +855,6 @@ async function polling2() {
 
 async function setDappResponse(decision) {
   console.log(decision);
-  dsNotif = false;
   if (decision == "confirm" && curSwitch == true) {
     // var responseMsgSigned = await signMsg(curDappRequests[0].reference);
     // console.log("currDappRequest reference: " + curDappRequests[0].reference)
@@ -893,6 +867,7 @@ async function setDappResponse(decision) {
     else if (dsHeader == 'Request Transaction TX')
       await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
   }
+  dsNotif = false;
 };
 
 function getDappRequests() {
@@ -915,7 +890,7 @@ function dappSigningDialog() {
 
 async function getDocID() {
   psdkOpts = {};
-  psdkOpts.network = 'testnet';
+  // psdkOpts.network = 'testnet';
   psdkOpts.wallet = {};
   psdkOpts.wallet.mnemonic = curMnemonic;
   psdkApps = '{ "myContract" : { "contractId" : "' + domainContractID + '" } }';
@@ -1257,7 +1232,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         try {
           tmpIdentity = await sdk.platform.identities.get(curIdentityId);
           console.log(tmpIdentity)
-          const nameRegistration = await sdk.platform.names.register(curName, tmpIdentity);
+          const nameRegistration = await sdk.platform.names.register(curName + ".dash", tmpIdentity);
           console.log({ nameRegistration });
           // await chrome.storage.local.set({ name: curName });
           wls.setItem('name', curName)
