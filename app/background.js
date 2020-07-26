@@ -65,7 +65,7 @@ var wls = window.localStorage;
 // chrome.storage.local.set({ identityId: curIdentityId });
 // chrome.storage.local.set({ name: curName });
 
-// sdkOpts.network = 'testnet';
+sdkOpts.network = 'evonet';
 const pContractName = 'myContract';
 
 ////////////////////////////////////
@@ -128,7 +128,7 @@ if (chrome.windows["WindowState"].HIDDEN == "hidden") {
 }
 
 async function connect() {
-  // sdkOpts.network = 'testnet';
+  sdkOpts.network = 'evonet';
   sdkOpts.wallet = {};
   sdkOpts.wallet.mnemonic = curMnemonic;
   sdkOpts.apps = curApps;
@@ -473,7 +473,7 @@ async function submitSimpleDappDocument(contractid, docName, docContent) {
   try {
 
     psdkOpts = {};
-    // psdkOpts.network = 'testnet';
+    psdkOpts.network = 'evonet';
     psdkOpts.wallet = {};
     psdkOpts.wallet.mnemonic = curMnemonic;
     psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
@@ -537,7 +537,7 @@ async function polling() {
 
   // TODO remove when DashJS removed curApps
   psdkOpts = {};
-  // psdkOpts.network = 'testnet';
+  psdkOpts.network = 'evonet';
   psdkOpts.wallet = {};
   psdkOpts.wallet.mnemonic = curMnemonic;
   psdkApps = '{ "myContract" : { "contractId" : "' + pContractID + '" } }';
@@ -730,7 +730,7 @@ async function polling2() {
 
   // TODO remove when DashJS removed curApps
   psdkOpts = {};
-  // psdkOpts.network = 'testnet';
+  psdkOpts.network = 'evonet';
   psdkOpts.wallet = {};
   psdkOpts.wallet.mnemonic = curMnemonic;
   psdkApps = '{ "myContract" : { "contractId" : "' + messageContractId + '" } }';
@@ -890,7 +890,7 @@ function dappSigningDialog() {
 
 async function getDocID() {
   psdkOpts = {};
-  // psdkOpts.network = 'testnet';
+  psdkOpts.network = 'evonet';
   psdkOpts.wallet = {};
   psdkOpts.wallet.mnemonic = curMnemonic;
   psdkApps = '{ "myContract" : { "contractId" : "' + domainContractID + '" } }';
