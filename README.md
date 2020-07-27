@@ -1,7 +1,7 @@
 # Dash Chrome-Wallet
 Cryptocurrency Wallet for [Dash Platform](https://www.dashdevs.org) EvoNet-Testnet environment. Browser-Extension (Chrome, Firefox, Brave, Edge) or Standalone Desktop versions (Windows, Linux, Mac) available.
 
-Support my work: XgQpScGHiEWFXxFiJuEKSY2VVpumaTUMkN (Mainnet Dash Address)
+**Support my work:** XgQpScGHiEWFXxFiJuEKSY2VVpumaTUMkN (Mainnet Dash Address)
 
 
 <img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/chrome-wallet.PNG" width="300" />
