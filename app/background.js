@@ -93,6 +93,7 @@ const pRequestProp2Ref = "reference";
 var messageSubmitContractID = [''];
 var messageSubmitDocName = [''];
 var messageSubmitDocContent = [''];
+var messageSubmitContractCreation = [''];
 var messageAmountTx = [''];
 var messageAddrTx = [''];
 
@@ -520,6 +521,51 @@ async function submitSimpleDappDocument(contractid, docName, docContent) {
   return true;
 }
 
+async function submitSimpleDappContractCreation(contractSchema) {
+
+  try {
+
+    psdkOpts = {};
+    psdkOpts.network = 'evonet';
+    psdkOpts.wallet = {};
+    psdkOpts.wallet.mnemonic = curMnemonic;
+    psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
+    psdkApps = JSON.parse(psdkApps);
+    psdkOpts.apps = psdkApps;
+
+    var docSdk = new Dash.Client(psdkOpts);
+
+    var tidentity = await docSdk.platform.identities.get(curIdentityId);
+
+    // prepare contract
+    contractSchema = JSON.parse(contractSchema);  // convert java string to json object
+
+    const contract = await platform.contracts.create(contractSchema, tidentity);
+    console.dir({ contract }, { depth: 15 });
+    // console.dir({ contract });
+
+    // Make sure contract passes validation checks
+    const validationResult = await docSdk.platform.dpp.dataContract.validate(contract);
+
+    if (validationResult.isValid()) {
+      console.log("validation passed, broadcasting contract..");
+      // Sign and submit the data contract
+      console.dir(await platform.contracts.broadcast(contract, tidentity));
+    } else {
+      console.error(validationResult) // An array of detailed validation errors
+      throw validationResult.errors[0];
+    }
+
+  } catch (e) {
+    console.error('Something went wrong:', e);
+  } finally {
+    docSdk.disconnect()
+    console.log("submitted " + docName + " contract creation with schema: " + contractSchema )
+  }
+  return true;
+
+}
+
 chrome.notifications.onClicked.addListener(async (id) => {
   console.log("Notification clicked")
   dappSigningDialog();
@@ -809,6 +855,9 @@ async function polling2() {
                 messageAddrTx[i] = requestMsg.TXaddr;
                 console.log("Address Tx: " + requestMsg.TXaddr);
                 console.log("Amount Tx: " + requestMsg.TXamount);
+              } else if (dsHeader == 'Request ContractCreation ST') {
+                messageSubmitContractCreation[i] = requestMsg.STcontract;
+                console.log("Contract Schema: " + requestMsg.STcontract);
               } else {
                 console.log("Skipping - Header specified: " + dsHeader)
                 continue;
@@ -864,6 +913,8 @@ async function setDappResponse(decision) {
   } else if (decision == "confirm" && curSwitch2 == true) {
     if (dsHeader == 'Request Document ST')
       await submitSimpleDappDocument(messageSubmitContractID[0], messageSubmitDocName[0], messageSubmitDocContent[0]);
+    else if (dsHeader == 'Request ContractCreation ST')
+    await submitSimpleDappContractCreation(messageSubmitContractCreation[0])
     else if (dsHeader == 'Request Transaction TX')
       await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
   }

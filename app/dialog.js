@@ -12,6 +12,8 @@ chrome.runtime.getBackgroundPage(function (bgWindow) {
     else if (bgWindow.curSwitch2 == true) { // SDS
         if (bgWindow.dsHeader == 'Request Document ST')
             requestText.value = bgWindow.curDappRequests[0].dappname + ": " + bgWindow.dsHeader + "\n" + bgWindow.curDappRequests[0].STcontent;
+        else if (bgWindow.dsHeader == 'Request ContractCreation ST')
+            requestText.value = bgWindow.curDappRequests[0].dappname + ": " + bgWindow.dsHeader + "\n" + bgWindow.curDappRequests[0].STcontract;
         else if (bgWindow.dsHeader == 'Request Transaction TX') 
             requestText.value = bgWindow.curDappRequests[0].dappname + ": " + bgWindow.dsHeader + "\n" + "Send " + bgWindow.curDappRequests[0].TXamount + " Dash to Address " + bgWindow.curDappRequests[0].TXaddr;
     }
