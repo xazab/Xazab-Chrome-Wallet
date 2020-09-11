@@ -85,7 +85,7 @@ const pResponseProp = "status";
 
 ////////////////////////////////////
 ///// Dapp Signing Simple
-const messageContractId = "B5tT3N8cVjo7bC9yNh3LGKjbvQhWDN6MGHog4oinwLMn"
+const messageContractId = "4NKGAcdxcEXxMNTBgLvmsvRbgUUjxv7pajbb3ERvwReN"
 var pRequestDocument2 = ["message"];
 const pRequestProp2Header = "header";
 const pRequestProp2Ref = "reference";
@@ -98,7 +98,7 @@ var messageAmountTx = [''];
 var messageAddrTx = [''];
 
 //// DPNS-Contract for docID
-const domainContractID = "FiBkhut4LFPMJqDWbZrxVeT6Mr6LsH3mTNTSSHJY2ape";
+const domainContractID = "566vcJkmebVCAb2Dkj2yVMSgGFcsshupnQqtsz1RFbcy";
 const domainRequestDocument = "domain";
 
 //// Vendor Details
@@ -1125,7 +1125,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Rion faucet
         // httpReq.open("GET", "https://qetrgbsx30.execute-api.us-west-1.amazonaws.com/stage/?dashAddress=" + curAddress, true); // true for async
         // dashameter faucet
-        httpReq.open("GET", "https://us-central1-evodrip.cloudfunctions.net/evofaucet/drip/" + curAddress, true); // true for async
+        // httpReq.open("GET", "https://us-central1-evodrip.cloudfunctions.net/evofaucet/drip/" + curAddress, true); // true for async
+        // cloud faucet (also got /bigdrip with 3 dash)
+        httpReq.open("GET", "http://134.122.104.155:5050/drip/" + curAddress, true); // true for async
         httpReq.addEventListener("load", function (e) {
           console.log(httpReq.responseText);
         }, false)
@@ -1283,7 +1285,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         try {
           tmpIdentity = await sdk.platform.identities.get(curIdentityId);
           console.log(tmpIdentity)
-          const nameRegistration = await sdk.platform.names.register(curName + ".dash", tmpIdentity);
+          // const nameRegistration = await sdk.platform.names.register(curName + ".dash", tmpIdentity);
+          const nameRegistration = await sdk.platform.names.register(curName + ".dash",  { dashUniqueIdentityId: tmpIdentity.getId() }, tmpIdentity);
           console.log({ nameRegistration });
           // await chrome.storage.local.set({ name: curName });
           wls.setItem('name', curName)
