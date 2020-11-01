@@ -85,7 +85,7 @@ const pResponseProp = "status";
 
 ////////////////////////////////////
 ///// Dapp Signing Simple
-const messageContractId = "4NKGAcdxcEXxMNTBgLvmsvRbgUUjxv7pajbb3ERvwReN"
+const messageContractId = "CfHbvNx8ZJfhoizqCDawZK53iqyuJXdqwzQ8eVh58bjE"
 var pRequestDocument2 = ["message"];
 const pRequestProp2Header = "header";
 const pRequestProp2Ref = "reference";
@@ -98,7 +98,7 @@ var messageAmountTx = [''];
 var messageAddrTx = [''];
 
 //// DPNS-Contract for docID
-const domainContractID = "566vcJkmebVCAb2Dkj2yVMSgGFcsshupnQqtsz1RFbcy";
+const domainContractID = "3VvS19qomuGSbEYWbTsRzeuRgawU3yK4fPMzLrbV62u8";
 const domainRequestDocument = "domain";
 
 //// Vendor Details
@@ -1155,6 +1155,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log(curAddress)
           curBalance = ((await account.getTotalBalance()) / 100000000);
           console.log(curBalance)
+          curIdentityId = (await account).getIdentityIds();
+          console.log(curIdentityId)
           await getIdentityKeys();
         } catch (e) {
           sendResponse({ complete: false });
@@ -1169,7 +1171,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         wls.setItem('balance', curBalance)
         // await chrome.storage.local.set({ identityId: curIdentityId });
         // await chrome.storage.local.set({ identityId: "" });
-        wls.setItem('identityId', '')
+        wls.setItem('identityId', curIdentityId)
 
         sendResponse({ complete: true });
         // disconnect();
@@ -1307,7 +1309,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const recordLocator = "myContract." + request.documentName; // just use myContract for all
 
         try {
-          var queryJson = JSON.parse(request.queryObject);
+          // var queryJson = JSON.parse(request.queryObject);
+          var queryJson = request.queryObject;
+          // console.log(request.queryObject);
+          // console.log(queryJson);
           const documents = await sdk.platform.documents.get(recordLocator, queryJson);
           console.log(documents);
           var documentJson = JSON.stringify(documents, null, 2)

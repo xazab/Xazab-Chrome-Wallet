@@ -325,26 +325,26 @@ document.addEventListener('DOMContentLoaded', async function () {
         '["normalizedParentDomainName", "==", "dash"]\n' +
         '],\n' +
         '"startAt": 1 }\n';
-      contractIdText.value = '566vcJkmebVCAb2Dkj2yVMSgGFcsshupnQqtsz1RFbcy';
+      contractIdText.value = '3VvS19qomuGSbEYWbTsRzeuRgawU3yK4fPMzLrbV62u8';
       // toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Message") {
       documentNameText.value = 'message';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = '4NKGAcdxcEXxMNTBgLvmsvRbgUUjxv7pajbb3ERvwReN';
+      contractIdText.value = 'CfHbvNx8ZJfhoizqCDawZK53iqyuJXdqwzQ8eVh58bjE';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Note") {
       documentNameText.value = 'note';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'FJSmCvfS8iuYb953nmKWJkjChUH82NDWLJ4cAHBYukee';
+      contractIdText.value = 'CscMg7A5qwWSFz8SmV45uP1WmeaDaS88fdo2SqxiKrxT';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example NFA") {
       documentNameText.value = 'mynfa';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'E6ZvBNdSYKAocu2v3es88QZdEBGRe9edEovebfUhwGSb';
+      contractIdText.value = '4EB6uk7fkcQ2PzKbExKn3VBPGdc5gyrJBrohpPkx8htj';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Jembe") {
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       identityIdText.value = wls.getItem('identityId')
 
       if (identityIdText.value != '') {
-        nameBtn.disabled = false
+        nameBtn.disabled = false;
         nameText.readOnly = false;
       }
       showLoading('spinnerCreateIdentity', false);
@@ -424,6 +424,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       if (identityIdText.value != '') identityIdBtn.disabled = true;
       if (identityIdText.value == '') identityIdBtn.disabled = false;
       if (balanceText.value != '0') sendFundsBtn.disabled = false;
+      if (identityIdText.value != '') nameBtn.disabled = false;
     });
 
   }, false);
