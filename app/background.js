@@ -1309,28 +1309,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const recordLocator = "myContract." + request.documentName; // just use myContract for all
 
         try {
-          // var queryString = JSON.stringify(request.queryObject, null, 2);
           var queryString = request.queryObject;
           var queryJson = JSON.parse(queryString);
           
-          // var queryJson = request.queryObject;
-          // var queryJsonStringify = JSON.stringify(queryJson, null, 2);
-          // console.log(queryJson)
-          // console.log("test")
-          // console.log(queryJsonStringify)
-          // console.log("test")
-          // console.log(queryJsonStringify.toString())
-
-          console.log("test1")
+          // var queryStringify = JSON.stringify(queryJson, null, 2);
 
           // console.log(request.queryObject);
           // console.log(queryJson);
+
           const documents = await sdk.platform.documents.get(recordLocator, queryJson );
-          console.log("test2")
           console.log(documents);
-          console.log("test3")
           var documentJson = JSON.stringify(documents, null, 2)
-          console.log("test4")
         } catch (e) {
           console.log(e);
           sendResponse({ complete: false });
