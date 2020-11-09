@@ -137,7 +137,7 @@ async function connect() {
   try {
     sdk = new Dash.Client(sdkOpts);
     account = await sdk.getWalletAccount();
-    await account.isReady();
+    // await account.isReady();
     // register TX listener
     account.on('FETCHED/CONFIRMED_TRANSACTION', async (data) => {
       console.log('FETCHED/CONFIRMED_TRANSACTION');
