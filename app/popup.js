@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (exampleQuerySelector.value == "Example NFA") {
       documentNameText.value = 'mynfa';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = '4EB6uk7fkcQ2PzKbExKn3VBPGdc5gyrJBrohpPkx8htj';
+      contractIdText.value = 'Faggf8rA3GuoEoSo8ACaqtY72iok6DY5D77dr2B7vFw1';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Jembe") {

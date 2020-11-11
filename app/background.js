@@ -1016,10 +1016,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   //   connect();
   // }
   if (request.greeting == 'getDocuments') {
-    curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
-    curApps = JSON.parse(curApps);
-    disconnect();
-    connect();
+    // curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
+    // curApps = JSON.parse(curApps);
+    // disconnect();
+    // connect();
   }
 
   // if (request.greeting == "switch") {
@@ -1306,6 +1306,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case "getDocuments":
       (async function getDocuments() {
         console.log('getDocuments');
+
+        // { "myContract" : { "contractId" : "' + request.contractId + '" } }
+        sdk.getApps().set("myContract",  { "contractId" : request.contractId } )
+
         const recordLocator = "myContract." + request.documentName; // just use myContract for all
 
         try {
@@ -1316,6 +1320,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
           // console.log(request.queryObject);
           // console.log(queryJson);
+
+          // Note
+          // client.apps is an instance of ClientApps class. Use Client#getApps() to get/update applications
+          // console.log('jembe.contractId', client.getApps().get('jembe').contractId)
+          // console.log('jembe.contractId', client.getApps().apps.jembe.contractId)
+          // sdk.getApps().get('myContract').contractId = '3VvS19qomuGSbEYWbTsRzeuRgawU3yK4fPMzLrbV62u8';
 
           const documents = await sdk.platform.documents.get(recordLocator, queryJson );
           console.log(documents);
