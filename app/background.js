@@ -67,6 +67,10 @@ var wls = window.localStorage;
 
 sdkOpts.network = 'evonet';
 const pContractName = 'myContract';
+const msgContractName = 'msgContract';
+const queryContractName = 'queryContract';  // is changed dynamic with every query
+const submitContractName = 'submitContract'; // also dynamic
+
 
 ////////////////////////////////////
 //// Dapp-Signing WDS contract constants and variables:
@@ -415,7 +419,7 @@ async function submitDocument(msg) {
 async function submitWdsResponseDocument(msg) {
 
   try {
-    var tidentity = await pollSdk.platform.identities.get(curIdentityId);
+    var tidentity = await sdk.platform.identities.get(curIdentityId);
 
     console.log(msg.reference)
     console.log(msg.status)
@@ -429,7 +433,7 @@ async function submitWdsResponseDocument(msg) {
       temp_timestamp: msg.temp_timestamp
     }
     // Create the note document
-    var noteDocument = await pollSdk.platform.documents.create(
+    var noteDocument = await sdk.platform.documents.create(
       pContractName + "." + pResponseDocument[curDocNr],
       tidentity,
       docProperties,
@@ -445,7 +449,7 @@ async function submitWdsResponseDocument(msg) {
     // TypeError: Cannot read property 'getIdentityHDKey' of undefined
     console.log(tidentity)
     console.log(noteDocument)
-    await pollSdk.platform.documents.broadcast(documentBatch, tidentity);
+    await sdk.platform.documents.broadcast(documentBatch, tidentity);
   } catch (e) {
     console.error('Something went wrong:', e);
   } finally {
@@ -473,17 +477,18 @@ async function submitSimpleDappDocument(contractid, docName, docContent) {
 
   try {
 
-    psdkOpts = {};
-    psdkOpts.network = 'evonet';
-    psdkOpts.wallet = {};
-    psdkOpts.wallet.mnemonic = curMnemonic;
-    psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
-    psdkApps = JSON.parse(psdkApps);
-    psdkOpts.apps = psdkApps;
+    // psdkOpts = {};
+    // psdkOpts.network = 'evonet';
+    // psdkOpts.wallet = {};
+    // psdkOpts.wallet.mnemonic = curMnemonic;
+    // psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
+    // psdkApps = JSON.parse(psdkApps);
+    // psdkOpts.apps = psdkApps;
 
-    var docSdk = new Dash.Client(psdkOpts);
+    // var docSdk = new Dash.Client(psdkOpts);
+    sdk.getApps().set(submitContractName,  { "contractId" : contractid } )
 
-    var tidentity = await docSdk.platform.identities.get(curIdentityId);
+    var tidentity = await sdk.platform.identities.get(curIdentityId);
 
     // build docProperty json from docContent string
     docContent = JSON.parse(docContent);  // convert java string to json object
@@ -495,8 +500,8 @@ async function submitSimpleDappDocument(contractid, docName, docContent) {
     console.log(docProperties)
 
     // Create the note document
-    var noteDocument = await docSdk.platform.documents.create(
-      pContractName + "." + docName,
+    var noteDocument = await sdk.platform.documents.create(
+      submitContractName + "." + docName,
       tidentity,
       docProperties
     );
@@ -511,11 +516,11 @@ async function submitSimpleDappDocument(contractid, docName, docContent) {
     // TypeError: Cannot read property 'getIdentityHDKey' of undefined
     console.log(tidentity)
     console.log(noteDocument)
-    await docSdk.platform.documents.broadcast(documentBatch, tidentity);
+    await sdk.platform.documents.broadcast(documentBatch, tidentity);
   } catch (e) {
     console.error('Something went wrong:', e);
   } finally {
-    docSdk.disconnect()
+    // docSdk.disconnect()
     console.log("submitted " + docName + " document with content: " + docContent + " to contract " + contractid)
   }
   return true;
@@ -525,17 +530,18 @@ async function submitSimpleDappContractCreation(contractSchema) {
 
   try {
 
-    psdkOpts = {};
-    psdkOpts.network = 'evonet';
-    psdkOpts.wallet = {};
-    psdkOpts.wallet.mnemonic = curMnemonic;
-    psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
-    psdkApps = JSON.parse(psdkApps);
-    psdkOpts.apps = psdkApps;
+    // psdkOpts = {};
+    // psdkOpts.network = 'evonet';
+    // psdkOpts.wallet = {};
+    // psdkOpts.wallet.mnemonic = curMnemonic;
+    // psdkApps = '{ "myContract" : { "contractId" : "' + contractid + '" } }';
+    // psdkApps = JSON.parse(psdkApps);
+    // psdkOpts.apps = psdkApps;
 
-    var docSdk = new Dash.Client(psdkOpts);
+    // var docSdk = new Dash.Client(psdkOpts);
+    // sdk.getApps().set("myContract",  { "contractId" : contractid } )
 
-    var tidentity = await docSdk.platform.identities.get(curIdentityId);
+    var tidentity = await sdk.platform.identities.get(curIdentityId);
 
     // prepare contract
     contractSchema = JSON.parse(contractSchema);  // convert java string to json object
@@ -545,7 +551,7 @@ async function submitSimpleDappContractCreation(contractSchema) {
     // console.dir({ contract });
 
     // Make sure contract passes validation checks
-    const validationResult = await docSdk.platform.dpp.dataContract.validate(contract);
+    const validationResult = await sdk.platform.dpp.dataContract.validate(contract);
 
     if (validationResult.isValid()) {
       console.log("validation passed, broadcasting contract..");
@@ -559,7 +565,7 @@ async function submitSimpleDappContractCreation(contractSchema) {
   } catch (e) {
     console.error('Something went wrong:', e);
   } finally {
-    docSdk.disconnect()
+    // docSdk.disconnect()
     console.log("submitted " + docName + " contract creation with schema: " + contractSchema )
   }
   return true;
@@ -775,18 +781,19 @@ async function polling2() {
   pRequestTarget = curName;
 
   // TODO remove when DashJS removed curApps
-  psdkOpts = {};
-  psdkOpts.network = 'evonet';
-  psdkOpts.wallet = {};
-  psdkOpts.wallet.mnemonic = curMnemonic;
-  psdkApps = '{ "myContract" : { "contractId" : "' + messageContractId + '" } }';
-  psdkApps = JSON.parse(psdkApps);
-  psdkOpts.apps = psdkApps;
+  // psdkOpts = {};
+  // psdkOpts.network = 'evonet';
+  // psdkOpts.wallet = {};
+  // psdkOpts.wallet.mnemonic = curMnemonic;
+  // psdkApps = '{ "myContract" : { "contractId" : "' + messageContractId + '" } }';
+  // psdkApps = JSON.parse(psdkApps);
+  // psdkOpts.apps = psdkApps;
 
   var nStart = [1];
-  var pollLocator = ["myContract." + pRequestDocument2[0]];
+  var pollLocator = [msgContractName + "." + pRequestDocument2[0]];
 
-  pollSdk = new Dash.Client(psdkOpts);
+  // pollSdk = new Dash.Client(psdkOpts);
+  sdk.getApps().set(msgContractName,  { "contractId" : messageContractId } )
 
   var reachedHead = [false];
   // for testing (remove later):
@@ -801,14 +808,22 @@ async function polling2() {
       try {
 
         console.log("polling " + pRequestDocument2[i] + ": " + nStart[i]);
+        // console.log("i is: " + i)
+        // console.log("nStart / pRequestDocument2 is: " + nStart[i] + " / " + pRequestDocument2[i])
 
-        var pollQuery = '{ "startAt" : "' + nStart[i] + '" }';
-        // console.log(pollQuery)
-        pollQuery = JSON.parse(pollQuery);
-        const pollDoc = await pollSdk.platform.documents.get(pollLocator[i], pollQuery);
+        var queryString = '{ "startAt" : "' + nStart[i] + '" }';
+        queryJson = JSON.parse(queryString);
+        // console.log(queryJson)
+
+        const pollDoc = await sdk.platform.documents.get(pollLocator[i], queryJson);
+
+        // console.dir(pollDoc)
+        // console.log(pollDoc.length)
 
         if (pollDoc.length == 0 || reachedHead[i] == false) {
+          // console.log("reachedHead is false")
           if (pollDoc.length == 0) {
+            // console.log("reachedHead set: true")
             reachedHead[i] = true;
             // console.log("reached head")
             await new Promise(r => setTimeout(r, 5000));  // sleep x ms
@@ -820,7 +835,10 @@ async function polling2() {
 
         for (let index = 0; index < pollDoc.length; ++index) {
           var requestMsg = pollDoc[index].data;  // get document data , TODO: change to pRequestProp
-          if (requestMsg.reference == null) return;
+          if (requestMsg.reference == null) {
+            console.log("reference is null");
+            return;
+          }
 
           // if (requestMsg.reference.startsWith(pRequestTarget)) {  // check for Target docID
           if (requestMsg.reference == pRequestTarget) {  // check for username match
@@ -829,8 +847,7 @@ async function polling2() {
             curDappRequests = [];
             curDappRequests.push(requestMsg);
             // debug, remove
-            console.log("requestMsg.reference:")
-            console.log(requestMsg.reference)
+            console.log("requestMsg.reference: " + requestMsg.reference)
 
             var views = chrome.extension.getViews({ type: "popup" });
             //views => [] //popup is closed
@@ -889,12 +906,14 @@ async function polling2() {
       } catch (e) {
         // NOTE: firefox not supporting buttons in notification, also not supporting alert+confirm dialog in background
         console.log("caught error polling " + e)
+        console.dir(e)
+        await new Promise(r => setTimeout(r, 5000));
         // curSwitch = false
         // return;
       }
     }
   }
-  pollSdk.disconnect();
+  // pollSdk.disconnect();
   console.log("return")
   return;
 }
@@ -940,15 +959,15 @@ function dappSigningDialog() {
 }
 
 async function getDocID() {
-  psdkOpts = {};
-  psdkOpts.network = 'evonet';
-  psdkOpts.wallet = {};
-  psdkOpts.wallet.mnemonic = curMnemonic;
-  psdkApps = '{ "myContract" : { "contractId" : "' + domainContractID + '" } }';
-  psdkApps = JSON.parse(psdkApps);
-  psdkOpts.apps = psdkApps;
+  // psdkOpts = {};
+  // psdkOpts.network = 'evonet';
+  // psdkOpts.wallet = {};
+  // psdkOpts.wallet.mnemonic = curMnemonic;
+  // psdkApps = '{ "myContract" : { "contractId" : "' + domainContractID + '" } }';
+  // psdkApps = JSON.parse(psdkApps);
+  // psdkOpts.apps = psdkApps;
 
-  var tRecordLocator = "myContract.domain";
+  var tRecordLocator = "dpns.domain";
   var tQueryObject = '{ "where": [' +
     '["normalizedParentDomainName", "==", "dash"],' +
     '["normalizedLabel", "==", "' + curName + '"]' +
@@ -956,7 +975,7 @@ async function getDocID() {
     '"startAt": 1 }';
 
   try {
-    var docSdk = new Dash.Client(psdkOpts);
+    // var docSdk = new Dash.Client(psdkOpts);
 
     var queryJson = JSON.parse(tQueryObject);
     if (curName == '') {
@@ -965,7 +984,7 @@ async function getDocID() {
       wls.setItem('switch', false)
       throw "Name not set, please create a Username for your Identity";
     }
-    const documents = await docSdk.platform.documents.get(tRecordLocator, queryJson);
+    const documents = await sdk.platform.documents.get(tRecordLocator, queryJson);
     // await new Promise(r => setTimeout(r, 2000));  // sleep x ms
     // TODO: remove later, just a fix for current dashjs error 13
     console.log(documents)
@@ -976,7 +995,7 @@ async function getDocID() {
       wls.setItem('switch', false)
     } else {
       console.log("Document ID for user " + curName + ": " + documents[0].id)
-      curDocDomainID = documents[0].id
+      curDocDomainID = documents[0].id.toString()
       console.log("saved document domain ID")
     }
   } catch (e) {
@@ -1015,12 +1034,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   //   disconnect();
   //   connect();
   // }
-  if (request.greeting == 'getDocuments') {
+  
+  // if (request.greeting == 'getDocuments') {
     // curApps = '{ "myContract" : { "contractId" : "' + request.contractId + '" } }';
     // curApps = JSON.parse(curApps);
     // disconnect();
     // connect();
-  }
+  // }
 
   // if (request.greeting == "switch") {
   //   (async function dappSigning() {
@@ -1308,9 +1328,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('getDocuments');
 
         // { "myContract" : { "contractId" : "' + request.contractId + '" } }
-        sdk.getApps().set("myContract",  { "contractId" : request.contractId } )
+        sdk.getApps().set(queryContractName,  { "contractId" : request.contractId } )
 
-        const recordLocator = "myContract." + request.documentName; // just use myContract for all
+        const recordLocator = queryContractName + "." + request.documentName; // just use myContract for all
 
         try {
           var queryString = request.queryObject;
