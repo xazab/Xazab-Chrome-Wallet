@@ -544,11 +544,12 @@ async function submitSimpleDappContractCreation(contractSchema) {
     var tidentity = await sdk.platform.identities.get(curIdentityId);
 
     // prepare contract
-    contractSchema = JSON.parse(contractSchema);  // convert java string to json object
+    contractSchemaJson = JSON.parse(contractSchema);  // convert java string to json object
 
-    const contract = await platform.contracts.create(contractSchema, tidentity);
+    const contract = await sdk.platform.contracts.create(contractSchemaJson, tidentity);
     console.dir({ contract }, { depth: 15 });
     // console.dir({ contract });
+    // console.log("Contract ID created: " + contract.id.toString());
 
     // Make sure contract passes validation checks
     const validationResult = await sdk.platform.dpp.dataContract.validate(contract);
@@ -556,7 +557,7 @@ async function submitSimpleDappContractCreation(contractSchema) {
     if (validationResult.isValid()) {
       console.log("validation passed, broadcasting contract..");
       // Sign and submit the data contract
-      console.dir(await platform.contracts.broadcast(contract, tidentity));
+      console.dir(await sdk.platform.contracts.broadcast(contract, tidentity));
     } else {
       console.error(validationResult) // An array of detailed validation errors
       throw validationResult.errors[0];
@@ -566,7 +567,7 @@ async function submitSimpleDappContractCreation(contractSchema) {
     console.error('Something went wrong:', e);
   } finally {
     // docSdk.disconnect()
-    console.log("submitted " + docName + " contract creation with schema: " + contractSchema )
+    console.log("success created contract with id " + contract.id.toString() + " and schema: " + contractSchema )
   }
   return true;
 
@@ -933,7 +934,7 @@ async function setDappResponse(decision) {
     if (dsHeader == 'Request Document ST')
       await submitSimpleDappDocument(messageSubmitContractID[0], messageSubmitDocName[0], messageSubmitDocContent[0]);
     else if (dsHeader == 'Request ContractCreation ST')
-    await submitSimpleDappContractCreation(messageSubmitContractCreation[0])
+      await submitSimpleDappContractCreation(messageSubmitContractCreation[0])
     else if (dsHeader == 'Request Transaction TX')
       await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
   }
