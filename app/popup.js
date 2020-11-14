@@ -424,7 +424,10 @@ document.addEventListener('DOMContentLoaded', async function () {
       if (identityIdText.value != '') identityIdBtn.disabled = true;
       if (identityIdText.value == '') identityIdBtn.disabled = false;
       if (balanceText.value != '0') sendFundsBtn.disabled = false;
-      if (identityIdText.value != '') nameBtn.disabled = false;
+      if (identityIdText.value != '') {
+        nameBtn.disabled = false;
+        nameText.readOnly = false;
+      }
     });
 
   }, false);

@@ -337,6 +337,24 @@ wls.setItem('pin', curPin)
 
 ////////////// code for dapp signing v1 ////////////
 
+async function getDefaultUsername() {
+  // var queryBasic = { startAt: 0 };
+  var queryRaw = { "where": [
+      ["records.dashUniqueIdentityId", "==", curIdentityId ]
+    ],
+    "startAt": 1 }
+  var retName = "";
+  try {
+    var docs = await sdk.platform.documents.get('dpns.domain', queryRaw);
+    console.log(docs[0].data.label)
+    retName = docs[0].data.label;
+  } catch (e) {
+    console.error('Something went wrong:', e);
+  }
+  
+  return retName;
+}
+
 async function getIdentityKeys() {
   console.log("start getIdentityKeys");
   // TODO: check if try..catch necessary
@@ -952,7 +970,7 @@ function dappSigningDialog() {
   chrome.windows.create({
     url: chrome.extension.getURL('dialog.html'),
     type: 'popup',
-    focused: true, // not supported by firefox
+    // focused: true, // not supported by firefox, will throw error and not work
     top: 300,
     left: 300,
     width: 710,
@@ -1177,9 +1195,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log(curAddress)
           curBalance = ((await account.getTotalBalance()) / 100000000);
           console.log(curBalance)
-          curIdentityId = (await account).getIdentityIds();
+          curIdentityId = (await account).getIdentityIds()[0].toString();
           console.log(curIdentityId)
           await getIdentityKeys();
+          curName = await getDefaultUsername();
         } catch (e) {
           sendResponse({ complete: false });
           return;
@@ -1194,6 +1213,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // await chrome.storage.local.set({ identityId: curIdentityId });
         // await chrome.storage.local.set({ identityId: "" });
         wls.setItem('identityId', curIdentityId)
+        wls.setItem('name', curName)
 
         sendResponse({ complete: true });
         // disconnect();
