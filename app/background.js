@@ -549,7 +549,7 @@ async function submitSimpleDappContractCreation(contractSchema) {
     const contract = await sdk.platform.contracts.create(contractSchemaJson, tidentity);
     console.dir({ contract }, { depth: 15 });
     // console.dir({ contract });
-    // console.log("Contract ID created: " + contract.id.toString());
+    console.log("Contract ID created: " + contract.id.toString());
 
     // Make sure contract passes validation checks
     const validationResult = await sdk.platform.dpp.dataContract.validate(contract);
@@ -567,7 +567,8 @@ async function submitSimpleDappContractCreation(contractSchema) {
     console.error('Something went wrong:', e);
   } finally {
     // docSdk.disconnect()
-    console.log("success created contract with id " + contract.id.toString() + " and schema: " + contractSchema )
+    // console.log("success created contract with id " + contract.id.toString() + " and schema: " + contractSchema )
+    console.log("success created contract")
   }
   return true;
 
@@ -951,11 +952,11 @@ function dappSigningDialog() {
   chrome.windows.create({
     url: chrome.extension.getURL('dialog.html'),
     type: 'popup',
-    // focused: true, // not supported by firefox
+    focused: true, // not supported by firefox
     top: 300,
     left: 300,
-    width: 510,
-    height: 290
+    width: 710,
+    height: 340
   });
 }
 
