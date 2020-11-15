@@ -338,21 +338,16 @@ wls.setItem('pin', curPin)
 ////////////// code for dapp signing v1 ////////////
 
 async function getDefaultUsername() {
-  // var queryBasic = { startAt: 0 };
-  var queryRaw = { "where": [
-      ["records.dashUniqueIdentityId", "==", curIdentityId ]
-    ],
-    "startAt": 1 }
-  var retName = "";
+  
+  var name = "";
   try {
-    var docs = await sdk.platform.documents.get('dpns.domain', queryRaw);
-    console.log(docs[0].data.label)
-    retName = docs[0].data.label;
+    var doc = await client.platform.names.resolveByRecord('dashUniqueIdentityId', curIdentityId);
+    name = doc[0].data.label;
   } catch (e) {
     console.error('Something went wrong:', e);
   }
   
-  return retName;
+  return name;
 }
 
 async function getIdentityKeys() {
