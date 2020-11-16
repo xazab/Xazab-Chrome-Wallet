@@ -1195,6 +1195,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           await getIdentityKeys();
           curName = await getDefaultUsername();
           console.log(curName)
+          console.log("Finish importing Mnemonic in background");
         } catch (e) {
           sendResponse({ complete: false });
           return;
