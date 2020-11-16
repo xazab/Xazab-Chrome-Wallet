@@ -1194,6 +1194,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           console.log(curIdentityId)
           await getIdentityKeys();
           curName = await getDefaultUsername();
+          console.log(curName)
         } catch (e) {
           sendResponse({ complete: false });
           return;
