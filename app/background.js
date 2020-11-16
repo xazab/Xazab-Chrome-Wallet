@@ -341,7 +341,7 @@ async function getDefaultUsername() {
   
   var name = "";
   try {
-    var doc = await client.platform.names.resolveByRecord('dashUniqueIdentityId', curIdentityId);
+    var doc = await sdk.platform.names.resolveByRecord('dashUniqueIdentityId', curIdentityId);
     name = doc[0].data.label;
   } catch (e) {
     console.error('Something went wrong:', e);
