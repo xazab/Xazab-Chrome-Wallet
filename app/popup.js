@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // wait for background, mostly not responding after browser/system restart TODO: remove direct background access
   async function waitForBG() {
-    if ((await chrome.extension.getBackgroundPage().dsNotif) == true) {
+    if ((await chrome.extension.getBackgroundPage().dsNotif) == true) { // TODO: fix, dsNotif may not init eg. after fresh install
       await chrome.extension.getBackgroundPage().dappSigningDialog();
     }
   }
