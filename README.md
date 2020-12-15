@@ -1,7 +1,8 @@
-# Dash Chrome-Wallet
-Cryptocurrency Wallet for [Dash Platform](https://www.dashdevs.org) EvoNet-Testnet environment. Browser-Extension (Chrome, Firefox, Brave, Edge) or Standalone Desktop versions (Windows, Linux, Mac) available.
+# Dash Chrome Wallet
+Cryptocurrency-Dapp Wallet for [Dash Platform](https://www.dashdevs.org). Create an identity and username. Fetch data contracts and documents. Connect with Dapps using Push Notifications.
+Browser-Extension (Chrome, Firefox, Brave, Edge) or Standalone Desktop versions (Windows, Linux, Mac) available.
 
-**Support my work:** XgQpScGHiEWFXxFiJuEKSY2VVpumaTUMkN (Mainnet Dash Address)
+**Support my work:** XgQpScGHiEWFXxFiJuEKSY2VVpumaTUMkN
 
 
 <img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/chrome-wallet.PNG" width="300" />
@@ -14,7 +15,7 @@ Cryptocurrency Wallet for [Dash Platform](https://www.dashdevs.org) EvoNet-Testn
 - v1.0 Initial Release
 
 ## Description:
-Simple GUI Sandbox as Google Chrome Browser Extension for Dash EvoNet-Testnet using [DashJS](https://github.com/dashevo/DashJS) with DAPI (Decentralized API) showing Payments, Usernames, Documents and Contracts features.
+Cryptocurrency-Dapp Wallet for Dash Platform (EvoNet-Testnet) using [DashJS](https://github.com/dashevo/js-dash-sdk) and DAPI (Decentralized API). Create an identity and username. Fetch data contracts and documents. Connect with Dapps using Push Notifications.
 
 ## Requirements:
 - None

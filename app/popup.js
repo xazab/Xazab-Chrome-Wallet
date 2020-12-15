@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   let contractIdText = document.getElementById('contractIdText');
   let getContractBtn = document.getElementById('getContractBtn');
-  let signingSwitch = document.getElementById('switch1');
+  // let signingSwitch = document.getElementById('switch1');
   let pinText = document.getElementById('pinText');
   let simpleSwitch = document.getElementById('switch2');
 
@@ -85,17 +85,16 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
 
-
   pinText.value = wls.getItem('pin')
 
-  // Firefox and Chrome reading boolean from wls as String
+  // NOTE: Firefox and Chrome reading boolean from wls as String !!!
   if (typeof wls.getItem('switch2') === "string") {
     simpleSwitch.checked = (wls.getItem('switch2') == 'true')
-    signingSwitch.checked = (wls.getItem('switch') == 'true')
+    // signingSwitch.checked = (wls.getItem('switch') == 'true')
   }
   else if (typeof wls.getItem('switch2') === "boolean") {
     simpleSwitch.checked = wls.getItem('switch2')
-    signingSwitch.checked = wls.getItem('switch')
+    // signingSwitch.checked = wls.getItem('switch')
     console.log("wls switch as Boolean")
   } else {
     console.log("Error reading typeof Switch")
@@ -144,22 +143,21 @@ document.addEventListener('DOMContentLoaded', async function () {
   //   simpleSwitch.checked = data.switch2;
   // });
 
-  // wait for background, mostly not responding after browser/system restart TODO: remove direct background access
-  async function waitForBG() {
-    if ((await chrome.extension.getBackgroundPage().dsNotif) == true) { // TODO: fix, dsNotif may not init eg. after fresh install
-      await chrome.extension.getBackgroundPage().dappSigningDialog();
-    }
+  // check for active push notification
+  console.log(wls.getItem('notification'))
+  if (wls.getItem('notification') == 'true') {
+    await chrome.extension.getBackgroundPage().dappSigningDialog();
   }
-  waitForBG();
+  
 
   //switch
-  signingSwitch.addEventListener('change', function () {
-    if (chrome.extension.getBackgroundPage().curName == '') {
-      window.alert("Please create a Username first! Aborting.")
-      return false;
-    }
-    chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) { });
-  }, false);
+  // signingSwitch.addEventListener('change', function () {
+  //   if (chrome.extension.getBackgroundPage().curName == '') {
+  //     window.alert("Please create a Username first! Aborting.")
+  //     return false;
+  //   }
+  //   chrome.runtime.sendMessage({ greeting: "switch", switch: signingSwitch.checked }, function (response) { });
+  // }, false);
 
   //switch2
   simpleSwitch.addEventListener('change', function () {

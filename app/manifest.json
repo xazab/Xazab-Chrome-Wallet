@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "Dash Chrome-Wallet",
-    "version": "1.4.1",
-    "description": "A Chrome-Extension for the Dash EvoNet-Testnet environment",
+    "name": "Dash Chrome Wallet",
+    "version": "1.7.0",
+    "description": "Create an identity and username. Fetch data contracts and documents. Connect with Dapps using Push Notifications.",
     "icons": {
         "16": "./img/icon16.png",
         "48": "./img/icon48.png",

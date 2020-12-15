@@ -262,7 +262,7 @@ async function disconnect() {
 // });
 
 chrome.runtime.onInstalled.addListener(async function () {
-  console.log("Dash Chrome-Wallet installed.");
+  console.log("Dash Chrome Wallet installed.");
 
   // check for fresh install with no set cookies
   var wlsTest = wls.getItem('mnemonic')
@@ -273,13 +273,14 @@ chrome.runtime.onInstalled.addListener(async function () {
     wls.setItem('balance', '')
     wls.setItem('identityId', '')
     wls.setItem('name', '')
-    wls.setItem('switch', 'false')
+    // wls.setItem('switch', 'false')
     wls.setItem('pin', curPin)
-    wls.setItem('switch2', 'false')
+    wls.setItem('switch2', false)
+    wls.setItem('notification', false)
   } else {
     console.log("Cookies detected.")
   }
-  console.log("Dash Chrome-Wallet initialization complete.");
+  console.log("Dash Chrome Wallet initialization complete.");
   // chrome.storage.local.set({ tab: chrome.extension.getURL("popup.html") });
 });
 
@@ -324,9 +325,10 @@ curName = wls.getItem('name')
 // });
 
 // set switch to false on "browser load" - TODO: remove switch from cookies, check if still needed? i dont think so, switch2 missing here
-wls.setItem('switch', 'false')
-wls.setItem('switch2', 'false')
+// wls.setItem('switch', 'false')
+wls.setItem('switch2', false)
 wls.setItem('pin', curPin)
+wls.setItem('notification', false)
 
 
 // chrome.storage.local.set({ switch: false });
@@ -763,6 +765,7 @@ async function polling() {
 
             // sleep until notification is checked
             dsNotif = true;
+            wls.setItem('notification', true)
             while (dsNotif == true) {
               await new Promise(r => setTimeout(r, 5000));
             }
@@ -910,6 +913,7 @@ async function polling2() {
 
             // sleep until notification is checked
             dsNotif = true;
+            wls.setItem('notification', true)
             while (dsNotif == true) {
               await new Promise(r => setTimeout(r, 5000));
             }
@@ -953,6 +957,7 @@ async function setDappResponse(decision) {
       await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
   }
   dsNotif = false;
+  wls.setItem('notification', false)
 };
 
 function getDappRequests() {
@@ -1437,8 +1442,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         wls.setItem('balance', '')
         wls.setItem('identityId', '')
         wls.setItem('name', '')
-        wls.setItem('switch', 'false')
-        wls.setItem('switch2', 'false')
+        wls.setItem('switch', false)
+        wls.setItem('switch2', false)
+        wls.setItem('notification', false)
         sendResponse({ complete: true });
         disconnect();
         connect();
