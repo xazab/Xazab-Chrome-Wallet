@@ -41,7 +41,7 @@
   "description": "",
   "window": {
     "id": "myNWJS-ID",
-    "title": "Dash Chrome Wallet (Desktop Edition)",
+    "title": "Dash Chrome Wallet",
     "icon": "./app/img/icon128.png",
     "frame": true,
     "width": 575,
