@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   // });
 
   // check for active push notification
-  console.log(wls.getItem('notification'))
+  // console.log(wls.getItem('notification'))
   if (wls.getItem('notification') == 'true') {
     await chrome.extension.getBackgroundPage().dappSigningDialog();
   }

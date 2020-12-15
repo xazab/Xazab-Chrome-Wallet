@@ -1,9 +1,9 @@
 {
-  "name": "Dash Chrome Wallet",
+  "name": "Dash-Chrome-Wallet",
   "main": "index.html",
   "chromium-args": "--enable-logging=stderr --mixed-content --load-extension='./app'",
   "dependencies": {
-    "nw": "^0.46.3"
+    "nw": "^0.50.2"
   },
   "version": "1.7.0",
   "devDependencies": {
@@ -16,18 +16,18 @@
     "start": "run --x86 --mirror https://dl.nwjs.io/ ."
   },
   "build": {
-    "nwVersion": "0.46.3",
+    "nwVersion": "0.50.2",
     "packed": false,
     "targets": [
       "zip"
     ],
-	"files": [
-	  "**/*"
-	],
-	"excludes": [
-	  "**/node_modules",
+    "files": [
+      "**/*"
+    ],
+    "excludes": [
+      "**/node_modules",
       "**/node_modules/**/*"
-	],
+    ],
     "win": {
       "icon": "./app/img/icon128.ico"
     },
