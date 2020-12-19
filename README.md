@@ -4,10 +4,12 @@ Browser-Extension (Chrome, Firefox, Brave, Edge) or Standalone Desktop versions 
 
 **Support my work:** XgQpScGHiEWFXxFiJuEKSY2VVpumaTUMkN
 
-
-<img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/chrome-wallet.PNG" width="300" />
+<!-- <p align="center"> -->
+<img src="https://raw.githubusercontent.com/readme55/Dash-Chrome-Wallet/master/chrome-wallet.PNG" width="400" />
+<!-- </p> -->
 
 ## Major Changelogs
+- v1.7.0 in preparation
 - v1.4.0 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.4.0) (3. July 2020) 
 - v1.3.1 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.3.1) (17 May 2020)
 - v1.2 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.2) (9 April 2020)
@@ -55,4 +57,3 @@ and extract directory on disk
 - Chrome Wallet will show Notification + Confirmation Dialog for the request. Confirm the dialog to get logged in. 
 - Now start the Dapp and submit some data. You will receive a Confirmation dialog inside Chrome Wallet for each submission.
 
-## TODO
