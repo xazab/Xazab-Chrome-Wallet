@@ -163,6 +163,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   simpleSwitch.addEventListener('change', function () {
     if (chrome.extension.getBackgroundPage().curName == '') {
       window.alert("Please create a Username first! Aborting.")
+      simpleSwitch.checked = false;
+      return false;
+    }
+    if (chrome.extension.getBackgroundPage().isConnected == false) {
+      window.alert("Please wait until your Account is initialized")
+      simpleSwitch.checked = false;
       return false;
     }
     chrome.runtime.sendMessage({ greeting: "switch2", switch: simpleSwitch.checked }, function (response) { });

@@ -14,6 +14,7 @@ var platform = null;
 var curApps = '';
 var psdkApps = '';
 var tmpIdentity = {};  //check remove
+var isConnected = false;
 
 var curIdentityHDPrivKey = {};
 var curIdentityPrivKey = '';
@@ -88,7 +89,7 @@ const pResponseDocument = ["LoginResponse", "SignupResponse", "TweetResponse"];
 const pResponseProp = "status";
 
 ////////////////////////////////////
-///// Dapp Signing Simple
+///// Dapp Signing Simple (Push Notifications)
 const messageContractId = "CfHbvNx8ZJfhoizqCDawZK53iqyuJXdqwzQ8eVh58bjE"
 var pRequestDocument2 = ["message"];
 const pRequestProp2Header = "header";
@@ -141,6 +142,7 @@ async function connect() {
   try {
     sdk = new Dash.Client(sdkOpts);
     account = await sdk.getWalletAccount();
+    isConnected = true;
     // await account.isReady();
     // register TX listener
     account.on('FETCHED/CONFIRMED_TRANSACTION', async (data) => {
@@ -175,6 +177,7 @@ async function disconnect() {
   try {
     await sdk.disconnect();
     account = null;
+    isConnected = false;
 
   } catch (e) {
     console.log('error disconnecting sdk', e);
