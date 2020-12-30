@@ -325,24 +325,25 @@ document.addEventListener('DOMContentLoaded', async function () {
   exampleQuerySelector.addEventListener("change", function () {
     if (exampleQuerySelector.value == "Example DPNS") {
       documentNameText.value = 'domain';
-      queryObjectText.value = '{ "where": [\n' +
-        '["normalizedParentDomainName", "==", "dash"]\n' +
-        '],\n' +
-        '"startAt": 1 }\n';
-      contractIdText.value = '3VvS19qomuGSbEYWbTsRzeuRgawU3yK4fPMzLrbV62u8';
+      queryObjectText.value = '{ "startAt": 1 }';
+      // queryObjectText.value = '{ "where": [\n' +
+      //   '["normalizedParentDomainName", "==", "dash"]\n' +
+      //   '],\n' +
+      //   '"startAt": 1 }\n';
+      contractIdText.value = '36ez8VqoDbR8NkdXwFaf9Tp8ukBdQxN8eYs8JNMnUyKz';
       // toAddressText.value = "yNPbcFfabtNmmxKdGwhHomdYfVs6gikbPf";  // Faucet
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Message") {
       documentNameText.value = 'message';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'CfHbvNx8ZJfhoizqCDawZK53iqyuJXdqwzQ8eVh58bjE';
+      contractIdText.value = '3coTShwTvmKiySpwmDDzRJ9FGQx4RNLdawLttT9RNxXa';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example Note") {
       documentNameText.value = 'note';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'CscMg7A5qwWSFz8SmV45uP1WmeaDaS88fdo2SqxiKrxT';
+      contractIdText.value = '9PiTpFPE4BC9Ugo2etsD2UDntv37qgHWoj67oW8fWhP6';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example NFA") {
