@@ -9,7 +9,7 @@ Browser-Extension (Chrome, Firefox, Brave, Edge) or Standalone Desktop versions 
 <!-- </p> -->
 
 ## Major Changelogs
-- v1.7.0 in preparation
+- v1.7.0 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.7.0) (31. December 2020) 
 - v1.4.0 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.4.0) (3. July 2020) 
 - v1.3.1 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.3.1) (17 May 2020)
 - v1.2 [Changelog](https://github.com/readme55/Dash-Chrome-Wallet/releases/tag/DashChromeWallet-v1.2) (9 April 2020)
