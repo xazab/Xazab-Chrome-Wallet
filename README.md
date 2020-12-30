@@ -48,12 +48,12 @@ and extract directory on disk
 ## Usage:
 - Click the Dash Extension button in the top right corner and click "Create Wallet"
 - Follow Tutorials from the [Dash Development Portal](https://dashplatform.readme.io/docs/tutorial-create-and-fund-a-wallet)
-- Use the [Faucet](http://faucet.evonet.networks.dash.org/) to receive Testnet-Coins and [Explorer](http://insight.evonet.networks.dash.org:3001/insight/) to check balance if needed
+- Use the [Faucet](http://testnet-452625393.us-west-2.elb.amazonaws.com/) to receive Testnet-Coins and [Explorer](http://testnet-452625393.us-west-2.elb.amazonaws.com:3001/insight/) to check balance if needed
 
 ## Push Notifications
 - Create Mnemonic, Identity and Username.
 - Activate "Push Notifications" switch
-- Visit [Sample Browser Dapps](http://readme-dapps.dashdevs.org), Sign-in with the registered Dash-Username. 
+- Visit [Sample Browser Dapps](http://readme.dashdevs.org/sample-dapps/), Sign-in with the registered Dash-Username. 
 - Chrome Wallet will show Notification + Confirmation Dialog for the request. Confirm the dialog to get logged in. 
 - Now start the Dapp and submit some data. You will receive a Confirmation dialog inside Chrome Wallet for each submission.
 
