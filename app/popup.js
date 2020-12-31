@@ -346,10 +346,10 @@ document.addEventListener('DOMContentLoaded', async function () {
       contractIdText.value = '9PiTpFPE4BC9Ugo2etsD2UDntv37qgHWoj67oW8fWhP6';
       toAddressText.value = "";
     }
-    if (exampleQuerySelector.value == "Example NFA") {
+    if (exampleQuerySelector.value == "Minecraft NFT") {
       documentNameText.value = 'mynfa';
       queryObjectText.value = '{ "startAt": 1 }';
-      contractIdText.value = 'Faggf8rA3GuoEoSo8ACaqtY72iok6DY5D77dr2B7vFw1';
+      contractIdText.value = '75LFKcpnX6mnz1ToWTnKrtZqTdYWyExUfixPmc4DvR6a';
       toAddressText.value = "";
     }
     if (exampleQuerySelector.value == "Example myToken") {
@@ -422,17 +422,21 @@ document.addEventListener('DOMContentLoaded', async function () {
       addressText.value = wls.getItem('address');
       balanceText.value = wls.getItem('balance');
       identityIdText.value = wls.getItem('identityId');
+      nameText.value = wls.getItem('name');
 
       showLoading('spinnerImportMnemonic', false);
       mnemonicBtn.disabled = false;
       if (addressText.value != '') createBtn.disabled = true;
       if (identityIdText.value != '') identityIdBtn.disabled = true;
       if (identityIdText.value == '') identityIdBtn.disabled = false;
+
       if (balanceText.value != '0') sendFundsBtn.disabled = false;
       if (identityIdText.value != '') {
         nameBtn.disabled = false;
         nameText.readOnly = false;
       }
+      
+      if (nameText.value != '') nameBtn.disabled = true;
     });
 
   }, false);
