@@ -151,6 +151,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   if (wls.getItem('connected') == 'false') {
     showLoading('spinnerTestConnection', true);
+    createBtn.disabled = true;
   }
   
 
@@ -471,17 +472,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 // use this for the case of updating popup while its open (special case for extension)
 // use localStorage to give instructions for initial popup state!!
 chrome.runtime.onMessage.addListener(
-  function (request, sender, sendResponse) {
+  async function (request, sender, sendResponse) {
     if (request.msg === "refresh balance") {
       balanceText.value = wls.getItem('balance')
-      //  To do something
-      chrome.extension.getBackgroundPage().console.log("popup listener");
+      chrome.extension.getBackgroundPage().console.log("popup: received refresh balance");
       // console.log(request.data.subject)
       // console.log(request.data.content)
       // sendResponse({ complete: true });  // send response if necessary
     }
     else if (request.msg === "stop CreateSpinner") {
-      showLoading('spinnerTestConnection', false);    
+      showLoading('spinnerTestConnection', false);
+      createBtn.disabled = false;
+    } else if (request.msg === "open dappDialog") {
+      await chrome.extension.getBackgroundPage().dappSigningDialog(); // open dapp dialog when "open tab mode" or NWJS instance
     }
   }
 );

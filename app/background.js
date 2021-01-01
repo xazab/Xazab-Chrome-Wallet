@@ -32,9 +32,8 @@ var curDappRequests = [];
 
 var uidpin_verified = false;
 
-// set to true when notification comes in and show dappSigningDialog when popup opens next time
-var dsNotif = false;
 var dsHeader = '';
+var dappDialogActive = false;
 
 var wls = window.localStorage;
 
@@ -767,18 +766,18 @@ async function polling() {
 
             // OS Request-DappSigning Notification
             console.log("Creating Notification")
-            chrome.notifications.create({
+            chrome.notifications.create("Dash-Notification", {
               type: "basic",
               iconUrl: chrome.extension.getURL("img/icon128.png"),
               title: "Request",
-              message: "Received message with your Identity ID. Confirm Request?",
-              requireInteraction: true  // TODO: test if works with https, currently no difference
+              message: "Received Dapp Message. Confirm Request?",
+              // requireInteraction: true  // TODO: test if works with https, currently no difference
             });
 
             // sleep until notification is checked
-            dsNotif = true;
             wls.setItem('notification', true)
-            while (dsNotif == true) {
+
+            while (wls.getItem('notification') == 'true') {
               await new Promise(r => setTimeout(r, 5000));
             }
           }
@@ -915,18 +914,24 @@ async function polling2() {
 
             // OS Request-DappSigning Notification
             console.log("Creating Notification")
-            chrome.notifications.create({
+            chrome.notifications.create("Dash-Notification", {
               type: "basic",
               iconUrl: chrome.extension.getURL("img/icon128.png"),
               title: "Request",
-              message: "Received message with your IdentityDocId. Confirm Request?",
+              message: "Received Dapp Message. Confirm Request?",
               // requireInteraction: true
             });
 
-            // sleep until notification is checked
-            dsNotif = true;
             wls.setItem('notification', true)
-            while (dsNotif == true) {
+
+            chrome.runtime.sendMessage({
+              msg: "open dappDialog"
+            });
+
+            // TODO: need to catch case where window is closed and confirm or deny is not submitted, for now do nothing
+            // also check https://stackoverflow.com/questions/15561723/final-window-close-event-listener-in-chrome-browser
+            // sleep until notification is checked
+            while (wls.getItem('notification') == 'true') {
               await new Promise(r => setTimeout(r, 5000));
             }
           }
@@ -949,9 +954,6 @@ async function polling2() {
   return;
 }
 
-
-
-
 async function setDappResponse(decision) {
   console.log(decision);
   if (decision == "confirm" && curSwitch == true) {
@@ -968,8 +970,9 @@ async function setDappResponse(decision) {
     else if (dsHeader == 'Request Transaction TX')
       await submitSimpleDappTransaction(messageAddrTx[0], messageAmountTx[0]);
   }
-  dsNotif = false;
   wls.setItem('notification', false)
+  chrome.notifications.clear("Dash-Notification");
+  dappDialogActive = false;
 };
 
 function getDappRequests() {
@@ -978,16 +981,22 @@ function getDappRequests() {
 }
 
 function dappSigningDialog() {
-  console.log("dappSigningDialog created")
-  chrome.windows.create({
-    url: chrome.extension.getURL('dialog.html'),
-    type: 'popup',
-    // focused: true, // not supported by firefox, will throw error and not work
-    top: 300,
-    left: 300,
-    width: 710,
-    height: 340
-  });
+  console.log("dappSigningDialog called")
+  if (!dappDialogActive) {
+    chrome.windows.create({
+      url: chrome.extension.getURL('dialog.html'),
+      type: 'popup',
+      // focused: true, // not supported by firefox, will throw error and break program
+      top: 300,
+      left: 300,
+      width: 710,
+      height: 340
+    });
+    console.log("dapp signing dialog created")
+    dappDialogActive = true;
+  }
+  
+  return true;
 }
 
 async function getDocID() {
