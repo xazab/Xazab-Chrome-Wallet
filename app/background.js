@@ -14,7 +14,6 @@ var platform = null;
 var curApps = '';
 var psdkApps = '';
 var tmpIdentity = {};  //check remove
-var isConnected = false;
 
 var curIdentityHDPrivKey = {};
 var curIdentityPrivKey = '';
@@ -138,10 +137,13 @@ async function connect() {
   sdkOpts.wallet.mnemonic = curMnemonic;
   sdkOpts.apps = curApps;
   console.log("SDK Init \nMnemonic: " + curMnemonic + " \ncurApps: " + curApps)
+  
   try {
+    // start testConnection-spinner to show its loading TODO use other bigger spinner and deactivate all input
     sdk = new Dash.Client(sdkOpts);
     account = await sdk.getWalletAccount();
-    isConnected = true;
+    wls.setItem('connected', true)
+
     // await account.isReady();
     // register TX listener
     account.on('FETCHED/CONFIRMED_TRANSACTION', async (data) => {
@@ -151,6 +153,7 @@ async function connect() {
       curBalance = await account.getTotalBalance() / 100000000;
       wls.setItem('balance', curBalance);
 
+      // send message to popup
       chrome.runtime.sendMessage({
         msg: "refresh balance",
         data: {
@@ -166,6 +169,11 @@ async function connect() {
 
   } catch (e) {
     console.log('error connecting sdk', e);
+  } finally {
+    // needed if popup stil open or nwjs instance
+    chrome.runtime.sendMessage({
+      msg: "stop CreateSpinner"
+    });
   }
   console.log("FIN SDK Init")
   return true;
@@ -176,7 +184,7 @@ async function disconnect() {
   try {
     await sdk.disconnect();
     account = null;
-    isConnected = false;
+    wls.setItem('connected', false)
 
   } catch (e) {
     console.log('error disconnecting sdk', e);
@@ -279,6 +287,7 @@ chrome.runtime.onInstalled.addListener(async function () {
     wls.setItem('pin', curPin)
     wls.setItem('switch2', false)
     wls.setItem('notification', false)
+    wls.setItem('connected', false)
   } else {
     console.log("Cookies detected.")
   }
@@ -331,6 +340,7 @@ curName = wls.getItem('name')
 wls.setItem('switch2', false)
 wls.setItem('pin', curPin)
 wls.setItem('notification', false)
+wls.setItem('connected', false)
 
 
 // chrome.storage.local.set({ switch: false });
@@ -1085,8 +1095,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case "connect":
       (async function connectTest() {
         console.log('connect with ' + curMnemonic);
-        connect();
-        sendResponse({ complete: true })
+        if (wls.getItem('connected') == 'true')
+          sendResponse({ complete: true })
+        else 
+          sendResponse({ complete: false })
         // var alertWindow = 'alert("message")';
         // chrome.tabs.executeScript({ code: alertWindow });
       })()
@@ -1189,6 +1201,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         curMnemonic = request.mnemonic;
         console.log(curMnemonic);
+
         await disconnect();
         await connect();
 

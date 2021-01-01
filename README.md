@@ -30,6 +30,11 @@ and extract directory on disk
 - Activate "Developer Mode" in the top right corner
 - Click "Load Unpacked" in top left corner and choose extracted directory
 
+## Debug
+In case of any problems or errors open the Debug Console:
+- type "chrome://extensions" into addressline or open `Three Dots(Menu) -> More Tools -> Extensions`
+- Click on "background page" below the "Dash Chrome Wallet" title
+
 ## Uninstall (for Option 1)
 - type "chrome://extensions" into addressline or open `Three Dots(Menu) -> More Tools -> Extensions`
 - Hit "Remove" below the Chrome Wallet extension description

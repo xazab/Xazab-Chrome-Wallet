@@ -148,6 +148,10 @@ document.addEventListener('DOMContentLoaded', async function () {
   if (wls.getItem('notification') == 'true') {
     await chrome.extension.getBackgroundPage().dappSigningDialog();
   }
+
+  if (wls.getItem('connected') == 'false') {
+    showLoading('spinnerTestConnection', true);
+  }
   
 
   //switch
@@ -161,13 +165,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   //switch2
   simpleSwitch.addEventListener('change', function () {
-    if (chrome.extension.getBackgroundPage().curName == '') {
+    if (wls.getItem('name') == '') {
       window.alert("Please create a Username first! Aborting.")
       simpleSwitch.checked = false;
       return false;
     }
-    if (chrome.extension.getBackgroundPage().isConnected == false) {
-      window.alert("Please wait until your Account is initialized")
+    if (wls.getItem('connected') == 'false') {
+      window.alert("Please wait until your Account is initialized.")
       simpleSwitch.checked = false;
       return false;
     }
@@ -181,11 +185,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     showLoading('spinnerTestConnection', true);
     chrome.runtime.sendMessage({ greeting: "connect" }, function (response) {
       //check return response then send alert
-      chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
+      // chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
       connectBtn.disabled = false;
-      showLoading('spinnerTestConnection', false);
+
       // TODO firefox: will autohide popup.html -> set autohide to false like chrome default
-      window.alert("connected");
+      if (response.complete) {
+        window.alert("Connection Success");
+        showLoading('spinnerTestConnection', false);
+      }
+      else {
+        window.alert("Not Connected - The spinner will stop once the wallet is connected!");
+      }
       // window.close();
     });
   }, false);
@@ -202,7 +212,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       window.close();
     });
   }, false);
-
 
   //create wallet
   createBtn.addEventListener('click', function () {
@@ -375,12 +384,16 @@ document.addEventListener('DOMContentLoaded', async function () {
       // await getLocalStorage(['identityId']).then((cookies) => {
       //   identityIdText.value = cookies.identityId;
       // });
+      if (response.complete) {
+        identityIdText.value = wls.getItem('identityId')
 
-      identityIdText.value = wls.getItem('identityId')
-
-      if (identityIdText.value != '') {
-        nameBtn.disabled = false;
-        nameText.readOnly = false;
+        if (identityIdText.value != '') {
+          nameBtn.disabled = false;
+          nameText.readOnly = false;
+        }
+      } else {
+        window.alert("Error occured: Please try again or Reset the wallet!");
+        identityIdBtn.disabled = false;
       }
       showLoading('spinnerCreateIdentity', false);
     });
@@ -397,10 +410,14 @@ document.addEventListener('DOMContentLoaded', async function () {
       // await getLocalStorage(['name']).then((cookies) => {
       //   nameText.value = cookies.name;
       // });
-
-      nameText.value = wls.getItem('name')
-
-      nameText.readOnly = true;
+      if (response.complete) {  // check if register successful
+        nameText.value = wls.getItem('name')
+        nameText.readOnly = true;
+      } else {  // else register not successful
+        window.alert("Error occured: Perhaps the username is already registered or has an invalid format. Please retry with a different username.");
+        nameBtn.disabled = false; 
+      }
+      
       showLoading('spinnerRegisterName', false);
     });
 
@@ -409,6 +426,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // import Mnemonic
   mnemonicBtn.addEventListener('click', function () {
+
+    if (mnemonicText.value == '') {
+      window.alert("Please insert a Mnemonic first.")
+      return;
+    }
+
     mnemonicBtn.disabled = true;
     showLoading('spinnerImportMnemonic', true);
     chrome.runtime.sendMessage({ greeting: "importMnemonic", mnemonic: mnemonicText.value }, async function (response) {
@@ -444,6 +467,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 }, false); // on DOMContentLoaded
 
 
+// For direct messages from popup to background process
+// use this for the case of updating popup while its open (special case for extension)
+// use localStorage to give instructions for initial popup state!!
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.msg === "refresh balance") {
@@ -452,6 +478,10 @@ chrome.runtime.onMessage.addListener(
       chrome.extension.getBackgroundPage().console.log("popup listener");
       // console.log(request.data.subject)
       // console.log(request.data.content)
+      // sendResponse({ complete: true });  // send response if necessary
+    }
+    else if (request.msg === "stop CreateSpinner") {
+      showLoading('spinnerTestConnection', false);    
     }
   }
 );
