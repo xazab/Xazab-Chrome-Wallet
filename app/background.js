@@ -154,10 +154,7 @@ async function connect() {
 
       // send message to popup
       chrome.runtime.sendMessage({
-        msg: "refresh balance",
-        data: {
-          greeting: "popup refresh balance command",
-        }
+        msg: "refresh balance"
       });
     });
     // var handler = function () {
@@ -171,7 +168,7 @@ async function connect() {
   } finally {
     // needed if popup stil open or nwjs instance
     chrome.runtime.sendMessage({
-      msg: "stop CreateSpinner"
+      msg: "stop ConnectionSpinner"
     });
   }
   console.log("FIN SDK Init")
@@ -543,11 +540,11 @@ async function submitSimpleDappDocument(contractid, docName, docContent) {
     console.log(tidentity)
     console.log(noteDocument)
     await sdk.platform.documents.broadcast(documentBatch, tidentity);
+    console.log("submitted " + docName + " document with content: " + docContent + " to contract " + contractid)
   } catch (e) {
     console.error('Something went wrong:', e);
   } finally {
     // docSdk.disconnect()
-    console.log("submitted " + docName + " document with content: " + docContent + " to contract " + contractid)
   }
   return true;
 }
@@ -588,13 +585,17 @@ async function submitSimpleDappContractCreation(contractSchema) {
       console.error(validationResult) // An array of detailed validation errors
       throw validationResult.errors[0];
     }
+    // console.log("success created contract with id " + contract.id.toString() + " and schema: " + contractSchema )
+    console.log("success created contract with id " + contract.id.toString() )
+    chrome.runtime.sendMessage({
+      msg: "show contract",
+      contractId: contract.id.toString()
+    });
 
   } catch (e) {
     console.error('Something went wrong:', e);
   } finally {
     // docSdk.disconnect()
-    // console.log("success created contract with id " + contract.id.toString() + " and schema: " + contractSchema )
-    console.log("success created contract")
   }
   return true;
 
@@ -866,7 +867,7 @@ async function polling2() {
           var requestMsg = pollDoc[index].data;  // get document data , TODO: change to pRequestProp
           if (requestMsg.reference == null) {
             console.log("reference is null");
-            return;
+            continue;
           }
 
           // if (requestMsg.reference.startsWith(pRequestTarget)) {  // check for Target docID
@@ -980,13 +981,14 @@ function getDappRequests() {
   return curDappRequests;
 }
 
-function dappSigningDialog() {
+async function dappSigningDialog() {
   console.log("dappSigningDialog called")
   if (!dappDialogActive) {
     chrome.windows.create({
       url: chrome.extension.getURL('dialog.html'),
       type: 'popup',
-      // focused: true, // not supported by firefox, will throw error and break program
+      // state: 'normal',
+      // focused: true, // not supported by firefox, will throw error and break program (update: might be supported now)
       top: 300,
       left: 300,
       width: 710,
@@ -996,7 +998,7 @@ function dappSigningDialog() {
     dappDialogActive = true;
   }
   
-  return true;
+  // return true;
 }
 
 async function getDocID() {

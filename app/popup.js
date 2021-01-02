@@ -434,6 +434,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     mnemonicBtn.disabled = true;
+    createBtn.disabled = true;
     showLoading('spinnerImportMnemonic', true);
     chrome.runtime.sendMessage({ greeting: "importMnemonic", mnemonic: mnemonicText.value }, async function (response) {
       chrome.extension.getBackgroundPage().console.log("Response background: " + response.complete);
@@ -442,12 +443,14 @@ document.addEventListener('DOMContentLoaded', async function () {
       //   balanceText.value = cookies.balance;
       //   identityIdText.value = cookies.identityId;
       // });
-
-      addressText.value = wls.getItem('address');
-      balanceText.value = wls.getItem('balance');
-      identityIdText.value = wls.getItem('identityId');
-      nameText.value = wls.getItem('name');
-
+      if (response.complete) {
+        addressText.value = wls.getItem('address');
+        balanceText.value = wls.getItem('balance');
+        identityIdText.value = wls.getItem('identityId');
+        nameText.value = wls.getItem('name');
+      } else {
+        createBtn.disabled = false;
+      }
       showLoading('spinnerImportMnemonic', false);
       mnemonicBtn.disabled = false;
       if (addressText.value != '') createBtn.disabled = true;
@@ -476,8 +479,6 @@ chrome.runtime.onMessage.addListener(
     if (request.msg === "refresh balance") {
       balanceText.value = wls.getItem('balance')
       chrome.extension.getBackgroundPage().console.log("popup: received refresh balance");
-      // console.log(request.data.subject)
-      // console.log(request.data.content)
       // sendResponse({ complete: true });  // send response if necessary
     }
     else if (request.msg === "stop CreateSpinner") {
@@ -485,6 +486,11 @@ chrome.runtime.onMessage.addListener(
       createBtn.disabled = false;
     } else if (request.msg === "open dappDialog") {
       await chrome.extension.getBackgroundPage().dappSigningDialog(); // open dapp dialog when "open tab mode" or NWJS instance
+    } else if (request.msg === "show contract") {
+      exampleQuerySelector.value = "";
+      documentNameText.value = "token"
+      queryObjectText.value = '{ "startAt": 1 }';
+      contractIdText.value = request.contractId;
     }
   }
 );
