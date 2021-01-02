@@ -481,7 +481,7 @@ chrome.runtime.onMessage.addListener(
       chrome.extension.getBackgroundPage().console.log("popup: received refresh balance");
       // sendResponse({ complete: true });  // send response if necessary
     }
-    else if (request.msg === "stop CreateSpinner") {
+    else if (request.msg === "stop ConnectionSpinner") {
       showLoading('spinnerTestConnection', false);
       createBtn.disabled = false;
     } else if (request.msg === "open dappDialog") {
